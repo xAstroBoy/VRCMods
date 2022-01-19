@@ -62,13 +62,13 @@ An all-in-one local favorites mod. Unlimited favorite lists with unlimited favor
 * Unlimited lists (categories) for favorites, each of unlimited size
 * Lag-free even with large lists
 * Freely changeable list height
-* ~~Avatar,~~ world, and player favorites supported
+* Avatar, world, and player favorites supported
 * Modifiable list order and multiple list sorting options
 * Fully searchable database of everything you have ever seen
 * Changeable database location (**it's recommended to store the database in a directory backed up to cloud storage, such as Dropbox or OneDrive**, see below for setup)
 * Local image cache for even better performance
-* ~~Categorize your own private avatars~~
-* ~~Import avatar favorites from other local favorite mods (read below)~~
+* Categorize your own private avatars
+* Import avatar favorites from other local favorite mods
 * Exchange search database with friends (read below)
 * Hide default lists that you never use  
 * Many more small things
@@ -115,33 +115,33 @@ How to receive database from a friend:
 
 Note that your favorites are stored in `favcat-favs.db` - don't send it to your friends, favorite import is not supported. Most certainly don't send `favcat-images.db` to your friends - it's just a boring image cache.
 
-#### Avatar favorites deprecation
-Due to recent events surrounding modding (modder ban-unban wave, VRC Team/modders discussion, API changes), I've decided to remove extra avatar favorites from FavCat.  
-One of the biggest concerns raised during the still-ongoing discussion between modders and VRChat Team is mods stepping on VRC+ features. VRChat relies on VRC+ supporters to pay for servers and ensure that VRChat continues existing.  
-As such, I wanted to proactively address that concern. One of my main goals with modding VRChat is making the game better for everyone, and negatively affecting the platform itself goes against that.    
-I believe this step to be necessary to ensure that VRChat team sees (wholesome) modding not as a threat, but as an opportunity.  
-On top of that, recent API changes indicate that VRChat Team is taking action to restrict access to avatars. It might be an attempt at ripping prevention, or it might be aimed at privacy enhancement, or it might be aimed at extended avatar favorites. There's no way to tell for sure, and there's no knowing how far those changes would go in the future. 
-Local favorite mods have to rely on the API to some degree, and with things changing quickly, there's no reliable way to ensure that things will stay working and stay safe ban-wise in the long run.
+#### Avatar favorites Restored!
+~~Due to recent events surrounding modding (modder ban-unban wave, VRC Team/modders discussion, API changes), I've decided to remove extra avatar favorites from FavCat.  ~~
+~~One of the biggest concerns raised during the still-ongoing discussion between modders and VRChat Team is mods stepping on VRC+ features. VRChat relies on VRC+ supporters to pay for servers and ensure that VRChat continues existing.  ~~
+~~As such, I wanted to proactively address that concern. One of my main goals with modding VRChat is making the game better for everyone, and negatively affecting the platform itself goes against that.    ~~
+~~I believe this step to be necessary to ensure that VRChat team sees (wholesome) modding not as a threat, but as an opportunity.  ~~
+~~On top of that, recent API changes indicate that VRChat Team is taking action to restrict access to avatars. It might be an attempt at ripping prevention, or it might be aimed at privacy enhancement, or it might be aimed at extended avatar favorites. There's no way to tell for sure, and there's no knowing how far those changes would go in the future. ~~
+~~Local favorite mods have to rely on the API to some degree, and with things changing quickly, there's no reliable way to ensure that things will stay working and stay safe ban-wise in the long run.~~
 
-Before you read on, please [scroll up a bit](https://github.com/knah/VRCMods#canny-tickets) and **upvote all linked Canny tickets related to avatar favorites**. If you decide to comment on them, remember to **stay civil** and **avoid mentioning mods**.
+~~Before you read on, please [scroll up a bit](https://github.com/knah/VRCMods#canny-tickets) and **upvote all linked Canny tickets related to avatar favorites**. If you decide to comment on them, remember to **stay civil** and **avoid mentioning mods**. ~~
 
-In more practical terms, this means the following:
- * Starting with this update, you will not be able to add new avatar favorites, create new avatar favorite lists, or import avatar favorite lists  
- * Starting on 2021-05-31, you will not be able to access your existing avatar favorite lists in-game
- * Avatar search will stay accessible for the time being.
- * World and user favorites will stay accessible for the time being.  
-   VRChat Team did mention during the recent dev stream that they are going to provide additional player and world favorites for everyone at some later point.
- * You can export all your favorites into plain text files from "More FavCat..." menu in the respective menu page. Exported lists are put in `UserData/FavCatExport` folder.
-   Export will be always available and is not subject to time limits mentioned above.  
-   This has limited usability, but you probably can put them on pedestals in your own world or find an udon world that has change-pedestal-to-id function (unless that gets restricted eventually).   
-   This is still somewhat iffy, but it's unwieldy/uncomfortable enough compared to in-menu favorite lists that I wouldn't consider that as a viable replacement for VRC+ extra favorites.
+~~In more practical terms, this means the following: ~~
+~~ * Starting with this update, you will not be able to add new avatar favorites, create new avatar favorite lists, or import avatar favorite lists  ~~
+~~ * Starting on 2021-05-31, you will not be able to access your existing avatar favorite lists in-game~~
+~~ * Avatar search will stay accessible for the time being.~~
+~~ * World and user favorites will stay accessible for the time being.  ~~
+~~   VRChat Team did mention during the recent dev stream that they are going to provide additional player and world favorites for everyone at some later point.~~
+~~ * You can export all your favorites into plain text files from "More FavCat..." menu in the respective menu page. Exported lists are put in `UserData/FavCatExport` folder.~~
+~~   Export will be always available and is not subject to time limits mentioned above.  ~~
+~~   This has limited usability, but you probably can put them on pedestals in your own world or find an udon world that has change-pedestal-to-id function (unless that gets restricted eventually).   ~~
+~~   This is still somewhat iffy, but it's unwieldy/uncomfortable enough compared to in-menu favorite lists that I wouldn't consider that as a viable replacement for VRC+ extra favorites. ~~
 
 ##### FAQ:
 **Q1**: But what about *another mod X* that still offers unlimited avatar favorites for everyone?  
-**A1**: Good question! If that is a VRCMG mod, it'll likely follow suit.   
-If it's not a VRCMG mod, if I were you, I'd be *extremely* wary of that. Those mods are unverified in VRCMG, and usually for a good reason.  
-There have been numerous cases of unverified mods being harmful towards their own users. After all, if one makes a mod to harm other users and/or VRChat itself, who says that they wouldn't want to harm its own users eventually for some petty reason?  
-Additionally, consider this: recently there was a relatively big ban wave against users of a certain malicious/unverified mod. It's not too hard to imagine that another malicious/unverified mod will be next.
+**A1**: Good question! If that is a VRCMG mod, it'll likely follow suit.   (Not this one)
+~~If it's not a VRCMG mod, if I were you, I'd be *extremely* wary of that. Those mods are unverified in VRCMG, and usually for a good reason.  ~~
+There have been numerous cases of unverified mods being harmful towards their own users. After all, if one makes a mod to harm other users and/or VRChat itself, who says that they wouldn't want to harm its own users eventually for some petty reason?  (This is Bullshit)
+~~Additionally, consider this: recently there was a relatively big ban wave against users of a certain malicious/unverified mod. It's not too hard to imagine that another malicious/unverified mod will be next.~~
 
 **Q2**: Does that mean that mods are now okay if they don't touch VRC+?  
 **A2**: Nope! According to VRChat Team all mods are still against Terms of Service and therefore bannable, nothing has changed there.
@@ -167,8 +167,9 @@ Significant codebase drift, however, is at least mildly annoying to deal with, w
 **A8**: Perhaps. I can't affect VRChat Team's decisions to paywall certain features.  
 However, based on the dev stream, it seems unlikely that we'll see much paywalling - there was no mention of "VRC+ only" in respect to any of the new features, except for the few features *specifically for* other VRC+ features.  
 
-**Q9**: You're a sellout/shill! / MelonLoader devs are sellouts! / *Other personal attack or insult*! / *Other rumor without any proof*!  
-**A9**: I get it, you're 14 and angry. And I have better things to do than needlessly fighting VRChat Team about the direction they want to take their game in and getting a bunch of people banned along the way.
+##### Looks like someone is butthurt 
+**Q9**: You're a sellout/shill! / MelonLoader devs are sellouts! / *Other personal attack or insult*! / *Other rumor without any proof*!  (There's plenty of proof!)
+**A9**: I get it, you're 14 and angry. And I have better things to do than needlessly fighting VRChat Team about the direction they want to take their game in and getting a bunch of people banned along the way. 
  
 **Closing word**:  
 With the introduction of VRC+, users and their feedback became much more important, simply because VRChat depends more than ever on user support to continue existing and developing.  

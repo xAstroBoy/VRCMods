@@ -5,6 +5,7 @@
         <TargetFramework Condition="'$(OS)' != 'Unix'">net472</TargetFramework>
         <TargetFrameworks Condition="'$(OS)' == 'Unix'">net6.0;net472</TargetFrameworks>
         <NoModReferences>true</NoModReferences>
+        <TargetFramework>net48</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>

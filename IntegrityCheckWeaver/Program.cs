@@ -30,34 +30,34 @@ namespace IntegrityCheckWeaver
                 return 1;
             }
 
-            var dummyOneResource = DummyThree.ProduceDummyThree();
-            var dummyOneName = Utils.CompletelyRandomString() + ".dll";
-            assembly.MainModule.Resources.Add(new EmbeddedResource(dummyOneName, ManifestResourceAttributes.Private, dummyOneResource));
+            //var dummyOneResource = DummyThree.ProduceDummyThree();
+            //var dummyOneName = Utils.CompletelyRandomString() + ".dll";
+            //assembly.MainModule.Resources.Add(new EmbeddedResource(dummyOneName, ManifestResourceAttributes.Private, dummyOneResource));
 
-            var dummyThreeResource = DummyThree.ProduceDummyThree();
-            var dummyThreeName = Utils.CompletelyRandomString() + ".dll";
-            assembly.MainModule.Resources.Add(new EmbeddedResource(dummyThreeName, ManifestResourceAttributes.Private, dummyThreeResource));
+            //var dummyThreeResource = DummyThree.ProduceDummyThree();
+            //var dummyThreeName = Utils.CompletelyRandomString() + ".dll";
+            //assembly.MainModule.Resources.Add(new EmbeddedResource(dummyThreeName, ManifestResourceAttributes.Private, dummyThreeResource));
 
-            var dummyTwoName = Utils.CompletelyRandomString() + ".dll";
+            //var dummyTwoName = Utils.CompletelyRandomString() + ".dll";
 
-            assembly.MainModule.Resources.Remove(assembly.MainModule.Resources.Single(it => it.Name.EndsWith("_dummy_.dll"))); // is replaced
-            assembly.MainModule.Resources.Single(it => it.Name.EndsWith("_dummy2_.dll")).Name = dummyTwoName;
-            
-            var methodRenameMap = CleanMethods(modType);
+            //assembly.MainModule.Resources.Remove(assembly.MainModule.Resources.Single(it => it.Name.EndsWith("_dummy_.dll"))); // is replaced
+            //assembly.MainModule.Resources.Single(it => it.Name.EndsWith("_dummy2_.dll")).Name = dummyTwoName;
 
-            foreach (var method in modType.Methods)
-            foreach (var instr in method.Body.Instructions)
-                if (instr.OpCode == OpCodes.Ldstr)
-                {
-                    var value = (string)instr.Operand;
-                    instr.Operand = value switch
-                    {
-                        "_dummy_.dll" => dummyOneName,
-                        "_dummy2_.dll" => dummyTwoName,
-                        "_dummy3_.dll" => dummyThreeName,
-                        _ => methodRenameMap.TryGetValue(value, out var renamed) ? renamed : value
-                    };
-                }
+            //var methodRenameMap = CleanMethods(modType);
+
+            //foreach (var method in modType.Methods)
+            //    foreach (var instr in method.Body.Instructions)
+            //        if (instr.OpCode == OpCodes.Ldstr)
+            //        {
+            //            var value = (string)instr.Operand;
+            //            instr.Operand = value switch
+            //            {
+            //                "_dummy_.dll" => dummyOneName,
+            //                "_dummy2_.dll" => dummyTwoName,
+            //                "_dummy3_.dll" => dummyThreeName,
+            //                _ => methodRenameMap.TryGetValue(value, out var renamed) ? renamed : value
+            //            };
+            //        }
 
             assembly.Write();
 
@@ -91,11 +91,11 @@ namespace IntegrityCheckWeaver
                     method.Name = newName;
                 }
 
-            foreach (var property in type.Properties) 
+            foreach (var property in type.Properties)
                 if (ourNamesToRename.Contains(property.Name))
                     property.Name = Utils.CompletelyRandomString();
 
-            foreach (var field in type.Fields) 
+            foreach (var field in type.Fields)
                 if (ourNamesToRename.Contains(field.Name))
                     field.Name = Utils.CompletelyRandomString();
 
