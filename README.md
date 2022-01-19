@@ -3,8 +3,8 @@
 #### For Knah, You should Reconsider "Malicious" , Most of the Unofficial VRCMG Mods are the Best Ones so far, You think any creator content should Upload the mod on github and keep it opensource?. That's your definition of Malicious.
 #### VRChat modders Unite! let's open a new Discord and compete against VRCMG Official Modding Group (IN reality that discord is highly toxic)! 
 
-
-This repository contains Knah's Mods for VRChat. Join the [VRChat Modding Group discord](https://discord.gg/rCqKSvR) for support and more mods!  [ TOXIC! ]
+#### VRCMG Discord is Toxic ! Avoid joining there!
+This repository contains Knah's Mods for VRChat. Join the [VRChat Modding Group discord](https://discord.gg/rCqKSvR) for support and more mods!  
 Looking for more (universal) mods? [Check out my universal mods repository!](https://github.com/knah/ML-UniversalMods)
 
 # **Don't want to install mods manually? [Check out the VRCMelonAssistant, an automatic mod installer!](https://github.com/knah/VRCMelonAssistant)**
