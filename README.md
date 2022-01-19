@@ -126,15 +126,15 @@ Note that your favorites are stored in `favcat-favs.db` - don't send it to your 
 ~~Before you read on, please [scroll up a bit](https://github.com/knah/VRCMods#canny-tickets) and **upvote all linked Canny tickets related to avatar favorites**. If you decide to comment on them, remember to **stay civil** and **avoid mentioning mods**. ~~
 
 ~~In more practical terms, this means the following: ~~
-~~ * Starting with this update, you will not be able to add new avatar favorites, create new avatar favorite lists, or import avatar favorite lists  ~~
-~~ * Starting on 2021-05-31, you will not be able to access your existing avatar favorite lists in-game~~
-~~ * Avatar search will stay accessible for the time being.~~
-~~ * World and user favorites will stay accessible for the time being.  ~~
-~~   VRChat Team did mention during the recent dev stream that they are going to provide additional player and world favorites for everyone at some later point.~~
-~~ * You can export all your favorites into plain text files from "More FavCat..." menu in the respective menu page. Exported lists are put in `UserData/FavCatExport` folder.~~
-~~   Export will be always available and is not subject to time limits mentioned above.  ~~
-~~   This has limited usability, but you probably can put them on pedestals in your own world or find an udon world that has change-pedestal-to-id function (unless that gets restricted eventually).   ~~
-~~   This is still somewhat iffy, but it's unwieldy/uncomfortable enough compared to in-menu favorite lists that I wouldn't consider that as a viable replacement for VRC+ extra favorites. ~~
+~~Starting with this update, you will not be able to add new avatar favorites, create new avatar favorite lists, or import avatar favorite lists~~
+~~Starting on 2021-05-31, you will not be able to access your existing avatar favorite lists in-game~~
+~~Avatar search will stay accessible for the time being.~~
+~~World and user favorites will stay accessible for the time being.~~
+~~VRChat Team did mention during the recent dev stream that they are going to provide additional player and world favorites for everyone at some later point.~~
+~~You can export all your favorites into plain text files from "More FavCat..." menu in the respective menu page. Exported lists are put in `UserData/FavCatExport` folder.~~
+~~Export will be always available and is not subject to time limits mentioned above.~~
+~~This has limited usability, but you probably can put them on pedestals in your own world or find an udon world that has change-pedestal-to-id function (unless that gets restricted eventually). ~~
+~~This is still somewhat iffy, but it's unwieldy/uncomfortable enough compared to in-menu favorite lists that I wouldn't consider that as a viable replacement for VRC+ extra favorites. ~~
 
 ##### FAQ:
 **Q1**: But what about *another mod X* that still offers unlimited avatar favorites for everyone?  
