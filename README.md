@@ -1,3 +1,9 @@
+#### This is a Clone of VRCMODS From Knah's repo to show KNAH that we are Tired of his malicious behaviour
+#### his Copy of VRCMods Is forked from his repo and has his Integrity Check system disarmed and removed, all of his mods will compile without his integrity checks.
+#### For Knah, You should Reconsider "Malicious" , Most of the Unofficial VRCMG Mods are the Best Ones so far, You think any creator content should Upload the mod on github and keep it opensource?. That's your definition of Malicious.
+#### VRChat modders Unite! let's open a new Discord and compete against VRCMG Official Modding Group (IN reality that discord is highly toxic)! 
+
+
 This repository contains my mods for VRChat. Join the [VRChat Modding Group discord](https://discord.gg/rCqKSvR) for support and more mods!  
 Looking for more (universal) mods? [Check out my universal mods repository!](https://github.com/knah/ML-UniversalMods)
 
@@ -139,9 +145,11 @@ This is still somewhat iffy, but it's unwieldy/uncomfortable enough compared to 
 ##### FAQ:
 **Q1**: But what about *another mod X* that still offers unlimited avatar favorites for everyone?  
 **A1**: Good question! If that is a VRCMG mod, it'll likely follow suit.   (Not this one)
-~~If it's not a VRCMG mod, if I were you, I'd be *extremely* wary of that. Those mods are unverified in VRCMG, and usually for a good reason.  ~~
-There have been numerous cases of unverified mods being harmful towards their own users. After all, if one makes a mod to harm other users and/or VRChat itself, who says that they wouldn't want to harm its own users eventually for some petty reason?  (This is Bullshit)
-~~Additionally, consider this: recently there was a relatively big ban wave against users of a certain malicious/unverified mod. It's not too hard to imagine that another malicious/unverified mod will be next.~~
+
+(This is Bullshit)
+~~If it's not a VRCMG mod, if I were you, I'd be *extremely* wary of that. Those mods are unverified in VRCMG, and usually for a good reason. 
+There have been numerous cases of unverified mods being harmful towards their own users. After all, if one makes a mod to harm other users and/or VRChat itself, who says that they wouldn't want to harm its own users eventually for some petty reason?  
+Additionally, consider this: recently there was a relatively big ban wave against users of a certain malicious/unverified mod. It's not too hard to imagine that another malicious/unverified mod will be next.
 
 **Q2**: Does that mean that mods are now okay if they don't touch VRC+?  
 **A2**: Nope! According to VRChat Team all mods are still against Terms of Service and therefore bannable, nothing has changed there.
