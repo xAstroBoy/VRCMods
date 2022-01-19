@@ -32,7 +32,7 @@ namespace FavCat
             {
                 if (file.EndsWith(".db")) 
                     databases.Add(file);
-                else
+                else if(FavCatMod.Instance.AvatarModule != null)
                     textFiles.Add(file);
             }
 
@@ -50,7 +50,6 @@ namespace FavCat
                     MelonLogger.Msg($"Import of {file} failed: {ex}");
                 }
             }
-            
             for (var i = 0; i < textFiles.Count; i++)
             {
                 var file = textFiles[i];
@@ -65,10 +64,10 @@ namespace FavCat
                     MelonLogger.Msg($"Import of {file} failed: {ex}");
                 }
             }
-
             ImportRunning = false;
         }
         
+        private static readonly Regex AvatarIdRegex = new Regex("avtr_[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}");
         private static readonly Regex ourUserIdRegex = new Regex("usr_[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}");
         private static readonly Regex ourWorldIdRegex = new Regex("wrld_[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}");
 
@@ -81,10 +80,10 @@ namespace FavCat
                 MelonLogger.Msg("Database does not exist, can't import");
                 return;
             }
-            
             var fileName = Path.GetFileName(filePath);
             MelonLogger.Msg($"Started avatar import process for file {fileName}");
             
+            var toAddAvatar = new List<string>();
             var toAddUsers = new List<string>();
             var toAddWorlds = new List<string>();
             { // file access block
@@ -96,22 +95,41 @@ namespace FavCat
                 {
                     foreach (Match match in ourUserIdRegex.Matches(line)) toAddUsers.Add(match.Value);
                     foreach (Match match in ourWorldIdRegex.Matches(line)) toAddWorlds.Add(match.Value);
+
+                    var matches = AvatarIdRegex.Matches(line);
+                    foreach (Match match in matches)
+                    {
+                        var avatarId = match.Value;
+                        toAddAvatar.Add(avatarId);
+                    }
                 }
             }
 
+
+            for (var i = 0; i < toAddAvatar.Count; i++)
+            {
+                ImportStatusInner = $"Fetching avatar {i + 1}/{toAddAvatar.Count}";
+                var avatarId = toAddAvatar[i];
+                if (FavCatMod.Database.myStoredAvatars.FindById(avatarId) == null)
+                {
+                    await TaskUtilities.YieldToMainThread();
+                    new ApiAvatar {id = avatarId}.Fetch(); // it will get intercepted and stored
+                    await Task.Delay(TimeSpan.FromSeconds(5f + Random.Range(0f, 5f))).ConfigureAwait(false);
+                }
+            }
             for (var i = 0; i < toAddUsers.Count; i++)
             {
                 ImportStatusInner = $"Fetching user {i + 1}/{toAddUsers.Count}";
                 var userId = toAddUsers[i];
-                
+
                 if (database.myStoredPlayers.FindById(userId) == null)
                 {
                     await TaskUtilities.YieldToMainThread();
-                    new APIUser {id = userId}.Fetch(); // it will get intercepted and stored
+                    new APIUser { id = userId }.Fetch(); // it will get intercepted and stored
                     await Task.Delay(TimeSpan.FromSeconds(5f + Random.Range(0f, 5f))).ConfigureAwait(false);
                 }
             }
-            
+
             for (var i = 0; i < toAddWorlds.Count; i++)
             {
                 ImportStatusInner = $"Fetching world {i + 1}/{toAddWorlds.Count}";
@@ -119,45 +137,43 @@ namespace FavCat
                 if (database.myStoredWorlds.FindById(worldId) == null)
                 {
                     await TaskUtilities.YieldToMainThread();
-                    new ApiWorld {id = worldId}.Fetch(); // it will get intercepted and stored
+                    new ApiWorld { id = worldId }.Fetch(); // it will get intercepted and stored
                     await Task.Delay(TimeSpan.FromSeconds(5f + Random.Range(0f, 5f))).ConfigureAwait(false);
                 }
             }
 
+
             ImportStatusInner = "Creating favorites list";
             await TaskUtilities.YieldToMainThread();
             var categoryName = $"Imported from {fileName}";
-
-            void DoAddCategories<T>(List<string> ids, DatabaseFavoriteHandler<T> favs, ExtendedFavoritesModuleBase<T>? module, ILiteCollection<T> rawStore) where T: class, INamedStoredObject
+            void DoAddCategories<T>(List<string> ids, DatabaseFavoriteHandler<T> favs, ExtendedFavoritesModuleBase<T>? module, ILiteCollection<T> rawStore) where T : class, INamedStoredObject
             {
                 if (ids.Count == 0) return;
-                
+
                 var existingCategory = favs.GetCategory(categoryName);
                 foreach (var id in ids)
                 {
                     if (favs.IsFavorite(id, categoryName))
                         continue;
-                
+
                     var storedAvatar = rawStore.FindById(id);
                     if (storedAvatar == null) continue;
-                
+
                     favs.AddFavorite(id, categoryName);
                 }
 
                 if (existingCategory != null) return;
-                
-                existingCategory = new StoredCategory {CategoryName = categoryName, SortType = "!added"};
                 favs.UpdateCategory(existingCategory);
 
                 if (module == null) return;
-                
+
                 module.CreateList(existingCategory);
                 module.ReorderLists();
             }
-            
+            DoAddCategories(toAddAvatar, database.AvatarFavorites, FavCatMod.Instance.AvatarModule, database.myStoredAvatars);
             DoAddCategories(toAddWorlds, database.WorldFavorites, FavCatMod.Instance.WorldsModule, database.myStoredWorlds);
             DoAddCategories(toAddUsers, database.PlayerFavorites, FavCatMod.Instance.PlayerModule, database.myStoredPlayers);
-            
+
             MelonLogger.Msg($"Done importing {fileName}");
             File.Delete(filePath);
         }
@@ -172,7 +188,6 @@ namespace FavCat
                     MelonLogger.Msg("Database does not exist, can't merge");
                     return;
                 }
-                
                 var fileName = Path.GetFileName(foreignStorePath);
                 MelonLogger.Msg($"Started merging database with {fileName}");
                 using var storeDatabase = new LiteDatabase(new ConnectionString {Filename = foreignStorePath, ReadOnly = true, Connection = ConnectionType.Direct});
@@ -188,7 +203,7 @@ namespace FavCat
                     if (existingStored == null || existingStored.UpdatedAt < storedAvatar.UpdatedAt)
                         database.myStoredAvatars.Upsert(storedAvatar);
                 }
-                
+
                 ImportStatusInner = "Importing players";
                 foreach (var storedPlayer in storedPlayers.FindAll())
                 {
@@ -196,7 +211,7 @@ namespace FavCat
                     if (existingStored == null)
                         database.myStoredPlayers.Upsert(storedPlayer);
                 }
-                
+
                 ImportStatusInner = "Importing worlds";
                 foreach (var storedWorld in storedWorlds.FindAll())
                 {
@@ -204,7 +219,7 @@ namespace FavCat
                     if (existingStored == null || existingStored.UpdatedAt < storedWorld.UpdatedAt)
                         database.myStoredWorlds.Upsert(storedWorld);
                 }
-                
+
                 MelonLogger.Msg($"Done merging database with {fileName}");
             });
         }

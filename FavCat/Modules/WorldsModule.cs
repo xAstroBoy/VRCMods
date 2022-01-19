@@ -18,7 +18,7 @@ namespace FavCat.Modules
     {
         private readonly PageWorldInfo myPageWorldInfo;
         
-        public WorldsModule() : base(ExpandedMenu.WorldMenu, FavCatMod.Database.WorldFavorites, GetListsParent(), true, true)
+        public WorldsModule() : base(ExpandedMenu.WorldMenu, FavCatMod.Database.WorldFavorites, GetListsParent(), true)
         {
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.WorldDetailsMenu).AddSimpleButton("Local Favorite", ShowFavMenu);
 
@@ -87,6 +87,8 @@ namespace FavCat.Modules
         }
 
         private string myLastRequestedWorld = "";
+
+
         protected override void OnPickerSelected(IPickerElement picker)
         {
             if (picker.Id == myLastRequestedWorld) 
@@ -162,5 +164,10 @@ namespace FavCat.Modules
                     FavCatMod.Database.RunBackgroundWorldSearch(s, AcceptSearchResult);
                 });
         }
+
+
+        protected override bool FavButtonsOnLists => false;
+        protected override void OnFavButtonClicked(StoredCategory storedCategory) { }
+        protected internal override void RefreshFavButtons() { }
     }
 }

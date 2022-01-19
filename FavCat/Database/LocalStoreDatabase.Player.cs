@@ -22,7 +22,8 @@ namespace FavCat.Database
                 Name = player.displayName,
                 ThumbnailUrl = player.profilePicThumbnailImageUrl // already includes override/avatar check
             };
-            
+
+
             myUpdateThreadQueue.Enqueue(() =>
             {
                 myStoredPlayers.Upsert(storedPlayer);

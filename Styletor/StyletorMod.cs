@@ -15,7 +15,7 @@ using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using VRC.UI.Core.Styles;
 
-[assembly:MelonInfo(typeof(StyletorMod), "Styletor", "0.2.0", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(StyletorMod), "Styletor", "0.2.0", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 #nullable disable
@@ -50,7 +50,7 @@ namespace Styletor
             settingMenu.AddSimpleButton("Reload styles from disk", ReloadStyles);
             settingMenu.AddSimpleButton("Export default VRChat style reference", ExportStyleClick);
             settingMenu.AddSimpleButton("Export QM object/style tree", ExportTreeClick);
-            settingMenu.AddSimpleButton("Open mod documentation in browser", () => Process.Start("https://github.com/knah/VRCMods#Styletor"));
+            settingMenu.AddSimpleButton("Open mod documentation in browser", () => Process.Start("https://github.com/xAstroBoy/VRCMods-Unchained#Styletor"));
 
             MelonCoroutines.Start(WaitForStyleInit());
         }

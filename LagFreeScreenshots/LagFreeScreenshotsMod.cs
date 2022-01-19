@@ -29,7 +29,7 @@ using Unity.Collections.LowLevel.Unsafe;
 
 // using CameraUtil = ObjectPublicCaSiVeUnique;
 
-[assembly:MelonInfo(typeof(LagFreeScreenshotsMod), "Lag Free Screenshots", "1.3.1", "knah, Protected", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(LagFreeScreenshotsMod), "Lag Free Screenshots", "1.3.1", "knah, Protected", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace LagFreeScreenshots
@@ -338,7 +338,6 @@ namespace LagFreeScreenshots
             }
         }
 
-
         private static async Task EncodeAndSavePicture(string filePath, (IntPtr, int Length) pixelsPair, int w, int h,
             bool hasAlpha, ScreenshotRotation rotationQuarters, MetadataV2 metadata)
         {
@@ -391,7 +390,6 @@ namespace LagFreeScreenshots
             {
                 FlipVertInPlace(pixelsPair, w, h, step);
             }
-
 
             var pixelFormat = hasAlpha ? PixelFormat.Format32bppArgb : PixelFormat.Format24bppRgb;
             using var bitmap = new Bitmap(w, h, pixelFormat);

@@ -19,19 +19,18 @@ namespace FavCat.Modules
 {
     public sealed class AvatarModule : ExtendedFavoritesModuleBase<StoredAvatar>
     {
-        private readonly string myCurrentAnnoyingMessage;
-        
         private readonly PageAvatar myPageAvatar;
         
         private string myCurrentUiAvatarId = "";
 
         private readonly bool myInitialised;
 
-        public AvatarModule() : base(ExpandedMenu.AvatarMenu, FavCatMod.Database.AvatarFavorites, GetListsParent(), false, false)
+        public static AvatarModule instance;
+
+        public AvatarModule() : base(ExpandedMenu.AvatarMenu, FavCatMod.Database.AvatarFavorites, GetListsParent())
         {
-            myCurrentAnnoyingMessage = CanPerformAdditiveActions ? "WillBeObsolete" : (CanShowExistingLists ? "CantAddWithCanny" : "NoFavorites");
-            
-            MelonLogger.Msg("Adding button to UI - Looking up for Change Button");
+            instance = this;
+            MelonLogger.Log("Adding button to UI - Looking up for Change Button");
             var foundAvatarPage = Resources.FindObjectsOfTypeAll<PageAvatar>()?.FirstOrDefault(p => p.transform.Find("Change Button") != null);
             if (foundAvatarPage == null)
                 throw new ApplicationException("No avatar page, can't initialize extended favorites");
@@ -45,25 +44,16 @@ namespace FavCat.Modules
             var layoutElement = expandEnforcer.GetComponent<LayoutElement>();
             layoutElement.minWidth = 1534;
             layoutElement.minHeight = 0;
-            
-            myPageAvatar.gameObject.AddComponent<EnableDisableListener>().OnEnabled += () =>
-            {
-                if (FavCatSettings.DontShowAnnoyingMessage == myCurrentAnnoyingMessage || myHasShownAnnoyingMessageThisRun) return;
-                ShowAnnoyingMessage();
-            };
 
             myInitialised = true;
         }
-
-
-        private bool myHasShownAnnoyingMessageThisRun = false;
 
         private void DoSearchKnownAvatars()
         {
             if (FavCatMod.PageUserInfo == null)
                 return;
             
-            FavCatMod.GetUiManager().Method_Public_Void_String_Boolean_0("UserInterface/MenuContent/Screens/Avatar", false);
+            VRCUiManager.prop_VRCUiManager_0.Method_Public_Void_String_Boolean_0("UserInterface/MenuContent/Screens/Avatar", false);
             SetSearchListHeaderAndScrollToIt("Search running...");
             LastSearchRequest = "Created by " + FavCatMod.PageUserInfo.field_Private_APIUser_0.displayName;
             FavCatMod.Database.RunBackgroundAvatarSearchByUser(FavCatMod.PageUserInfo.field_Private_APIUser_0.id, AcceptSearchResult);
@@ -78,42 +68,153 @@ namespace FavCat.Modules
             var randomList = foundAvatarPage.GetComponentInChildren<UiAvatarList>();
             return randomList.transform.parent;
         }
+        
+        protected override void OnFavButtonClicked(StoredCategory storedCategory)
+        {
+            ApiAvatar currentApiAvatar = myPageAvatar.field_Public_SimpleAvatarPedestal_0.field_Internal_ApiAvatar_0;
+            OnFavButtonClicked(storedCategory, currentApiAvatar.id, false);
+        }
+
+        private void OnFavButtonClicked(StoredCategory storedCategory, string avatarId, bool disallowRecursiveRequests)
+        {
+            if (FavCatMod.Database.myStoredAvatars.FindById(avatarId) == null)
+            {
+                if (disallowRecursiveRequests)
+                    return;
+                
+                // something showed an unknown avatar, request it before favoriting
+                new ApiAvatar { id = avatarId }.Fetch(new Action<ApiContainer>(model =>
+                {
+                    FavCatMod.Database?.UpdateStoredAvatar(model.Model.Cast<ApiAvatar>());
+                    MelonCoroutines.Start(ReFavAfterDelay(storedCategory, avatarId));
+                }));
+                return;
+            }
+
+            if (FavCatMod.Database.AvatarFavorites.IsFavorite(avatarId, storedCategory.CategoryName))
+                FavCatMod.Database.AvatarFavorites.DeleteFavorite(avatarId, storedCategory.CategoryName);
+            else
+                FavCatMod.Database.AvatarFavorites.AddFavorite(avatarId, storedCategory.CategoryName);
+        }
+
+        private IEnumerator ReFavAfterDelay(StoredCategory category, string id)
+        {
+            yield return new WaitForSeconds(0.25f);
+            OnFavButtonClicked(category, id, true);
+        }
+
+
+        public static void SetSearchHeader(string Header = "Search running...", bool Scroll = true)
+        {
+            instance.SetSearchListHeaderAndScrollToIt(Header, Scroll);
+        }
+
+        public static void AvatarSearchResults(string searchText, System.Collections.Generic.IEnumerable<StoredAvatar> list)
+        {
+            ExtendedFavoritesModuleBase<StoredAvatar>.LastSearchRequest = searchText;
+            ExtendedFavoritesModuleBase<StoredAvatar>.AcceptSearchResult(list);
+        }
+
+
+        public static void GetStoredFromID(string id, System.Action<StoredAvatar> Result = null, bool ForceLatest = false, bool AllowRecursive = false)
+        {
+            try
+            {
+                StoredAvatar StoredAvi = FavCatMod.Database.myStoredAvatars.FindById(id);
+                if (StoredAvi == null || ForceLatest)
+                {
+                    GetApiAvatarFromID(id, delegate (ApiAvatar avatar)
+                    {
+                        FavCatMod.Database?.UpdateStoredAvatar(avatar);
+                        StoredAvi = FavCatMod.Database?.myStoredAvatars.FindById(id);
+                        if (StoredAvi != null)
+                        {
+                            Result?.Invoke(StoredAvi);
+                        }
+                    }, delegate (ApiContainer model)
+                    {
+                        if (model.Code != 404 && AllowRecursive)
+                        {
+                            GetStoredFromID(id, Result, ForceLatest, AllowRecursive);
+                        }
+                    });
+                }
+                if (StoredAvi != null)
+                {
+                    Result?.Invoke(StoredAvi);
+                }
+            }
+            catch
+            {
+            }
+        }
+
+    
+
+    public static void GetApiAvatarFromID(string id, System.Action<ApiAvatar> AfterSuccess = null, System.Action<ApiContainer> OnFailure = null, bool ShowOnPedestal = false)
+        {
+            try
+            {
+                PageAvatar component = GameObject.Find("Screens").transform.Find("Avatar").GetComponent<PageAvatar>();
+                ApiAvatar apiAvatar = new ApiAvatar();
+                apiAvatar.id = id;
+                apiAvatar.Get((System.Action<ApiContainer>)delegate (ApiContainer model)
+                {
+                    ApiAvatar apiAvatar2 = model.Model.Cast<ApiAvatar>();
+                    if (ShowOnPedestal)
+                    {
+                        component.field_Public_SimpleAvatarPedestal_0.field_Internal_ApiAvatar_0 = apiAvatar2;
+                        component.field_Public_SimpleAvatarPedestal_0.Refresh(apiAvatar2);
+                    }
+                    AfterSuccess?.Invoke(apiAvatar2);
+                }, (System.Action<ApiContainer>)delegate (ApiContainer model)
+                {
+                    OnFailure?.Invoke(model);
+                });
+            }
+            catch
+            {
+            }
+        }
+
+        protected internal override void RefreshFavButtons()
+        {
+            var apiAvatar = myPageAvatar != null ? myPageAvatar.field_Public_SimpleAvatarPedestal_0 != null ? myPageAvatar.field_Public_SimpleAvatarPedestal_0.field_Internal_ApiAvatar_0 : null : null;
+
+            foreach (var customPickerList in PickerLists)
+            {
+                bool favorited = FavCatMod.Database.AvatarFavorites.IsFavorite(myCurrentUiAvatarId, customPickerList.Key);
+                    
+                var isNonPublic = apiAvatar?.releaseStatus != "public";
+                if (favorited)
+                    customPickerList.Value.SetFavButtonText(isNonPublic ? "Unfav (p)" : "Unfav", true);
+                else
+                    customPickerList.Value.SetFavButtonText(isNonPublic ? "Fav (p)" : "Fav", true);
+            }
+        }
 
         protected override void OnPickerSelected(IPickerElement model)
         {
             PlaySound();
-
-            if (FavCatSettings.AvatarSearchMode.Value == "author")
-            {
-                FavCatMod.Instance.PlayerModule?.OnPickerSelected(((IStoredModelAdapter<StoredAvatar>) model).Model.AuthorId, listsParent.gameObject);
-                return;
-            }
-
+            
             var avatar = new ApiAvatar() {id = model.Id};
-            if (MelonDebug.IsEnabled())
-                MelonDebug.Msg($"Performing an API request for {model.Id}");
+            if (Imports.IsDebugMode())
+                MelonLogger.Log($"Performing an API request for {model.Id}");
             avatar.Fetch(new Action<ApiContainer>((_) =>
             {
-                if (MelonDebug.IsEnabled())
-                    MelonDebug.Msg($"Done an API request for {model.Id}");
+                if (Imports.IsDebugMode())
+                    MelonLogger.Log($"Done an API request for {model.Id}");
 
                 FavCatMod.Database?.UpdateStoredAvatar(avatar);
-
-                var canUse = avatar.releaseStatus == "public" || avatar.authorId == APIUser.CurrentUser.id;
-                if (!canUse)
-                {
-                    myPageAvatar.field_Public_SimpleAvatarPedestal_0.DisplayErrorAvatar();
-                    myPageAvatar.field_Public_SimpleAvatarPedestal_0.field_Internal_ApiAvatar_0 = avatar; // set it directly here because refreshing will load it
-                }
-                else
-                    myPageAvatar.field_Public_SimpleAvatarPedestal_0.Refresh(avatar);
+                myPageAvatar.field_Public_SimpleAvatarPedestal_0.Refresh(avatar);
 
                 // VRC has a tendency to change visibility of its lists after pedestal refresh 
                 ReorderLists();
+                RefreshFavButtons();
             }), new Action<ApiContainer>(c =>
             {
-                if (MelonDebug.IsEnabled())
-                    MelonDebug.Msg("API request errored with " + c.Code + " - " + c.Error);
+                if (Imports.IsDebugMode())
+                    MelonLogger.Log("API request errored with " + c.Code + " - " + c.Error);
                 if (c.Code == 404 && listsParent.gameObject.activeInHierarchy)
                 {
                     FavCatMod.Database.CompletelyDeleteAvatar(model.Id);
@@ -142,10 +243,11 @@ namespace FavCat.Modules
             var apiAvatar = pedestal.field_Internal_ApiAvatar_0;
             if (apiAvatar == null) return;
             if (apiAvatar.id == myCurrentUiAvatarId) return;
-            
+
             myCurrentUiAvatarId = apiAvatar.id ?? "";
 
-            if (apiAvatar.Populated) 
+            RefreshFavButtons();
+            if (apiAvatar.Populated)
                 FavCatMod.Database?.UpdateStoredAvatar(apiAvatar);
         }
 
@@ -160,6 +262,7 @@ namespace FavCat.Modules
                 });
         }
 
+        protected override bool FavButtonsOnLists => true;
         protected override IPickerElement WrapModel(StoredFavorite? favorite, StoredAvatar model) => new DbAvatarAdapter(model, favorite);
 
         protected override void SortModelList(string sortCriteria, string category, List<(StoredFavorite?, StoredAvatar)> avatars)
@@ -187,34 +290,6 @@ namespace FavCat.Modules
                     break;
             }
             avatars.Sort(comparison);
-        }
-
-        public override void ShowAnnoyingMessage()
-        {
-            var popup = ExpansionKitApi.CreateCustomFullMenuPopup(LayoutDescription.WideSlimList);
-            
-            popup.AddLabel("Due to recent events, avatar favorites in FavCat were phased out.");
-            popup.AddSimpleButton($"More info (opens in browser)", () => Process.Start("https://github.com/knah/VRCMods#avatar-favorites-deprecation"));
-            popup.AddSimpleButton($"Vote on Canny! (opens in browser)", () => Process.Start("https://feedback.vrchat.com/vrchat-plus-feedback/p/reconsider-the-approach-to-paywalling-extra-avatar-favorite-slotsgroups"));
-            popup.AddLabel("You can't add new avatar favorites or create new lists");
-
-            popup.AddLabel("You can't see existing avatar favorite lists. You still can export them.");
-
-            popup.AddLabel("World and user favorites and avatar search will remain for the time being");
-            popup.AddLabel("Favorite export is available from \"More FavCat...\" menu");
-            popup.AddLabel("Scroll down for close buttons");
-            popup.AddSimpleButton("Don't show this until game restart", () =>
-            {
-                popup.Hide();
-                myHasShownAnnoyingMessageThisRun = true;
-            });
-            popup.AddSimpleButton("Don't show this until something changes", () =>
-            {
-                popup.Hide();
-                FavCatSettings.DontShowAnnoyingMessage = myCurrentAnnoyingMessage;
-            });
-            
-            popup.Show();
         }
     }
 }

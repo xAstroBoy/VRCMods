@@ -5,8 +5,8 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.UserCamera;
 
-[assembly:MelonGame("VRChat", "VRChat")]
-[assembly:MelonInfo(typeof(CameraMinusMod), "CameraMinus", "3.0.1", "knah", "https://github.com/knah/VRCMods")]
+[assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonInfo(typeof(CameraMinusMod), "CameraMinus", "3.0.1", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 
 namespace CameraMinus
 {
@@ -18,18 +18,18 @@ namespace CameraMinus
         public override void OnApplicationStart()
         {
             var category = MelonPreferences.CreateCategory("CameraMinus", "CameraMinus");
-            
+
             myUseCameraExpando = category.CreateEntry("UseCameraExpando", true, "Use Camera expando (instead of QM expando)");
             myUnlimitCameraPickupDistance = category.CreateEntry("UnlimitCameraPickupDistance", true, "Longer camera pickup distance");
 
             ExpansionKitApi.GetSettingsCategory("CameraMinus")
                 .AddLabel("Disable and enable camera to update camera expando visibility");
-            
+
             GameObject cameraEnlargeButton = null;
             GameObject cameraShrinkButton = null;
             GameObject qmEnlargeButton = null;
             GameObject qmShrinkButton = null;
-            
+
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.Camera).AddSimpleButton("Enlarge camera", Enlarge, go =>
             {
                 cameraEnlargeButton = go;
@@ -83,7 +83,7 @@ namespace CameraMinus
             if (cameraController == null) return;
             cameraController.transform.Find("ViewFinder").localScale *= 1.5f;
         }
-        
+
         private void Shrink()
         {
             var cameraController = UserCameraController.field_Internal_Static_UserCameraController_0;

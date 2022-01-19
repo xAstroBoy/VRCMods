@@ -10,7 +10,7 @@ using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
 using UnhollowerRuntimeLib.XrefScans;
 
-[assembly:MelonInfo(typeof(TurbonesMod), "Turbones", "1.1.2", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(TurbonesMod), "Turbones", "1.1.2", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace Turbones
@@ -62,7 +62,6 @@ namespace Turbones
                     .Method_Private_Void_Single_Boolean_0))).GetValue(null));
             
             var isCollidePatched = false;
-            
 
             unsafe void PatchCollide()
             {
@@ -100,8 +99,6 @@ namespace Turbones
                     ourLastPatchPointer = IntPtr.Zero;
                 }
                 
-                if (!CheckWasSuccessful) return;
-                
                 if (useFast)
                 {
                     ourLastPatchPointer = useMt ? JigglySolverApi.LibDynBoneUpdateMultiThreaded : JigglySolverApi.LibDynBoneUpdateSingleThreaded;
@@ -123,8 +120,6 @@ namespace Turbones
                     MelonLogger.Msg($"Patched DynamicBone Update (notify)");
                 }
             }
-            
-            CheckDummyThree();
 
             enableCollisionChecks.OnValueChanged += (_, v) =>
             {

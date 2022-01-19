@@ -8,7 +8,7 @@ using UnhollowerBaseLib;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-[assembly:MelonInfo(typeof(FinitizerMod), "Finitizer", "1.3.1", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(FinitizerMod), "Finitizer", "1.3.1", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace Finitizer
@@ -36,7 +36,6 @@ namespace Finitizer
 
             OnModSettingsApplied(entry.Value);
         }
-        
 
         private void OnModSettingsApplied(bool isEnabled)
         {

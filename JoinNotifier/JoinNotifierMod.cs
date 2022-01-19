@@ -16,8 +16,8 @@ using VRC.Core;
 using VRC.Management;
 using Object = UnityEngine.Object;
 
-[assembly:MelonInfo(typeof(JoinNotifierMod), "JoinNotifier", "1.0.6", "knah", "https://github.com/knah/VRCMods")]
-[assembly:MelonGame("VRChat", "VRChat")]
+[assembly: MelonInfo(typeof(JoinNotifierMod), "JoinNotifier", "1.0.6", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
+[assembly: MelonGame("VRChat", "VRChat")]
 
 namespace JoinNotifier
 {
@@ -35,10 +35,10 @@ namespace JoinNotifier
         private AudioSource myLeaveSource;
         private Text myJoinText;
         private Text myLeaveText;
-        
+
         private int myLastLevelLoad;
         private bool myObservedLocalPlayerJoin;
-        
+
         private AssetBundle myAssetBundle;
         private Sprite myJoinSprite;
         private AudioClip myJoinClip;
@@ -48,8 +48,7 @@ namespace JoinNotifier
 
         public override void OnApplicationStart()
         {
-            if (!CheckWasSuccessful || !MustStayTrue || MustStayFalse) return;
-            
+
             JoinNotifierSettings.RegisterSettings();
 
             MelonCoroutines.Start(InitThings());
@@ -58,7 +57,7 @@ namespace JoinNotifier
         public IEnumerator InitThings()
         {
             MelonDebug.Msg("Waiting for init");
-            
+
             while (ReferenceEquals(NetworkManager.field_Internal_Static_NetworkManager_0, null)) yield return null;
             while (ReferenceEquals(VRCAudioManager.field_Private_Static_VRCAudioManager_0, null)) yield return null;
             while (ReferenceEquals(GetUiManager(), null)) yield return null;
@@ -72,18 +71,18 @@ namespace JoinNotifier
             }.Single(it => it.name == "UI");
 
             MelonDebug.Msg("Start init");
-            
+
             NetworkManagerHooks.Initialize();
 
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("JoinNotifier.joinnotifier.assetbundle"))
-            using (var tempStream = new MemoryStream((int) stream.Length))
+            using (var tempStream = new MemoryStream((int)stream.Length))
             {
                 stream.CopyTo(tempStream);
-                
+
                 myAssetBundle = AssetBundle.LoadFromMemory_Internal(tempStream.ToArray(), 0);
                 myAssetBundle.hideFlags |= HideFlags.DontUnloadUnusedAsset;
             }
-            
+
             myJoinSprite = myAssetBundle.LoadAsset_Internal("Assets/JoinNotifier/JoinIcon.png", Il2CppType.Of<Sprite>()).Cast<Sprite>();
             myJoinSprite.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 
@@ -94,41 +93,42 @@ namespace JoinNotifier
                 uwr.SendWebRequest();
 
                 while (!uwr.isDone) yield return null;
-                
+
                 myJoinClip = WebRequestWWW.InternalCreateAudioClipUsingDH(uwr.downloadHandler, uwr.url, false, false, AudioType.UNKNOWN);
             }
-            
+
             if (myJoinClip == null)
                 myJoinClip = myAssetBundle.LoadAsset_Internal("Assets/JoinNotifier/Chime.ogg", Il2CppType.Of<AudioClip>()).Cast<AudioClip>();
-            
+
             myJoinClip.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 
             if (File.Exists(CustomLeaveSoundFileName))
             {
                 MelonLogger.Msg("Loading custom leave sound");
-                
+
                 var uwr = UnityWebRequest.Get($"file://{Path.Combine(Environment.CurrentDirectory, CustomLeaveSoundFileName)}");
                 uwr.SendWebRequest();
 
                 while (!uwr.isDone) yield return null;
-                
+
                 myLeaveClip = WebRequestWWW.InternalCreateAudioClipUsingDH(uwr.downloadHandler, uwr.url, false, false, AudioType.UNKNOWN);
             }
-            
+
             if (myLeaveClip == null)
                 myLeaveClip = myAssetBundle.LoadAsset_Internal("Assets/JoinNotifier/DoorClose.ogg", Il2CppType.Of<AudioClip>()).Cast<AudioClip>();
-            
+
             myLeaveClip.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 
             CreateGameObjects();
-            
+
             NetworkManagerHooks.OnJoin += OnPlayerJoined;
             NetworkManagerHooks.OnLeave += OnPlayerLeft;
 
             JoinNotifierSettings.SoundVolume.OnValueChanged += (_, _) => ApplySoundSettings();
             JoinNotifierSettings.UseUiMixer.OnValueChanged += (_, _) => ApplySoundSettings();
             JoinNotifierSettings.TextSize.OnValueChanged += (_, _) => ApplyFontSize();
-            JoinNotifierSettings.JoinIconColor.OnValueChanged += (_, _) => {
+            JoinNotifierSettings.JoinIconColor.OnValueChanged += (_, _) =>
+            {
                 if (myJoinImage != null) myJoinImage.color = JoinNotifierSettings.GetJoinIconColor();
             };
             JoinNotifierSettings.LeaveIconColor.OnValueChanged += (_, _) =>
@@ -219,22 +219,20 @@ namespace JoinNotifier
                 MelonLogger.Msg("Not creating gameobjects - no hud root");
                 return;
             }
-            
+
             MelonDebug.Msg("Creating gameobjects");
-//            var pathToThing = "UserInterface/UnscaledUI/HudContent/Hud/NotificationDotParent/NotificationDot";
+            //            var pathToThing = "UserInterface/UnscaledUI/HudContent/Hud/NotificationDotParent/NotificationDot";
             myJoinImage = CreateNotifierImage("join", 0f, JoinNotifierSettings.GetJoinIconColor());
             myJoinSource = CreateAudioSource(myJoinClip, myJoinImage.gameObject);
             myJoinText = CreateTextNear(myJoinImage, 110f, TextAnchor.LowerRight);
-            
+
             myLeaveImage = CreateNotifierImage("leave", 100f, JoinNotifierSettings.GetLeaveIconColor());
             myLeaveSource = CreateAudioSource(myLeaveClip, myLeaveImage.gameObject);
             myLeaveText = CreateTextNear(myLeaveImage, 110f, TextAnchor.LowerLeft);
         }
 
-        partial void OnSceneWasLoaded2(int buildIndex, string sceneName)
+        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
-            base.OnSceneWasLoaded(buildIndex, sceneName);
-            
             myLastLevelLoad = Environment.TickCount;
             myObservedLocalPlayerJoin = false;
         }
@@ -250,9 +248,9 @@ namespace JoinNotifier
             }
 
             if (!myObservedLocalPlayerJoin || Environment.TickCount - myLastLevelLoad < 5_000) return;
-            
+
             if (JoinNotifierSettings.HideBlockedUsers.Value && IsBlocked(apiUser.id)) return;
-            
+
             var isFriendsWith = APIUser.IsFriendsWith(apiUser.id);
             if (!isFriendsWith || !JoinNotifierSettings.ShowFriendsAlways.Value)
             {
@@ -263,15 +261,15 @@ namespace JoinNotifier
             if (JoinNotifierSettings.ShouldBlinkIcon(true))
                 MelonCoroutines.Start(BlinkIconCoroutine(myJoinImage));
             if (JoinNotifierSettings.ShouldPlaySound(true))
-               myJoinSource.Play();
+                myJoinSource.Play();
             if (JoinNotifierSettings.ShouldShowNames(true))
                 MelonCoroutines.Start(ShowName(myJoinText, myJoinNames, playerName, true, isFriendsWith));
             if (JoinNotifierSettings.LogToConsole.Value)
                 MelonLogger.Msg(isFriendsWith && JoinNotifierSettings.ShowFriendsInDifferentColor.Value
-                        ? ConsoleColor.DarkYellow : ConsoleColor.DarkCyan, 
+                        ? ConsoleColor.DarkYellow : ConsoleColor.DarkCyan,
                     $"{(isFriendsWith ? "Friend " : "")}{playerName} joined");
         }
-        
+
         public void OnPlayerLeft(Player player)
         {
             var apiUser = player.prop_APIUser_0;
@@ -296,7 +294,7 @@ namespace JoinNotifier
                 MelonCoroutines.Start(ShowName(myLeaveText, myLeaveNames, playerName, false, isFriendsWith));
             if (JoinNotifierSettings.LogToConsole.Value)
                 MelonLogger.Msg(isFriendsWith && JoinNotifierSettings.ShowFriendsInDifferentColor.Value
-                        ? ConsoleColor.DarkYellow : ConsoleColor.DarkMagenta, 
+                        ? ConsoleColor.DarkYellow : ConsoleColor.DarkMagenta,
                     $"{(isFriendsWith ? "Friend " : "")}{playerName} left");
         }
 
@@ -310,7 +308,7 @@ namespace JoinNotifier
             var playerLine = $"<color={RenderHex(color)}>{name}</color>";
 
             namesList.Add(playerLine);
-            
+
             text.text = string.Join("\n", namesList);
             yield return new WaitForSeconds(3);
             namesList.Remove(playerLine);
@@ -319,7 +317,7 @@ namespace JoinNotifier
 
         private static string RenderHex(Color color)
         {
-            return $"#{(int) (color.r * 255):X2}{(int) (color.g * 255):X2}{(int) (color.b * 255):X2}{(int) (color.a * 255):X2}";
+            return $"#{(int)(color.r * 255):X2}{(int)(color.g * 255):X2}{(int)(color.b * 255):X2}{(int)(color.a * 255):X2}";
         }
 
         public IEnumerator BlinkIconCoroutine(Image imageToBlink)
@@ -332,27 +330,27 @@ namespace JoinNotifier
                 yield return new WaitForSeconds(.5f);
             }
         }
-        
+
         private static bool IsBlocked(string userId)
         {
             if (userId == null) return false;
-            
+
             var moderationManager = ModerationManager.prop_ModerationManager_0;
             if (moderationManager == null) return false;
             if (APIUser.CurrentUser?.id == userId)
                 return false;
-            
+
             var moderationsDict = ModerationManager.prop_ModerationManager_0.field_Private_Dictionary_2_String_List_1_ApiPlayerModeration_0;
             if (!moderationsDict.ContainsKey(userId)) return false;
-            
+
             foreach (var playerModeration in moderationsDict[userId])
             {
                 if (playerModeration != null && playerModeration.moderationType == ApiPlayerModeration.ModerationType.Block)
                     return true;
             }
-            
+
             return false;
-            
+
         }
     }
 }

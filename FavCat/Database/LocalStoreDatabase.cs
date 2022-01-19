@@ -46,7 +46,6 @@ namespace FavCat.Database
                 File.Delete(imageDbPath);
                 myImageDatabase = new LiteDatabase(new ConnectionString { Filename = imageDbPath, Connection = connectionType });
             }
-            
             myStoreDatabase.Mapper.EmptyStringToNull = false;
             myFavDatabase.Mapper.EmptyStringToNull = false;
             myImageDatabase.Mapper.EmptyStringToNull = false;

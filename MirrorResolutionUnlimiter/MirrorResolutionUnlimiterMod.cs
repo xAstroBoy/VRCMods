@@ -8,7 +8,7 @@ using UnhollowerRuntimeLib;
 using UnityEngine;
 using VRC.SDKBase;
 
-[assembly:MelonInfo(typeof(MirrorResolutionUnlimiterMod), "MirrorResolutionUnlimiter", "1.1.4", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(MirrorResolutionUnlimiterMod), "MirrorResolutionUnlimiter", "1.1.4", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 [assembly:MelonOptionalDependencies("UIExpansionKit")]
 

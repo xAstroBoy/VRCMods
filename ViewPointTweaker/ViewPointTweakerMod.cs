@@ -13,7 +13,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ViewPointTweaker;
 
-[assembly:MelonInfo(typeof(ViewPointTweakerMod), "View Point Tweaker", "1.0.5", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(ViewPointTweakerMod), "View Point Tweaker", "1.0.5", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace ViewPointTweaker

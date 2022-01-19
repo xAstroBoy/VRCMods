@@ -14,7 +14,7 @@ using UIExpansionKit.API;
 using UnityEngine.SceneManagement;
 using VRC.Core;
 
-[assembly:MelonInfo(typeof(TrueShaderAntiCrashMod), "True Shader Anticrash", "1.0.6", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(TrueShaderAntiCrashMod), "True Shader Anticrash", "1.0.6", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace TrueShaderAntiCrash
@@ -32,8 +32,6 @@ namespace TrueShaderAntiCrash
 
         public override void OnApplicationStart()
         {
-            if (!CheckWasSuccessful || !MustStayTrue || MustStayFalse) return;
-            
             string unityPlayerHash;
             {
                 using var sha = SHA512.Create();

@@ -7,6 +7,11 @@
     <Nullable>enable</Nullable>
     <ClearOutputDirectory>False</ClearOutputDirectory>
     <AssemblyVersion>1.1.11.0</AssemblyVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <ClearOutputDirectory>False</ClearOutputDirectory>
+    <VRChatFolder>D:\Steam Library\steamapps\common\VRChat</VRChatFolder>
+    <MelonManaged>$(VRChatFolder)\MelonLoader\Managed</MelonManaged>
+    <MelonLoader>$(VRChatFolder)\MelonLoader</MelonLoader>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="LiteDB" Version="5.0.9" />
@@ -35,7 +40,9 @@
       <InputAssemblies Include="$(OutputPath)/System.Runtime.CompilerServices.Unsafe.dll" />
 
       <IlRepackLibs Include="$(OutputPath)" />
-      <IlRepackLibs Include="$(MsBuildThisFileDirectory)/../Libs" />
+      <IlRepackLibs Include="$(MelonManaged)" />
+      <IlRepackLibs Include="$(MelonLoader)" />
+
     </ItemGroup>
     <Message Text="MERGING: @(InputAssemblies->'%(Filename)') into $(OutputAssembly)" Importance="High" />
     <ILRepack Internalize="true" LibraryPath="@(IlRepackLibs)" OutputFile="$(OutputPath)/$(AssemblyName)-merged.dll" InputAssemblies="@(InputAssemblies)" />

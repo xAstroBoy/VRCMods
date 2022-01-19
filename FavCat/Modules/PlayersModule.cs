@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FavCat.Adapters;
 using FavCat.CustomLists;
+using FavCat.Database;
 using FavCat.Database.Stored;
 using MelonLoader;
 using UIExpansionKit.API;
@@ -21,8 +22,7 @@ namespace FavCat.Modules
     {
 
         private static readonly Dictionary<string, APIUser> ourUsersCache = new();
-
-        public PlayersModule() : base(ExpandedMenu.SocialMenu, FavCatMod.Database.PlayerFavorites, GetListsParent(), true, true, false)
+        public PlayersModule() : base(ExpandedMenu.SocialMenu, FavCatMod.Database.PlayerFavorites, GetListsParent(), false)
         {
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserDetailsMenu).AddSimpleButton("Local Favorite", ShowFavMenu);
 
@@ -238,5 +238,10 @@ namespace FavCat.Modules
         {
             return ourUsersCache.TryGetValue(id, out var apiUser) ? apiUser : null;
         }
+
+        protected override bool FavButtonsOnLists => false;
+        protected override void OnFavButtonClicked(StoredCategory storedCategory) { }
+        protected internal override void RefreshFavButtons() { }
+
     }
 }
