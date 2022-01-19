@@ -4,7 +4,7 @@
 #### VRChat modders Unite! let's open a new Discord and compete against VRCMG Official Modding Group (IN reality that discord is highly toxic)! 
 
 
-This repository contains my mods for VRChat. Join the [VRChat Modding Group discord](https://discord.gg/rCqKSvR) for support and more mods!  
+This repository contains Knah's Mods for VRChat. Join the [VRChat Modding Group discord](https://discord.gg/rCqKSvR) for support and more mods!  [ TOXIC! ]
 Looking for more (universal) mods? [Check out my universal mods repository!](https://github.com/knah/ML-UniversalMods)
 
 # **Don't want to install mods manually? [Check out the VRCMelonAssistant, an automatic mod installer!](https://github.com/knah/VRCMelonAssistant)**
