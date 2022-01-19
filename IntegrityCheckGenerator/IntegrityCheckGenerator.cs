@@ -1,21 +1,20 @@
-using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Linq;
+using System.Text;
 
 #nullable enable
 
 namespace IntegrityCheckGenerator
 {
     [Generator]
-    class IntegrityCheckGenerator : ISourceGenerator
+    internal class IntegrityCheckGenerator : ISourceGenerator
     {
         private static readonly DiagnosticDescriptor ourGenerationFailed = new("ICG0000",
             "Generation failed", "{0}", "Generators", DiagnosticSeverity.Error, true);
 
         public void Initialize(GeneratorInitializationContext context)
         {
-
         }
 
         public void Execute(GeneratorExecutionContext context)
@@ -93,6 +92,5 @@ namespace IntegrityCheckGenerator
 
             context.AddSource($"{modTypeName}.Generated.cs", generatedCode.ToString());
         }
-
     }
 }

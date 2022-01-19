@@ -1,7 +1,6 @@
+using MelonLoader;
 using System;
 using System.Collections;
-using System.Linq;
-using MelonLoader;
 using UIExpansionKit;
 using UIExpansionKit.API;
 using UnhollowerRuntimeLib;
@@ -24,10 +23,10 @@ namespace AdvancedSafety
         public static void OnApplicationStart()
         {
             ClassInjector.RegisterTypeInIl2Cpp<QuickMenuHideAvatarButtonHandler>();
-            
+
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserDetailsMenu).AddSimpleButton("Hide all avatars by this author", OnHideBigClick, ConsumeHideBigInstance);
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserQuickMenu).AddSimpleButton("Hide this avatar (on anyone)", OnHideAvatarClick, ConsumeOnHideAvatar);
-            
+
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.SettingsMenu).AddSimpleButton("Reload all avatars", () => ScanningReflectionCache.ReloadAllAvatars(false));
 
             MelonCoroutines.Start(InitThings());
@@ -51,9 +50,9 @@ namespace AdvancedSafety
                 AvatarHiding.ourBlockedAvatars.Remove(apiAvatar.id);
             else
                 AvatarHiding.ourBlockedAvatars[apiAvatar.id] = apiAvatar.name;
-            
+
             AvatarHiding.SaveBlockedAvatars();
-            
+
             ScanningReflectionCache.ReloadAllAvatars(true);
         }
 
@@ -68,7 +67,7 @@ namespace AdvancedSafety
             var apiUser = ourUserInfoPage?.field_Private_APIUser_0;
             var userId = apiUser?.id;
             if (userId == null) return;
-            
+
             if (AvatarHiding.ourBlockedAvatarAuthors.ContainsKey(userId))
                 AvatarHiding.ourBlockedAvatarAuthors.Remove(userId);
             else
@@ -77,7 +76,7 @@ namespace AdvancedSafety
             AvatarHiding.SaveBlockedAuthors();
 
             OnPageShown(ourUserInfoPage);
-            
+
             ScanningReflectionCache.ReloadAllAvatars(true);
         }
 

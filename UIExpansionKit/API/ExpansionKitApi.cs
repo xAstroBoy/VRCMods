@@ -1,7 +1,7 @@
+using MelonLoader;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using MelonLoader;
 using UnityEngine;
 
 namespace UIExpansionKit.API
@@ -22,6 +22,7 @@ namespace UIExpansionKit.API
         internal class SettingVisibilityRegistrationValue
         {
             internal readonly Func<bool> IsVisible;
+
             internal event Action OnUpdateVisibility;
 
             public SettingVisibilityRegistrationValue(Func<bool> isVisible)
@@ -31,7 +32,7 @@ namespace UIExpansionKit.API
 
             internal void FireUpdateVisibility() => OnUpdateVisibility?.Invoke();
         }
-        
+
         /// <summary>
         /// Actions added to this even will be called during UI Expansion Kit init, after VrcUiManager has been created
         /// <exception cref="InvalidOperationException">Thrown if an action is attempted to be added after UI Expansion Kit is initialized (and VrcUiManager is already created)</exception>
@@ -50,7 +51,7 @@ namespace UIExpansionKit.API
                 if (onUiManagerInitDelegateList != null) onUiManagerInitDelegateList.Remove(value);
             }
         }
-        
+
         /// <summary>
         /// Register a simple button for given menu
         /// </summary>
@@ -65,7 +66,7 @@ namespace UIExpansionKit.API
         }
 
         /// <summary>
-        /// Registers a custom button prefab. This prefab can be instantiated multiple times. 
+        /// Registers a custom button prefab. This prefab can be instantiated multiple times.
         /// </summary>
         /// <param name="menu">Menu to attach this button to</param>
         /// <param name="gameObject">Button prefab</param>
@@ -99,7 +100,7 @@ namespace UIExpansionKit.API
         public static ICustomLayoutedMenu GetExpandedMenu(ExpandedMenu menu)
         {
             if (ExpandedMenus.TryGetValue(menu, out var result)) return result;
-            
+
             return ExpandedMenus[menu] = new CustomLayoutedPageImpl(null);
         }
 
@@ -118,13 +119,13 @@ namespace UIExpansionKit.API
         internal class ButtonRegistration
         {
             public GameObject Prefab;
-            
+
             public Action<GameObject> InstanceConsumer;
-            
+
             public string Text;
-            
+
             public Action Action;
-            
+
             public Action<bool> ToggleAction;
             public Func<bool> InitialState;
 
@@ -168,7 +169,7 @@ namespace UIExpansionKit.API
         {
             return new CustomQuickMenuPageImpl(requestedLayout);
         }
-        
+
         /// <summary>
         /// Creates a custom quick menu page.
         /// When shown, the page will be positioned over the camera expando.
@@ -178,8 +179,7 @@ namespace UIExpansionKit.API
         {
             return new CustomCameraPageImpl(requestedLayout);
         }
-        
-        
+
         /// <summary>
         /// Creates a custom quick menu expando overlay page.
         /// When shown, the page will be positioned over the quick menu expando.

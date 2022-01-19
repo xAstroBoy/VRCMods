@@ -1,5 +1,5 @@
-﻿using System;
-using LagFreeScreenshots.API;
+﻿using LagFreeScreenshots.API;
+using System;
 
 namespace LagFreeScreenshots
 {

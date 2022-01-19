@@ -8,13 +8,12 @@ namespace UIExpansionKit.Components
 {
     public class EnableDisableListener : MonoBehaviour
     {
-
-        [method:HideFromIl2Cpp]
+        [method: HideFromIl2Cpp]
         public event Action? OnEnabled;
-        
-        [method:HideFromIl2Cpp]
+
+        [method: HideFromIl2Cpp]
         public event Action? OnDisabled;
-        
+
         public EnableDisableListener(IntPtr obj0) : base(obj0)
         {
         }

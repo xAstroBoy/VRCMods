@@ -1,5 +1,5 @@
-using System.Collections;
 using MelonLoader;
+using System.Collections;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -15,7 +15,7 @@ namespace UIExpansionKit
     {
         public static void DestroyChildren(this Transform parent)
         {
-            for (var i = parent.childCount; i > 0; i--) 
+            for (var i = parent.childCount; i > 0; i--)
                 Object.DestroyImmediate(parent.GetChild(i - 1).gameObject);
         }
 
@@ -25,11 +25,11 @@ namespace UIExpansionKit
             return obj;
         }
 
-        public static T GetOrAddComponent<T>(this GameObject obj) where T: Component
+        public static T GetOrAddComponent<T>(this GameObject obj) where T : Component
         {
             var result = obj.GetComponent<T>();
-            if (result == null) 
-                result  = obj.AddComponent<T>();
+            if (result == null)
+                result = obj.AddComponent<T>();
             return result;
         }
 
@@ -60,7 +60,7 @@ namespace UIExpansionKit
 
             return trueUser.field_Protected_TYPE_0.GetPlayer();
         }
-        
+
         public static Player? GetPlayer(this APIUser user)
         {
             foreach (var pl in PlayerManager.prop_PlayerManager_0.field_Private_List_1_Player_0)

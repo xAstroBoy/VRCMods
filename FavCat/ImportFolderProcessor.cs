@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using FavCat.Database;
 using FavCat.Database.Stored;
 using FavCat.Modules;
 using LiteDB;
 using MelonLoader;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using UIExpansionKit.API;
 using VRC.Core;
 using Random = UnityEngine.Random;
@@ -20,19 +20,19 @@ namespace FavCat
 
         public static string ImportStatusOuter { get; private set; } = "Not importing";
         public static string ImportStatusInner { get; private set; } = "";
-        
+
         public static async Task ProcessImportsFolder()
         {
             ImportRunning = true;
             ImportStatusOuter = "Import running...";
-            
+
             var databases = new List<string>();
             var textFiles = new List<string>();
             foreach (var file in Directory.EnumerateFiles("./UserData/FavCatImport"))
             {
-                if (file.EndsWith(".db")) 
+                if (file.EndsWith(".db"))
                     databases.Add(file);
-                else if(FavCatMod.Instance.AvatarModule != null)
+                else if (FavCatMod.Instance.AvatarModule != null)
                     textFiles.Add(file);
             }
 
@@ -66,7 +66,7 @@ namespace FavCat
             }
             ImportRunning = false;
         }
-        
+
         private static readonly Regex AvatarIdRegex = new Regex("avtr_[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}");
         private static readonly Regex ourUserIdRegex = new Regex("usr_[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}");
         private static readonly Regex ourWorldIdRegex = new Regex("wrld_[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}");
@@ -82,7 +82,7 @@ namespace FavCat
             }
             var fileName = Path.GetFileName(filePath);
             MelonLogger.Msg($"Started avatar import process for file {fileName}");
-            
+
             var toAddAvatar = new List<string>();
             var toAddUsers = new List<string>();
             var toAddWorlds = new List<string>();
@@ -90,7 +90,7 @@ namespace FavCat
                 using var file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 using var reader = new StreamReader(file);
                 string line;
-                
+
                 while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
                 {
                     foreach (Match match in ourUserIdRegex.Matches(line)) toAddUsers.Add(match.Value);
@@ -105,7 +105,6 @@ namespace FavCat
                 }
             }
 
-
             for (var i = 0; i < toAddAvatar.Count; i++)
             {
                 ImportStatusInner = $"Fetching avatar {i + 1}/{toAddAvatar.Count}";
@@ -113,7 +112,7 @@ namespace FavCat
                 if (FavCatMod.Database.myStoredAvatars.FindById(avatarId) == null)
                 {
                     await TaskUtilities.YieldToMainThread();
-                    new ApiAvatar {id = avatarId}.Fetch(); // it will get intercepted and stored
+                    new ApiAvatar { id = avatarId }.Fetch(); // it will get intercepted and stored
                     await Task.Delay(TimeSpan.FromSeconds(5f + Random.Range(0f, 5f))).ConfigureAwait(false);
                 }
             }
@@ -141,7 +140,6 @@ namespace FavCat
                     await Task.Delay(TimeSpan.FromSeconds(5f + Random.Range(0f, 5f))).ConfigureAwait(false);
                 }
             }
-
 
             ImportStatusInner = "Creating favorites list";
             await TaskUtilities.YieldToMainThread();
@@ -177,7 +175,7 @@ namespace FavCat
             MelonLogger.Msg($"Done importing {fileName}");
             File.Delete(filePath);
         }
-        
+
         internal static Task MergeInForeignStore(string foreignStorePath)
         {
             return Task.Run(() =>
@@ -190,8 +188,8 @@ namespace FavCat
                 }
                 var fileName = Path.GetFileName(foreignStorePath);
                 MelonLogger.Msg($"Started merging database with {fileName}");
-                using var storeDatabase = new LiteDatabase(new ConnectionString {Filename = foreignStorePath, ReadOnly = true, Connection = ConnectionType.Direct});
-            
+                using var storeDatabase = new LiteDatabase(new ConnectionString { Filename = foreignStorePath, ReadOnly = true, Connection = ConnectionType.Direct });
+
                 var storedAvatars = storeDatabase.GetCollection<StoredAvatar>("avatars");
                 var storedPlayers = storeDatabase.GetCollection<StoredPlayer>("players");
                 var storedWorlds = storeDatabase.GetCollection<StoredWorld>("worlds");

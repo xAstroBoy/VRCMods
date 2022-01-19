@@ -1,18 +1,16 @@
+using FavCat.Adapters;
+using FavCat.CustomLists;
+using FavCat.Database.Stored;
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FavCat.Adapters;
-using FavCat.CustomLists;
-using FavCat.Database;
-using FavCat.Database.Stored;
-using MelonLoader;
 using UIExpansionKit.API;
 using UIExpansionKit.Components;
 using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.Core;
-using VRC.DataModel;
 using VRC.DataModel.Core;
 using VRC.UI;
 
@@ -20,8 +18,8 @@ namespace FavCat.Modules
 {
     public class PlayersModule : ExtendedFavoritesModuleBase<StoredPlayer>
     {
-
         private static readonly Dictionary<string, APIUser> ourUsersCache = new();
+
         public PlayersModule() : base(ExpandedMenu.SocialMenu, FavCatMod.Database.PlayerFavorites, GetListsParent(), false)
         {
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserDetailsMenu).AddSimpleButton("Local Favorite", ShowFavMenu);
@@ -37,12 +35,12 @@ namespace FavCat.Modules
         {
             var availableListsMenu = ExpansionKitApi.CreateCustomFullMenuPopup(LayoutDescription.WideSlimList);
             var currentUser = FavCatMod.PageUserInfo.field_Private_APIUser_0;
-            
+
             var storedCategories = GetCategoriesInSortedOrder();
 
             if (storedCategories.Count == 0)
                 availableListsMenu.AddLabel("Create some categories first before favoriting players!");
-            
+
             availableListsMenu.AddSimpleButton("Close", () => availableListsMenu.Hide());
 
             foreach (var storedCategory in storedCategories)
@@ -52,7 +50,7 @@ namespace FavCat.Modules
 
                 Text? buttonText = null;
                 availableListsMenu.AddSimpleButton(
-                    $"{(!Favorites.IsFavorite(currentUser.id, storedCategory.CategoryName) ? "Favorite to" : "Unfavorite from")} {storedCategory.CategoryName}", 
+                    $"{(!Favorites.IsFavorite(currentUser.id, storedCategory.CategoryName) ? "Favorite to" : "Unfavorite from")} {storedCategory.CategoryName}",
                     () =>
                     {
                         if (Favorites.IsFavorite(currentUser.id, storedCategory.CategoryName))
@@ -61,12 +59,12 @@ namespace FavCat.Modules
                             Favorites.AddFavorite(currentUser.id, storedCategory.CategoryName);
 
                         buttonText!.text = $"{(!Favorites.IsFavorite(currentUser.id, storedCategory.CategoryName) ? "Favorite to" : "Unfavorite from")} {storedCategory.CategoryName}";
-                        
+
                         if (FavCatSettings.HidePopupAfterFav.Value) availableListsMenu.Hide();
-                    }, 
+                    },
                     o => buttonText = o.GetComponentInChildren<Text>());
             }
-            
+
             availableListsMenu.Show();
         }
 
@@ -81,17 +79,18 @@ namespace FavCat.Modules
         }
 
         private string myLastRequestedPlayer = "";
+
         protected override void OnPickerSelected(IPickerElement picker) => OnPickerSelected(picker.Id, listsParent.gameObject);
-        
+
         public void OnPickerSelected(string playerId, GameObject whichObjectToCheck)
         {
-            if (playerId == myLastRequestedPlayer) 
+            if (playerId == myLastRequestedPlayer)
                 return;
-            
+
             PlaySound();
 
             myLastRequestedPlayer = playerId;
-            var user = new APIUser {id = playerId};
+            var user = new APIUser { id = playerId };
             user.Fetch(new Action<ApiContainer>(_ =>
             {
                 myLastRequestedPlayer = "";
@@ -128,14 +127,15 @@ namespace FavCat.Modules
                 case "name":
                 case "!name":
                 default:
-                    comparison = (a, b) => string.Compare(a.Model.Name, b.Model.Name, StringComparison.InvariantCultureIgnoreCase) * (inverted ? -1 : 1); 
+                    comparison = (a, b) => string.Compare(a.Model.Name, b.Model.Name, StringComparison.InvariantCultureIgnoreCase) * (inverted ? -1 : 1);
                     break;
+
                 case "added":
                 case "!added":
                     comparison = (a, b) => (a.Fav?.AddedOn ?? DateTime.MinValue).CompareTo(b.Fav?.AddedOn ?? DateTime.MinValue) * (inverted ? -1 : 1);
                     break;
             }
-            
+
             if (FavCatSettings.SortPlayersByJoinable.Value)
             {
                 var oldComparison = comparison;
@@ -189,8 +189,7 @@ namespace FavCat.Modules
             SetUserPageUser(FavCatMod.PageUserInfo, user, friendState, UiUserList.ListType.FavoriteFriends);
         }
 
-        private static
-            Action<PageUserInfo, APIUser, PageUserInfo.InfoType,
+        private static Action<PageUserInfo, APIUser, PageUserInfo.InfoType,
                 UiUserList.ListType>? ourSetUserInfo;
 
         private static void SetUserPageUser(PageUserInfo pageUserInfo, APIUser user, PageUserInfo.InfoType enumA,
@@ -201,7 +200,7 @@ namespace FavCat.Modules
                 var targetMethod = typeof(PageUserInfo).GetMethods().Single(it =>
                     it.Name.StartsWith("Method_Public_Void_APIUser_InfoType_ListType_") && XrefScanner.XrefScan(it).Any(jt => jt.Type == XrefType.Global && jt.ReadAsObject()?.ToString() == " wants to be your friend"));
                 ourSetUserInfo = (Action<PageUserInfo, APIUser, PageUserInfo.InfoType,
-                    UiUserList.ListType>) Delegate.CreateDelegate(typeof(Action<PageUserInfo, APIUser, PageUserInfo.InfoType,
+                    UiUserList.ListType>)Delegate.CreateDelegate(typeof(Action<PageUserInfo, APIUser, PageUserInfo.InfoType,
                     UiUserList.ListType>), targetMethod);
             }
 
@@ -224,7 +223,7 @@ namespace FavCat.Modules
         private static void UpdateUsersCache()
         {
             ourUsersCache.Clear();
-            
+
             var list = FriendsListManager.field_Private_Static_FriendsListManager_0.field_Private_List_1_IUser_1;
             if (list == null) return;
             foreach (var userI in list)
@@ -240,8 +239,11 @@ namespace FavCat.Modules
         }
 
         protected override bool FavButtonsOnLists => false;
-        protected override void OnFavButtonClicked(StoredCategory storedCategory) { }
-        protected internal override void RefreshFavButtons() { }
 
+        protected override void OnFavButtonClicked(StoredCategory storedCategory)
+        { }
+
+        protected internal override void RefreshFavButtons()
+        { }
     }
 }

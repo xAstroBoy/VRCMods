@@ -9,7 +9,7 @@ namespace UIExpansionKit.API
         /// Number of columns in grid layout of this menu. Does not change menu width.
         /// </summary>
         public int NumColumns;
-        
+
         /// <summary>
         /// Height of single row in menu-units
         /// </summary>
@@ -20,9 +20,9 @@ namespace UIExpansionKit.API
         /// </summary>
         public int NumRows;
 
-        public static LayoutDescription QuickMenu3Columns = new LayoutDescription {NumColumns = 3, RowHeight = 380 / 3, NumRows = 3};
-        public static LayoutDescription QuickMenu4Columns = new LayoutDescription {NumColumns = 4, RowHeight = 95, NumRows = 4 };
-        public static LayoutDescription WideSlimList = new LayoutDescription {NumColumns = 1, RowHeight = 50, NumRows = 8 };
+        public static LayoutDescription QuickMenu3Columns = new LayoutDescription { NumColumns = 3, RowHeight = 380 / 3, NumRows = 3 };
+        public static LayoutDescription QuickMenu4Columns = new LayoutDescription { NumColumns = 4, RowHeight = 95, NumRows = 4 };
+        public static LayoutDescription WideSlimList = new LayoutDescription { NumColumns = 1, RowHeight = 50, NumRows = 8 };
 
         public LayoutDescription With(int? numColumns = null, int? rowHeight = null, int? numRows = null)
         {

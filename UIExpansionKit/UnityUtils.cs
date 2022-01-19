@@ -9,7 +9,7 @@ namespace UIExpansionKit
     {
         public static GameObject? FindInactiveObjectInActiveRoot(string path)
         {
-            var split = path.Split(new char[]{'/'}, 2);
+            var split = path.Split(new char[] { '/' }, 2);
             var rootObject = GameObject.Find($"/{split[0]}")?.transform;
             if (rootObject == null) return null;
             return Transform.FindRelativeTransformWithPath(rootObject, split[1], false)?.gameObject;

@@ -18,7 +18,7 @@ namespace Styletor.Jsons
         /// User-visible author name of this style
         /// </summary>
         public string Author = "";
-        
+
         /// <summary>
         /// VRC build number this style was created for, i.e. "1137"
         /// </summary>
@@ -28,7 +28,7 @@ namespace Styletor.Jsons
         /// If true, this style is a mix-in and can be disabled or enabled (as opposed to chosen). It will be applied after VRC base style
         /// </summary>
         public bool IsMixin;
-        
+
         /// <summary>
         /// Sorting priority of this mix-in relative to others.
         /// Mixins with larger numbers will override properties from mixins with lower numbers.

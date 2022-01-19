@@ -8,16 +8,19 @@ namespace UIExpansionKit
     internal class CustomExpandoOverlayImpl : CustomLayoutedPageWithOwnedMenuImpl
     {
         private static readonly Stack<CustomLayoutedPageWithOwnedMenuImpl> ourExpandoPagesStack = new();
-        
+
         public CustomExpandoOverlayImpl(LayoutDescription? layoutDescription) : base(layoutDescription)
         {
             IsQuickMenu = true;
         }
-        
+
         protected override Transform ParentTransform => UiExpansionKitMod.Instance.myQmExpandosRoot;
         protected override GameObject MenuPrefab => UiExpansionKitMod.Instance.StuffBundle.GenericPopupWindow;
+
         protected override Transform GetContentRoot(Transform instantiatedMenu) => instantiatedMenu.Find("Content/Scroll View/Viewport/Content");
+
         protected override RectTransform GetTopLevelUiObject(Transform instantiatedMenu) => instantiatedMenu.Cast<RectTransform>();
+
         protected override bool CloseOnMenuClose => true;
         protected override Stack<CustomLayoutedPageWithOwnedMenuImpl> PanelStack => ourExpandoPagesStack;
 

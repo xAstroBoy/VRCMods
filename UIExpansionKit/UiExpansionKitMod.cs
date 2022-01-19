@@ -1,10 +1,10 @@
+using MelonLoader;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using MelonLoader;
 using UIExpansionKit;
 using UIExpansionKit.API;
 using UIExpansionKit.Components;

@@ -1,8 +1,8 @@
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using MelonLoader;
 using UIExpansionKit.API;
 using UIExpansionKit.Components;
 using UnityEngine;
@@ -20,6 +20,7 @@ namespace UIExpansionKit
                 case MelonPreferences_Entry<bool> boolEntry:
                     CreatePinnedPrefButton(boolEntry, expandoRoot, bundle.QuickMenuToggle);
                     return true;
+
                 case MelonPreferences_Entry<string> stringEntry:
                     if (ExpansionKitApi.EnumSettings.TryGetValue((stringEntry.Category.Identifier, stringEntry.Identifier), out var possibleValues))
                     {
@@ -48,7 +49,7 @@ namespace UIExpansionKit
             var button = Object.Instantiate(buttonPrefab, expandoRoot, false);
             var buttonText = button.GetComponentInChildren<Text>();
             var buttonPrefix = (stringEntry.DisplayName ?? stringEntry.Identifier) + ": ";
-            
+
             buttonText.resizeTextMinSize = 8;
             buttonText.resizeTextMaxSize = buttonText.fontSize;
             buttonText.resizeTextForBestFit = true;
@@ -66,7 +67,7 @@ namespace UIExpansionKit
             {
                 var currentValueIsWrong = possibleValues.All(it => it.SettingsValue != stringEntry.Value);
                 var maxRows = Math.Min(possibleValues.Count + 2 + (currentValueIsWrong ? 1 : 0), 8);
-                
+
                 var menu = ExpansionKitApi.CreateCustomQmExpandoPage(LayoutDescription.WideSlimList.With(numRows: maxRows));
 
                 if (currentValueIsWrong)
@@ -77,7 +78,7 @@ namespace UIExpansionKit
                         menu.Hide();
                     });
                 }
-                
+
                 foreach (var possibleValue in possibleValues)
                 {
                     var settingValue = possibleValue.SettingsValue;
@@ -91,20 +92,20 @@ namespace UIExpansionKit
 
                 menu.AddSpacer();
                 menu.AddSimpleButton("Cancel", menu.Hide);
-                
+
                 menu.Show(true);
             }));
-            
+
             Action<string, string> handler = (_, _) => { UpdateText(); };
             stringEntry.OnValueChanged += handler;
             button.GetOrAddComponent<DestroyListener>().OnDestroyed += () => stringEntry.OnValueChanged -= handler;
             button.GetOrAddComponent<EnableDisableListener>().OnEnabled += UpdateText;
         }
 
-        private static void CreatePinnedPrefButtonForEnum<T>(MelonPreferences_Entry<T> enumEntry, Transform expandoRoot, GameObject buttonPrefab) where T: Enum
+        private static void CreatePinnedPrefButtonForEnum<T>(MelonPreferences_Entry<T> enumEntry, Transform expandoRoot, GameObject buttonPrefab) where T : Enum
         {
             var possibleValues = EnumPrefUtil.GetEnumSettingOptions<T>();
-            
+
             var button = Object.Instantiate(buttonPrefab, expandoRoot, false);
             var buttonText = button.GetComponentInChildren<Text>();
             var buttonPrefix = (enumEntry.DisplayName ?? enumEntry.Identifier) + ": ";
@@ -125,7 +126,7 @@ namespace UIExpansionKit
             button.GetComponent<Button>().onClick.AddListener(new Action(() =>
             {
                 var menu = ExpansionKitApi.CreateCustomQmExpandoPage(LayoutDescription.WideSlimList.With(numRows: maxRows));
-                
+
                 foreach (var possibleValue in possibleValues)
                 {
                     var settingValue = possibleValue.SettingsValue;
@@ -136,13 +137,13 @@ namespace UIExpansionKit
                         menu.Hide();
                     });
                 }
-                
+
                 menu.AddSpacer();
                 menu.AddSimpleButton("Cancel", menu.Hide);
-                
+
                 menu.Show(true);
             }));
-            
+
             Action<T, T> handler = (_, _) => { UpdateText(); };
             enumEntry.OnValueChanged += handler;
             button.GetOrAddComponent<DestroyListener>().OnDestroyed += () => enumEntry.OnValueChanged -= handler;

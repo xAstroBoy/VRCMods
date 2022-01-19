@@ -48,7 +48,6 @@ namespace JoinNotifier
 
         public override void OnApplicationStart()
         {
-
             JoinNotifierSettings.RegisterSettings();
 
             MelonCoroutines.Start(InitThings());
@@ -350,7 +349,6 @@ namespace JoinNotifier
             }
 
             return false;
-
         }
     }
 }

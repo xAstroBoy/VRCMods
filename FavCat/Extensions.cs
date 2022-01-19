@@ -19,7 +19,7 @@ namespace FavCat
         internal static void SetSiblingIndex2(this Transform t, int index)
         {
             var currentIndex = t.GetSiblingIndex();
-            if(index < currentIndex || index == t.parent.childCount)
+            if (index < currentIndex || index == t.parent.childCount)
                 t.SetSiblingIndex(index);
             else if (index == currentIndex)
                 return;

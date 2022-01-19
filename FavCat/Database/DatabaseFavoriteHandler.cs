@@ -1,12 +1,12 @@
+using FavCat.Database.Stored;
+using LiteDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FavCat.Database.Stored;
-using LiteDB;
 
 namespace FavCat.Database
 {
-    public class DatabaseFavoriteHandler<T> where T: class
+    public class DatabaseFavoriteHandler<T> where T : class
     {
         public readonly DatabaseEntity EntityType;
         internal readonly ILiteCollection<StoredFavorite> myStoredFavorites;
@@ -28,24 +28,24 @@ namespace FavCat.Database
             myStoredCategories = database.GetCollection<StoredCategory>($"{entityName}_categories");
 
             myStoredFavorites.EnsureIndex("ObjectAndCategory", it => it.ObjectId + it.Category, true);
-            
+
             myStoredFavorites.EnsureIndex(it => it.ObjectId);
             myStoredFavorites.EnsureIndex(it => it.Category);
         }
 
         public StoredCategoryOrder GetStoredOrder()
         {
-            return myStoredOrders.FindById(EntityType.ToString()) ?? new StoredCategoryOrder {EntityType = EntityType};
+            return myStoredOrders.FindById(EntityType.ToString()) ?? new StoredCategoryOrder { EntityType = EntityType };
         }
 
         public void SetStoredOrder(List<CategoryInfo> order, List<string> defaultListsToHide)
         {
-            myStoredOrders.Upsert(new StoredCategoryOrder {EntityType = EntityType, Order = order, DefaultListsToHide = defaultListsToHide});
+            myStoredOrders.Upsert(new StoredCategoryOrder { EntityType = EntityType, Order = order, DefaultListsToHide = defaultListsToHide });
         }
 
         public void AddFavorite(string objectId, string category)
         {
-            myStoredFavorites.Upsert(new StoredFavorite {AddedOn = DateTime.UtcNow, Category = category, ObjectId = objectId});
+            myStoredFavorites.Upsert(new StoredFavorite { AddedOn = DateTime.UtcNow, Category = category, ObjectId = objectId });
             OnCategoryContentsChanged?.Invoke(category);
         }
 
@@ -89,9 +89,9 @@ namespace FavCat.Database
         public void DeleteFavoriteFromAllCategories(string id)
         {
             var favs = myStoredFavorites.Find(it => it.ObjectId == id).ToList();
-            foreach (var storedFavorite in favs) 
+            foreach (var storedFavorite in favs)
                 myStoredFavorites.Delete(storedFavorite.FavoriteId);
-            
+
             foreach (var affectedCategory in favs.Select(it => it.Category).Distinct())
                 OnCategoryContentsChanged?.Invoke(affectedCategory);
         }
@@ -116,7 +116,7 @@ namespace FavCat.Database
 
             category.CategoryName = newName;
             myStoredCategories.Upsert(category);
-            
+
             // no events fired
         }
     }

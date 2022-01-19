@@ -1,5 +1,5 @@
-using System;
 using MelonLoader;
+using System;
 using UIExpansionKit.API;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,7 +20,7 @@ namespace UIExpansionKit
                 MelonLogger.Error($"Exception when creating a button for registration of {registration}: {ex}");
             }
         }
-        
+
         private static void CreateButtonForRegistrationImpl(ExpansionKitApi.ButtonRegistration registration, Transform root, bool isQuickMenu)
         {
             if (registration.Prefab != null)
@@ -28,10 +28,10 @@ namespace UIExpansionKit
                 var newObject = Object.Instantiate(registration.Prefab, root, false);
                 registration.InstanceConsumer?.Invoke(newObject);
             }
-            else if(registration.Text != null)
+            else if (registration.Text != null)
             {
                 var stuff = UiExpansionKitMod.Instance.StuffBundle;
-                
+
                 if (registration.Action != null)
                 {
                     var clickButtonPrefab = stuff.QuickMenuButton;
@@ -40,7 +40,8 @@ namespace UIExpansionKit
                     buttonInstance.GetComponentInChildren<Text>().text = registration.Text;
                     buttonInstance.GetComponent<Button>().onClick.AddListener(registration.Action);
                     registration.InstanceConsumer?.Invoke(buttonInstance);
-                } else if (registration.ToggleAction != null)
+                }
+                else if (registration.ToggleAction != null)
                 {
                     // todo: non-qm proper toggle
                     var clickButtonPrefab = isQuickMenu ? stuff.QuickMenuToggle : stuff.QuickMenuToggle;

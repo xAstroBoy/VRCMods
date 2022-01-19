@@ -1,5 +1,5 @@
-using System;
 using Il2CppSystem.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,7 +26,7 @@ namespace UIExpansionKit.API
         {
             ScanningReflectionCache.ShowUiInputPopup(title, initialText, inputType, isNumeric, confirmButtonText, onComplete, onCancel, placeholderText, closeAfterInput, onPopupShown);
         }
-        
+
         /// <summary>
         /// Shows a VRC keyboard input popup. Requires a big menu page to be open.
         /// </summary>
@@ -49,13 +49,17 @@ namespace UIExpansionKit.API
         {
             ScanningReflectionCache.ShowUiInputPopup(title, initialText, inputType, isNumeric, confirmButtonText, onComplete, onCancel, placeholderText, closeAfterInput, onPopupShown, showLimitLabel, textLengthLimit);
         }
-        
+
         public static event Action QuickMenuClosed;
+
         public static event Action FullMenuClosed;
+
         public static event Action<ExpandedMenu> OnMenuOpened;
 
         internal static void InvokeQuickMenuClosed() => QuickMenuClosed?.Invoke();
+
         internal static void InvokeFullMenuClosed() => FullMenuClosed?.Invoke();
+
         internal static void InvokeMenuOpened(ExpandedMenu menu) => OnMenuOpened?.Invoke(menu);
     }
 }

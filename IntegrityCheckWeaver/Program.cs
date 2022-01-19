@@ -1,19 +1,18 @@
-﻿using System;
+﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
 
 namespace IntegrityCheckWeaver
 {
-    static class Program
+    internal static class Program
     {
         /// <summary>
         /// Why, you may ask?
         /// Because certain individuals with incredibly loose morals are hell-bent on making the game worse for everyone
         /// </summary>
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             if (args.Length <= 0 || !File.Exists(args[0]))
             {

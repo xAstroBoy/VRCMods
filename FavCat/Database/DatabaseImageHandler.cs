@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using FavCat.Database.Stored;
 using LiteDB;
 using MelonLoader;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using UIExpansionKit.API;
 using UnhollowerBaseLib;
 using UnityEngine;
@@ -40,10 +40,10 @@ namespace FavCat.Database
                 foreach (var liteFileInfo in myFileDatabase.FileStorage.FindAll())
                 {
                     if (string.IsNullOrEmpty(liteFileInfo.Id)) continue;
-                    
+
                     allFileInfos.Add((liteFileInfo,
                         myImageInfos.FindById(liteFileInfo.Id) ?? new StoredImageInfo
-                            {LastAccessed = DateTime.MinValue, Id = liteFileInfo.Id}));
+                        { LastAccessed = DateTime.MinValue, Id = liteFileInfo.Id }));
                 }
 
                 allFileInfos.Sort((a, b) => a.Item2.LastAccessed.CompareTo(b.Item2.LastAccessed));
@@ -71,7 +71,7 @@ namespace FavCat.Database
                 }
 
                 await TaskUtilities.YieldToMainThread();
-                
+
                 MelonLogger.Msg($"Removed {cutoffPoint} images from cache");
             }).ContinueWith(task =>
             {
@@ -98,7 +98,7 @@ namespace FavCat.Database
                 using var imageStream = myFileDatabase.FileStorage.OpenRead(url);
                 using var image = await Image.LoadAsync<Rgba32>(imageStream).ConfigureAwait(false);
 
-                var newImageInfo = new StoredImageInfo {Id = url, LastAccessed = DateTime.UtcNow};
+                var newImageInfo = new StoredImageInfo { Id = url, LastAccessed = DateTime.UtcNow };
                 myImageInfos.Upsert(newImageInfo);
 
                 await TaskUtilities.YieldToMainThread();
@@ -129,7 +129,7 @@ namespace FavCat.Database
 
             var texture = new Texture2D(image.Width, image.Height, TextureFormat.RGBA32, false, false);
             fixed (void* pixelsPtr = pixels)
-                texture.LoadRawTextureData((IntPtr) pixelsPtr, pixels.Length * 4);
+                texture.LoadRawTextureData((IntPtr)pixelsPtr, pixels.Length * 4);
 
             texture.Apply(false, true);
 
@@ -139,7 +139,7 @@ namespace FavCat.Database
         public Task StoreImageAsync(string url, Il2CppStructArray<byte> data)
         {
             if (string.IsNullOrEmpty(url)) return Task.CompletedTask;
-            
+
             return Task.Run(() =>
             {
                 try
@@ -149,7 +149,7 @@ namespace FavCat.Database
 
                     myFileDatabase.FileStorage.Upload(url, url, new MemoryStream(data));
 
-                    var newImageInfo = new StoredImageInfo {Id = url, LastAccessed = DateTime.MinValue};
+                    var newImageInfo = new StoredImageInfo { Id = url, LastAccessed = DateTime.MinValue };
                     myImageInfos.Upsert(newImageInfo);
                 }
                 catch (LiteException ex)

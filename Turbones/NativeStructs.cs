@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace Turbones
 {
-
     [StructLayout(LayoutKind.Sequential)]
     internal struct ICallOffsets
     {
@@ -19,18 +18,20 @@ namespace Turbones
 
         public IntPtr transform_get_local_rotation;
     }
-    
+
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ColliderComponentOffsets {
+    internal struct ColliderComponentOffsets
+    {
         public uint collider_radius;
         public uint collider_height;
         public uint collider_center;
         public uint collider_bound;
         public uint collider_direction;
     }
-    
+
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ParticleClassOffsets {
+    internal struct ParticleClassOffsets
+    {
         public uint transform;
         public uint parent_index;
         public uint damping;
@@ -40,9 +41,10 @@ namespace Turbones
         public uint radius;
         public uint end_offset;
     }
-    
+
     [StructLayout(LayoutKind.Sequential)]
-    internal struct BoneComponentOffsets {
+    internal struct BoneComponentOffsets
+    {
         public uint particle_list;
         public uint collider_list;
         public uint gravity;
@@ -52,7 +54,7 @@ namespace Turbones
         public uint update_rate;
         public uint root;
     }
-    
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct ListClassOffsets
     {
@@ -60,7 +62,7 @@ namespace Turbones
         public uint store;
         public uint array_store;
     }
-    
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct ObjectOffsets
     {

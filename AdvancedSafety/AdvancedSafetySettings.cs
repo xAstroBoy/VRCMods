@@ -9,8 +9,8 @@ namespace AdvancedSafety
         public static void RegisterSettings()
         {
             var category = MelonPreferences.CreateCategory(SettingsCategory, "Advanced safety");
-            
-            AvatarFilteringEnabled = category.CreateEntry( nameof(AvatarFilteringEnabled), true, "Enable avatar filtering");
+
+            AvatarFilteringEnabled = category.CreateEntry(nameof(AvatarFilteringEnabled), true, "Enable avatar filtering");
             IncludeFriends = category.CreateEntry(nameof(IncludeFriends), false, "Friends are affected by avatar filtering");
             AbideByShowAvatar = category.CreateEntry(nameof(AbideByShowAvatar), true, "\"Show avatar\" bypasses avatar filtering");
 
@@ -25,7 +25,7 @@ namespace AdvancedSafety
             MaxPolygons = category.CreateEntry(nameof(MaxPolygons), 2_000_000, "Max polygons");
             MaxMaterialSlots = category.CreateEntry(nameof(MaxMaterialSlots), 100, "Max material slots");
             HeuristicallyRemoveScreenSpaceBullshit = category.CreateEntry(nameof(HeuristicallyRemoveScreenSpaceBullshit), true, "Try to remove fullscreen effects");
-            
+
             MaxConstraints = category.CreateEntry(nameof(MaxConstraints), 200, "Max constraints");
             MaxColliders = category.CreateEntry(nameof(MaxColliders), 32, "Max colliders");
             MaxRigidBodies = category.CreateEntry(nameof(MaxRigidBodies), 32, "Max rigidbodies");
@@ -33,27 +33,27 @@ namespace AdvancedSafety
             MaxClothVertices = category.CreateEntry(nameof(MaxClothVertices), 10_000, "Max cloth vertices");
             MaxTransforms = category.CreateEntry(nameof(MaxTransforms), 1000, "Max bones/transforms");
             MaxDepth = category.CreateEntry(nameof(MaxDepth), 50, "Max transforms depth");
-            
+
             MaxAnimators = category.CreateEntry(nameof(MaxAnimators), 64, "Max animators");
             MaxLights = category.CreateEntry(nameof(MaxLights), 2, "Max lights");
             MaxComponents = category.CreateEntry(nameof(MaxComponents), 4_000, "Max total components");
-            
+
             MaxParticles = category.CreateEntry(nameof(MaxParticles), 1_000_000, "Max total particles");
             MaxMeshParticleVertices = category.CreateEntry(nameof(MaxMeshParticleVertices), 1_000_000, "Max total mesh particle polygons");
             MaxParticleTrails = category.CreateEntry(nameof(MaxParticleTrails), 64, "Maximum particle trails");
-            
+
             AllowUiLayer = category.CreateEntry(nameof(AllowUiLayer), false, "Allow UI layer on avatars");
             AllowCustomMixers = category.CreateEntry(nameof(AllowCustomMixers), false, "Allow custom audio mixers on avatars");
             AllowReadingMixers = category.CreateEntry(nameof(AllowReadingMixers), false, "Allow audio mixers in assetbundles");
-            
+
             MaxMaterialSlotsOverSubmeshCount = category.CreateEntry(nameof(MaxMaterialSlotsOverSubmeshCount), 2, "Maximum material slots over submesh count");
             AllowReadingBadFloats = category.CreateEntry(nameof(AllowReadingBadFloats), false, "Allow unbounded floats in assetbundles");
             AllowNonDefaultSortingLayers = category.CreateEntry(nameof(AllowNonDefaultSortingLayers), false, "Allow non-default sorting layers (overrender)");
-            
+
             EnforceDefaultSortingLayer = category.CreateEntry(nameof(EnforceDefaultSortingLayer), true, "Enforce default sorting layer (less overrender, affects performance)");
             RiskyAssertDisable = category.CreateEntry(nameof(RiskyAssertDisable), false, "Disable assertions from corrupted bundles (potentially risky, but prevents more crashes)");
             RemoveSuspiciousThings = category.CreateEntry(nameof(RemoveSuspiciousThings), true, "Completely remove suspicious gameobjects (instead of trying to limit then)");
-            
+
             HidePortalsFromBlockedUsers = category.CreateEntry(nameof(HidePortalsFromBlockedUsers), true, "Hide portals from blocked users");
             HidePortalsFromNonFriends = category.CreateEntry(nameof(HidePortalsFromNonFriends), false, "Hide portals from non-friends");
             HidePortalsCreatedTooClose = category.CreateEntry(nameof(HidePortalsCreatedTooClose), true, "Hide portals created too close to local player");
@@ -61,16 +61,16 @@ namespace AdvancedSafety
 
         public static MelonPreferences_Entry<bool> AvatarFilteringEnabled;
         public static MelonPreferences_Entry<bool> AvatarFilteringOnlyInPublic;
-        
+
         public static MelonPreferences_Entry<bool> AllowSpawnSounds;
         public static MelonPreferences_Entry<bool> AllowGlobalSounds;
-        
+
         public static MelonPreferences_Entry<bool> IncludeFriends;
         public static MelonPreferences_Entry<bool> IncludeFriendsInHides;
-        
+
         public static MelonPreferences_Entry<bool> AbideByShowAvatar;
         public static MelonPreferences_Entry<bool> HidesAbideByShowAvatar;
-        
+
         public static MelonPreferences_Entry<bool> AllowUiLayer;
         public static MelonPreferences_Entry<bool> AllowCustomMixers;
         public static MelonPreferences_Entry<bool> AllowReadingMixers;

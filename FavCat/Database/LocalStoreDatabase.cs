@@ -1,10 +1,10 @@
+using FavCat.Database.Stored;
+using LiteDB;
+using MelonLoader;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
-using FavCat.Database.Stored;
-using LiteDB;
-using MelonLoader;
 
 namespace FavCat.Database
 {
@@ -17,7 +17,7 @@ namespace FavCat.Database
         internal readonly DatabaseFavoriteHandler<StoredAvatar> AvatarFavorites;
         internal readonly DatabaseFavoriteHandler<StoredWorld> WorldFavorites;
         internal readonly DatabaseFavoriteHandler<StoredPlayer> PlayerFavorites;
-        
+
         internal readonly ILiteCollection<StoredAvatar> myStoredAvatars;
         internal readonly ILiteCollection<StoredPlayer> myStoredPlayers;
         internal readonly ILiteCollection<StoredWorld> myStoredWorlds;
@@ -32,9 +32,9 @@ namespace FavCat.Database
         public LocalStoreDatabase(string databasePath, string imageCachePath)
         {
             var connectionType = ConnectionType.Direct;
-            
-            myStoreDatabase = new LiteDatabase(new ConnectionString {Filename = $"{databasePath}/favcat-store.db", Connection = connectionType});
-            myFavDatabase = new LiteDatabase(new ConnectionString {Filename = $"{databasePath}/favcat-favs.db", Connection = connectionType});
+
+            myStoreDatabase = new LiteDatabase(new ConnectionString { Filename = $"{databasePath}/favcat-store.db", Connection = connectionType });
+            myFavDatabase = new LiteDatabase(new ConnectionString { Filename = $"{databasePath}/favcat-favs.db", Connection = connectionType });
             var imageDbPath = $"{imageCachePath}/favcat-images.db";
             try
             {
@@ -55,9 +55,9 @@ namespace FavCat.Database
             myStoredAvatars = myStoreDatabase.GetCollection<StoredAvatar>("avatars");
             myStoredPlayers = myStoreDatabase.GetCollection<StoredPlayer>("players");
             myStoredWorlds = myStoreDatabase.GetCollection<StoredWorld>("worlds");
-            
+
             myStoredOrders = myFavDatabase.GetCollection<StoredCategoryOrder>("category_orders");
-            
+
             AvatarFavorites = new DatabaseFavoriteHandler<StoredAvatar>(myFavDatabase, DatabaseEntity.Avatar, myStoredAvatars, myStoredOrders);
             WorldFavorites = new DatabaseFavoriteHandler<StoredWorld>(myFavDatabase, DatabaseEntity.World, myStoredWorlds, myStoredOrders);
             PlayerFavorites = new DatabaseFavoriteHandler<StoredPlayer>(myFavDatabase, DatabaseEntity.Player, myStoredPlayers, myStoredOrders);
@@ -80,7 +80,8 @@ namespace FavCat.Database
                     {
                         MelonLogger.Error($"Exception in DB update thread: {ex}");
                     }
-                } else
+                }
+                else
                     Thread.Sleep(100);
             }
         }

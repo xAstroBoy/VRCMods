@@ -1,19 +1,19 @@
-﻿using System;
+﻿using FriendsPlusHome;
+using HarmonyLib;
+using MelonLoader;
+using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using FriendsPlusHome;
-using HarmonyLib;
-using MelonLoader;
 using UIExpansionKit.API;
 using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using VRC.Core;
 
-[assembly:MelonInfo(typeof(FriendsPlusHomeMod), "Friends+ Home", "1.1.2", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
-[assembly:MelonGame("VRChat", "VRChat")]
-[assembly:MelonOptionalDependencies("UIExpansionKit")]
+[assembly: MelonInfo(typeof(FriendsPlusHomeMod), "Friends+ Home", "1.1.2", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
+[assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonOptionalDependencies("UIExpansionKit")]
 
 namespace FriendsPlusHome
 {
@@ -32,21 +32,21 @@ namespace FriendsPlusHome
             StartupName = category.CreateEntry(SettingStartupName, nameof(InstanceAccessType.FriendsOfGuests), "Startup instance type");
             ButtonName = category.CreateEntry(SettingButtonName, nameof(InstanceAccessType.FriendsOfGuests), "\"Go Home\" instance type");
 
-            if (MelonHandler.Mods.Any(it => it.Info.Name == "UI Expansion Kit" && !it.Info.Version.StartsWith("0.1."))) 
+            if (MelonHandler.Mods.Any(it => it.Info.Name == "UI Expansion Kit" && !it.Info.Version.StartsWith("0.1.")))
                 RegisterUix2Extension();
 
             foreach (var methodInfo in typeof(VRCFlowManager).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
-                if (methodInfo.ReturnType != typeof(void) || methodInfo.GetParameters().Length != 0) 
+                if (methodInfo.ReturnType != typeof(void) || methodInfo.GetParameters().Length != 0)
                     continue;
-                
-                if (!XrefScanner.XrefScan(methodInfo).Any(it => it.Type == XrefType.Global && it.ReadAsObject()?.ToString() == "Going to Home Location: ")) 
+
+                if (!XrefScanner.XrefScan(methodInfo).Any(it => it.Type == XrefType.Global && it.ReadAsObject()?.ToString() == "Going to Home Location: "))
                     continue;
-                
+
                 MelonLogger.Msg($"Patched {methodInfo.Name}");
                 HarmonyInstance.Patch(methodInfo, postfix: new HarmonyMethod(AccessTools.Method(typeof(FriendsPlusHomeMod), nameof(GoHomePatch))));
             }
-            
+
             DoAfterUiManagerInit(OnUiManagerInit);
         }
 
@@ -58,7 +58,7 @@ namespace FriendsPlusHome
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void RegisterUix2Extension()
         {
-            var possibleValues = new []
+            var possibleValues = new[]
             {
                 (nameof(InstanceAccessType.Public), "Public"),
                 (nameof(InstanceAccessType.FriendsOfGuests), "Friends+"),
@@ -83,9 +83,9 @@ namespace FriendsPlusHome
 
             MelonCoroutines.Start(EnforceTargetInstanceType(flowManager, targetType, isButton ? 10 : 30));
         }
-        
+
         private static int ourRequestId;
-        
+
         private static IEnumerator EnforceTargetInstanceType(VRCFlowManager manager, InstanceAccessType type, float time)
         {
             var endTime = Time.time + time;

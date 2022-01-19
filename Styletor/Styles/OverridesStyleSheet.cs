@@ -1,8 +1,8 @@
+using MelonLoader;
+using Styletor.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using MelonLoader;
-using Styletor.Utils;
 using VRC.UI.Core.Styles;
 
 namespace Styletor.Styles
@@ -23,7 +23,7 @@ namespace Styletor.Styles
         public static OverridesStyleSheet ParseFrom(StyleEngineWrapper styleEngine, string name, IEnumerable<string> lines)
         {
             var result = new OverridesStyleSheet(name, styleEngine);
-            
+
             var inComment = false;
             var inBody = false;
             var lastSelectorText = "";
@@ -42,16 +42,17 @@ namespace Styletor.Styles
                         inComment = false;
                     else if (line.Contains("*/"))
                         throw new ArgumentException($"Multi-line comments mixed into line are not supported (at line {lineNumber})");
-                    
+
                     continue;
                 }
-                
+
                 if (line.StartsWith("//")) continue;
                 if (line.StartsWith("/*"))
                 {
                     inComment = true;
                     continue;
-                } else if (line.Contains("/*"))
+                }
+                else if (line.Contains("/*"))
                     throw new ArgumentException($"Multi-line comments mixed into line are not supported (at line {lineNumber})");
 
                 if (inBody)
@@ -62,7 +63,8 @@ namespace Styletor.Styles
                         result.ParseOverride(lastSelectorText, bodyText.ToString());
                         lastSelectorText = "";
                         bodyText.Clear();
-                    } else if (line.Contains("}"))
+                    }
+                    else if (line.Contains("}"))
                     {
                         throw new ArgumentException($"Mid-line closing braces are not supported (at line {lineNumber})");
                     }
@@ -95,15 +97,15 @@ namespace Styletor.Styles
                     MelonLogger.Msg($"Selector {keyValuePair.Key} overrides nothing in default style");
                     continue;
                 }
-                
+
                 var style = new ElementStyle();
                 myStyleEngine.StyleEngine.Method_Public_Void_ElementStyle_String_0(style, colorizer.ReplacePlaceholders(keyValuePair.Value));
-                
+
                 foreach (var newStylePair in style.field_Public_Dictionary_2_Int32_PropertyValue_0)
-                foreach (var baseStyle in baseStyles)
-                    baseStyle.field_Public_Dictionary_2_Int32_PropertyValue_0[newStylePair.Key] = newStylePair.Value;
+                    foreach (var baseStyle in baseStyles)
+                        baseStyle.field_Public_Dictionary_2_Int32_PropertyValue_0[newStylePair.Key] = newStylePair.Value;
             }
-            
+
             MelonLogger.Msg($"Applies {myStyleOverrides.Count} overrides");
         }
 

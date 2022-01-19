@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
 using MelonLoader;
+using System.Threading.Tasks;
 using UIExpansionKit.API.Classes;
 
 namespace UIExpansionKit.API
@@ -9,9 +9,9 @@ namespace UIExpansionKit.API
     /// </summary>
     public static class TaskUtilities
     {
-        internal static readonly AwaitProvider ourMainThreadQueue = new("UIExpansionKit.ToMainThread"); 
-        internal static readonly AwaitProvider ourFrameEndQueue = new("UIExpansionKit.FrameEnd"); 
-        
+        internal static readonly AwaitProvider ourMainThreadQueue = new("UIExpansionKit.ToMainThread");
+        internal static readonly AwaitProvider ourFrameEndQueue = new("UIExpansionKit.FrameEnd");
+
         /// <summary>
         /// Returns an awaitable object used to return an async method's execution to the main thread.
         /// After the returned object is awaited, execution will continue on main thread inside of `Update` event
@@ -21,7 +21,7 @@ namespace UIExpansionKit.API
         {
             return ourMainThreadQueue.Yield();
         }
-        
+
         /// <summary>
         /// Returns an awaitable object used to return an async method's execution to the main thread.
         /// After the returned object is awaited, execution will continue on main thread inside of `OnGUI` event
@@ -30,7 +30,7 @@ namespace UIExpansionKit.API
         {
             return ourFrameEndQueue.Yield();
         }
-        
+
         /// <summary>
         /// Adds a handler to a Task that prints a message to console if an exception is thrown within that task
         /// </summary>

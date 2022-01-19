@@ -1,9 +1,9 @@
+using FavCat.Database.Stored;
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FavCat.Database.Stored;
-using MelonLoader;
 using UIExpansionKit.API;
 using VRC.Core;
 
@@ -14,7 +14,8 @@ namespace FavCat.Database
         internal void RunBackgroundWorldSearch(string text, Action<IEnumerable<StoredWorld>> callback)
         {
             MelonLogger.Msg($"Running local world search for text {text}");
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 var searchText = text.ToLowerInvariant();
                 var list = myStoredWorlds.Find(stored =>
                     stored.Name.ToLower().Contains(searchText) ||
@@ -24,12 +25,12 @@ namespace FavCat.Database
                 callback(list);
             }).NoAwait();
         }
-        
+
         public void UpdateStoredWorld(ApiWorld world)
         {
             var id = world.id;
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(world.name)) return;
-            
+
             var storedWorld = new StoredWorld
             {
                 WorldId = id,
@@ -56,14 +57,14 @@ namespace FavCat.Database
                 if (preExisting != null)
                 {
                     if (world.assetUrl == null) storedWorld.SupportedPlatforms = preExisting.SupportedPlatforms;
-                
+
                     storedWorld.Description ??= preExisting.Description;
                 }
 
                 myStoredWorlds.Upsert(storedWorld);
             });
         }
-        
+
         public void CompletelyDeleteWorld(string worldId)
         {
             myStoredWorlds.Delete(worldId);

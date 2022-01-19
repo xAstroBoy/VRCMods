@@ -1,7 +1,6 @@
+using MelonLoader;
 using System;
 using System.Runtime.InteropServices;
-using MelonLoader;
-using UnhollowerBaseLib;
 
 namespace Turbones
 {
@@ -38,7 +37,9 @@ namespace Turbones
         internal static ComponentDelegate ResetParticlePositions { get; private set; }
 
         public delegate void RegisterColliderForCollisionFeedbackDelegate(IntPtr colliderPtr, byte group);
+
         public delegate void UnregisterColliderForCollisionFeedbackDelegate(IntPtr colliderPtr);
+
         public delegate ulong GetAndClearCollidingGroupsMaskDelegate();
 
         public delegate void BoneConsumingDelegate(IntPtr bonePtr);

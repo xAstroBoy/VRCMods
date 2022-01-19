@@ -1,6 +1,6 @@
+using MelonLoader;
 using System.Collections.Generic;
 using System.Linq;
-using MelonLoader;
 
 namespace UIExpansionKit
 {
@@ -18,20 +18,22 @@ namespace UIExpansionKit
 
         internal static void RegisterSettings()
         {
-            var category = MelonPreferences.CreateCategory(KitCategory,"UI Expansion Kit");
-            
+            var category = MelonPreferences.CreateCategory(KitCategory, "UI Expansion Kit");
+
             PinsEntry = category.CreateEntry(PinnedPrefs, "", is_hidden: true);
-            
+
             category.CreateEntry(QmExpandoStartsCollapsed, false, "Quick Menu extra panel starts hidden");
             category.CreateEntry(CategoriesStartCollapsed, false, "Settings categories start collapsed");
             category.CreateEntry(CameraExpandoStartsCollapsed, true, "Camera expanded menu starts collapsed");
-            
+
             category.CreateEntry(QmExpandoMinRows, 1, "Minimum rows in Quick Menu extra panel");
             category.CreateEntry(QmExpandoMaxRows, 3, "Maximum rows in Quick Menu extra panel");
         }
 
         public static bool IsQmExpandoStartsCollapsed() => MelonPreferences.GetEntryValue<bool>(KitCategory, QmExpandoStartsCollapsed);
+
         public static bool IsCameraExpandoStartsCollapsed() => MelonPreferences.GetEntryValue<bool>(KitCategory, CameraExpandoStartsCollapsed);
+
         public static bool IsCategoriesStartCollapsed() => MelonPreferences.GetEntryValue<bool>(KitCategory, CategoriesStartCollapsed);
 
         public static int ClampQuickMenuExpandoRowCount(int targetCount)
@@ -46,9 +48,9 @@ namespace UIExpansionKit
 
         public static void PinPref(string category, string prefName)
         {
-            SetPinnedPrefs(ListPinnedPrefs().Concat(new []{(category, prefName)}).Distinct());
+            SetPinnedPrefs(ListPinnedPrefs().Concat(new[] { (category, prefName) }).Distinct());
         }
-        
+
         public static void UnpinPref(string category, string prefName)
         {
             SetPinnedPrefs(ListPinnedPrefs().Where(it => it != (category, prefName)));
@@ -58,7 +60,7 @@ namespace UIExpansionKit
         {
             return ListPinnedPrefs().Contains((category, prefName));
         }
-        
+
         internal static void SetPinnedPrefs(IEnumerable<(string category, string name)> prefs)
         {
             var raw = string.Join(";", prefs.Select(it => $"{it.category},{it.name}"));

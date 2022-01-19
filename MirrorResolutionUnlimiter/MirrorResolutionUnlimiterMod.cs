@@ -1,23 +1,23 @@
-using System;
-using System.Linq;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using MelonLoader;
 using MirrorResolutionUnlimiter;
+using System;
+using System.Linq;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using VRC.SDKBase;
 
-[assembly:MelonInfo(typeof(MirrorResolutionUnlimiterMod), "MirrorResolutionUnlimiter", "1.1.4", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
-[assembly:MelonGame("VRChat", "VRChat")]
-[assembly:MelonOptionalDependencies("UIExpansionKit")]
+[assembly: MelonInfo(typeof(MirrorResolutionUnlimiterMod), "MirrorResolutionUnlimiter", "1.1.4", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
+[assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonOptionalDependencies("UIExpansionKit")]
 
 namespace MirrorResolutionUnlimiter
 {
     internal partial class MirrorResolutionUnlimiterMod : MelonMod
     {
         internal const string ModCategory = "MirrorResolutionUnlimiter";
-        
+
         private const string MaxResPref = "MaxEyeTextureResolution";
         private const string MirrorMsaaPref = "MirrorMsaa";
         private const string AllMirrorsAutoPref = "AllMirrorsUseAutoRes";
@@ -54,7 +54,7 @@ namespace MirrorResolutionUnlimiter
             var forceAutoRes = category.CreateEntry(AllMirrorsAutoPref, false, "Force auto resolution");
             forceAutoRes.OnValueChanged += (_, v) => ourAllMirrorsAuto = v;
             ourAllMirrorsAuto = forceAutoRes.Value;
-            
+
             myPixelLightsSetting = category.CreateEntry(PixelLightsSetting, "default", "Pixel lights in mirrors");
             myPixelLightsSetting.OnValueChangedUntyped += UpdateMirrorPixelLights;
 
@@ -76,7 +76,7 @@ namespace MirrorResolutionUnlimiter
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
             if (buildIndex != -1) return;
-            
+
             foreach (var mirror in Resources.FindObjectsOfTypeAll<VRC_MirrorReflection>())
             {
                 var store = mirror.gameObject.GetComponent<OriginalPixelLightsSettingKeeper>() ??
@@ -98,9 +98,11 @@ namespace MirrorResolutionUnlimiter
                     case "default":
                         mirror.m_DisablePixelLights = mirror.gameObject.GetComponent<OriginalPixelLightsSettingKeeper>()?.OriginalValue ?? mirror.m_DisablePixelLights;
                         break;
+
                     case "disable":
                         mirror.m_DisablePixelLights = true;
                         break;
+
                     case "allow":
                         mirror.m_DisablePixelLights = false;
                         break;
@@ -124,7 +126,7 @@ namespace MirrorResolutionUnlimiter
                 var reflectionData = reflections.ContainsKey(currentCamera)
                     ? reflections[currentCamera]
                     : reflections[currentCamera] = new VRC_MirrorReflection.ReflectionData
-                        {propertyBlock = new MaterialPropertyBlock()};
+                    { propertyBlock = new MaterialPropertyBlock() };
 
                 if (@this._temporaryRenderTexture)
                     RenderTexture.ReleaseTemporary(@this._temporaryRenderTexture);
@@ -142,7 +144,7 @@ namespace MirrorResolutionUnlimiter
                     height = Mathf.Min(currentCamera.pixelHeight, ourMaxEyeResolution);
                 }
                 else
-                    width = height = (int) @this.mirrorResolution;
+                    width = height = (int)@this.mirrorResolution;
 
                 var requestedMsaa = currentCamera.targetTexture?.antiAliasing ?? QualitySettings.antiAliasing;
                 if (ourMirrorMsaa != 0)

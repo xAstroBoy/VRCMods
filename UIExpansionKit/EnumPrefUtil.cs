@@ -15,7 +15,7 @@ namespace UIExpansionKit
                 .Select(it => (it, (T)it.GetValue(null))).Select(it => (it.Item2, GetEnumNameFromField(it.Item1)))
                 .ToList();
         }
-        
+
         private static string GetEnumNameFromField(FieldInfo fi) => fi.GetCustomAttribute<DescriptionAttribute>()?.Description ?? fi.Name;
     }
 }

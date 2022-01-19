@@ -10,8 +10,9 @@ namespace FavCat
     public static class ScanningReflectionCache
     {
         private delegate void DisplayErrorAvatarDelegate(SimpleAvatarPedestal @this);
+
         private delegate void PedestalRefreshDelegate(SimpleAvatarPedestal @this, ApiAvatar avatar);
-        
+
         private static DisplayErrorAvatarDelegate? ourDisplayErrorAvatarDelegate;
         private static PedestalRefreshDelegate? ourPedestalRefreshDelegate;
 
@@ -28,7 +29,7 @@ namespace FavCat
                             jt.Type == XrefType.Global && jt.ReadAsObject()?.ToString() ==
                             "UserInterface/MenuContent/Screens/WorldInfo"));
 
-                ourShowWorldInfoPageDelegate = (Action<ApiWorld, ApiWorldInstance?, bool, APIUser?>) Delegate.CreateDelegate(typeof(Action<ApiWorld, ApiWorldInstance?, bool, APIUser?>), target);
+                ourShowWorldInfoPageDelegate = (Action<ApiWorld, ApiWorldInstance?, bool, APIUser?>)Delegate.CreateDelegate(typeof(Action<ApiWorld, ApiWorldInstance?, bool, APIUser?>), target);
             }
 
             ourShowWorldInfoPageDelegate(world, instance, hasInstanceId, user);
@@ -52,7 +53,7 @@ namespace FavCat
                         });
 
                 ourDisplayErrorAvatarDelegate =
-                    (DisplayErrorAvatarDelegate) Delegate.CreateDelegate(typeof(DisplayErrorAvatarDelegate), target);
+                    (DisplayErrorAvatarDelegate)Delegate.CreateDelegate(typeof(DisplayErrorAvatarDelegate), target);
             }
 
             ourDisplayErrorAvatarDelegate(@this);
@@ -73,12 +74,12 @@ namespace FavCat
 
                             var strings = XrefScanner.XrefScan(it)
                                 .Select(jt => jt.Type == XrefType.Global ? jt.ReadAsObject()?.ToString() : null)
-                                .Where(jt => jt != null).ToHashSet(); 
+                                .Where(jt => jt != null).ToHashSet();
                             return strings.Contains("Refreshing with : ");
                         });
 
                 ourPedestalRefreshDelegate =
-                    (PedestalRefreshDelegate) Delegate.CreateDelegate(typeof(PedestalRefreshDelegate), target);
+                    (PedestalRefreshDelegate)Delegate.CreateDelegate(typeof(PedestalRefreshDelegate), target);
             }
 
             ourPedestalRefreshDelegate(pedestal, avatar);

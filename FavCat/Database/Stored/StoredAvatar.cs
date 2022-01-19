@@ -1,12 +1,12 @@
-using System;
 using LiteDB;
+using System;
 using VRC.Core;
 
 #nullable disable
 
 namespace FavCat.Database.Stored
 {
-    public class StoredAvatar: INamedStoredObject
+    public class StoredAvatar : INamedStoredObject
     {
         [BsonId] public string AvatarId { get; set; }
         public string Name { get; set; }

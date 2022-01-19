@@ -1,4 +1,3 @@
-using MelonLoader;
 using Styletor.Utils;
 using UnityEngine;
 
@@ -11,17 +10,17 @@ namespace Styletor.Styles
         public string MenuColorHighlight { get; private set; } = "";
         public string MenuColorBackground { get; private set; } = "";
         public string MenuColorDarklight { get; private set; } = "";
-        
+
         public string MenuColorText { get; private set; } = "";
         public string MenuColorTextHigh { get; private set; } = "";
-        
+
         public string MenuColorAccent { get; private set; } = "";
         public string MenuColorAccentDarker { get; private set; } = "";
 
         public ColorizerManager(SettingsHolder settings)
         {
             mySettings = settings;
-            
+
             settings.BaseColorEntry.OnValueChanged += (_, _) => { UpdateColors(); };
             settings.AccentColorEntry.OnValueChanged += (_, _) => { UpdateColors(); };
             settings.TextColorEntry.OnValueChanged += (_, _) => { UpdateColors(); };
@@ -57,7 +56,7 @@ namespace Styletor.Styles
             MenuColorHighlight = ColorToHex(highlight);
             MenuColorBackground = ColorToHex(background);
             MenuColorDarklight = ColorToHex(dark);
-            
+
             MenuColorText = ColorToHex(text.RGBMultipliedClamped(0.9f));
             MenuColorTextHigh = ColorToHex(text);
 
@@ -66,6 +65,7 @@ namespace Styletor.Styles
         }
 
         private static string PartToHex(float f) => ((int)(f * 255)).ToString("x2");
+
         private static string ColorToHex(Color c) => $"#{PartToHex(c.r)}{PartToHex(c.g)}{PartToHex(c.b)}";
     }
 }

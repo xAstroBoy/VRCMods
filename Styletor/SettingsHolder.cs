@@ -1,8 +1,8 @@
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using MelonLoader;
 using UIExpansionKit.API;
 using UnityEngine;
 
@@ -11,7 +11,7 @@ namespace Styletor
     public class SettingsHolder
     {
         internal const string CategoryIdentifier = "Styletor";
-        
+
         internal readonly MelonPreferences_Entry<string> StyleEntry;
         internal readonly MelonPreferences_Entry<string> DisabledMixinsEntry;
         internal readonly MelonPreferences_Entry<string> BaseColorEntry;
@@ -21,33 +21,33 @@ namespace Styletor
 
         internal readonly MelonPreferences_Entry<SingleColorMode> UiLasersModeEntry;
         internal readonly MelonPreferences_Entry<string> UiLasersColorEntry;
-        
+
         internal readonly MelonPreferences_Entry<MultiColorMode> ActionMenuModeEntry;
         internal readonly MelonPreferences_Entry<string> ActionMenuBaseColorEntry;
         internal readonly MelonPreferences_Entry<string> ActionMenuAccentColorEntry;
 
         internal readonly List<(string SettingsValue, string DisplayName)> EnumSettingsInfo = new();
-        
+
         public SettingsHolder()
         {
             var category = MelonPreferences.CreateCategory(CategoryIdentifier, "Styletor");
-            
+
             DisabledMixinsEntry = category.CreateEntry("DisabledMixins", "", is_hidden: true);
 
             BaseColorEntry = category.CreateEntry("BaseColorString", "0 60 60", "Menu base color (red green blue; 0-255)");
             AccentColorEntry = category.CreateEntry("AccentColorString", "106 227 249", "Accent color (icons etc)");
             TextColorEntry = category.CreateEntry("TextColorString", "", "Text color (empty = use accent)");
             AuxColorEntry = category.CreateEntry("AuxColorString", "", "Auxiliary color (other things; empty = use accent)");
-            
+
             StyleEntry = category.CreateEntry("SelectedStyle", "Styletor.BundledStyles.basic-recolorable.styletor.zip", "Selected style");
-            
+
             UiLasersModeEntry = category.CreateEntry("LasersMode", SingleColorMode.UseAccentColor, "Laser/cursor recoloring mode");
-            
+
             ActionMenuModeEntry = category.CreateEntry("ActionMenuMode", MultiColorMode.UseMainScheme, "Action Menu color mode");
 
             // todo: right default color?
             UiLasersColorEntry = category.CreateEntry("UiLasersColorString", "106 227 249", "UI Lasers/cursor color");
-            
+
             // todo: right default color?
             ActionMenuBaseColorEntry = category.CreateEntry("ActionMenuBaseColorString", "106 227 249", "Action Menu base color");
             ActionMenuAccentColorEntry = category.CreateEntry("ActionMenuAccentColorString", "106 227 249", "Action Menu accent color");
@@ -77,7 +77,7 @@ namespace Styletor
                     _ => throw new ArgumentOutOfRangeException()
                 };
             }
-            
+
             void UpdateBaseEntrySub()
             {
                 if (lastSubbedEntry1 != null) lastSubbedEntry1.OnValueChangedUntyped -= onUpdate;
@@ -90,12 +90,12 @@ namespace Styletor
 
                 onUpdate();
             }
-            
+
             modeEntry.OnValueChanged += (_, _) => UpdateBaseEntrySub();
-            
+
             UpdateBaseEntrySub();
         }
-        
+
         internal void RegisterUpdateDelegate(MelonPreferences_Entry<MultiColorMode> modeEntry, Action onUpdate, params MelonPreferences_Entry<string>[] ownColorEntries)
         {
             var prevEntries = new List<MelonPreferences_Entry>();
@@ -103,16 +103,16 @@ namespace Styletor
             void UpdateCurrentEntries()
             {
                 prevEntries.Clear();
-                
+
                 prevEntries.AddRange(modeEntry.Value switch
                 {
                     MultiColorMode.DoNotRecolor => Enumerable.Empty<MelonPreferences_Entry>(),
-                    MultiColorMode.UseMainScheme => new []{BaseColorEntry, AccentColorEntry, TextColorEntry, AuxColorEntry},
+                    MultiColorMode.UseMainScheme => new[] { BaseColorEntry, AccentColorEntry, TextColorEntry, AuxColorEntry },
                     MultiColorMode.UseOwnColors => ownColorEntries,
                     _ => throw new ArgumentOutOfRangeException()
                 });
             }
-            
+
             void UpdateBaseEntrySub()
             {
                 foreach (var entry in prevEntries) entry.OnValueChangedUntyped -= onUpdate;
@@ -123,9 +123,9 @@ namespace Styletor
 
                 onUpdate();
             }
-            
+
             modeEntry.OnValueChanged += (_, _) => UpdateBaseEntrySub();
-            
+
             UpdateBaseEntrySub();
         }
 
@@ -141,8 +141,8 @@ namespace Styletor
                 SingleColorMode.UseOwnColor => ParseColor(ownColorEntry.Value),
                 _ => throw new ArgumentOutOfRangeException()
             };
-        } 
-        
+        }
+
         internal Color? GetColorForMode(MelonPreferences_Entry<MultiColorMode> modeEntry, MelonPreferences_Entry<string> baseColorEntry, MelonPreferences_Entry<string> ownColorEntry)
         {
             return modeEntry.Value switch
@@ -152,7 +152,7 @@ namespace Styletor
                 MultiColorMode.UseOwnColors => ParseColor(ownColorEntry.Value),
                 _ => throw new ArgumentOutOfRangeException()
             };
-        } 
+        }
 
         private static void LinkSettingVisibility(MelonPreferences_Entry<SingleColorMode> modeEntry, MelonPreferences_Entry targetEntry)
         {
@@ -161,7 +161,7 @@ namespace Styletor
 
             modeEntry.OnValueChangedUntyped += updateDelegate;
         }
-        
+
         private static void LinkSettingVisibility(MelonPreferences_Entry<MultiColorMode> modeEntry, MelonPreferences_Entry targetEntry)
         {
             var updateDelegate = ExpansionKitApi.RegisterSettingsVisibilityCallback(targetEntry.Category.Identifier,
@@ -203,31 +203,31 @@ namespace Styletor
         {
             [Description("Don't recolor")]
             DoNotRecolor,
-            
+
             [Description("Use base color")]
             UseBaseColor,
-            
+
             [Description("Use accent color")]
             UseAccentColor,
-            
+
             [Description("Use text color")]
             UseTextColor,
-            
+
             [Description("Use auxiliary color")]
             UseAuxColor,
-            
+
             [Description("Use own color")]
             UseOwnColor,
         }
-        
+
         internal enum MultiColorMode
         {
             [Description("Don't recolor")]
             DoNotRecolor,
-            
+
             [Description("Use main color scheme")]
             UseMainScheme,
-            
+
             [Description("Use own colors")]
             UseOwnColors
         }

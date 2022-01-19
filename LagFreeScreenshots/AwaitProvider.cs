@@ -1,8 +1,8 @@
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using MelonLoader;
 
 namespace LagFreeScreenshots
 {
@@ -16,7 +16,7 @@ namespace LagFreeScreenshots
 
             if (myToMainThreadQueue.Count == 0)
                 return;
-            
+
             lock (myToMainThreadQueue)
             {
                 toProcess = myToMainThreadQueue.ToList();
@@ -35,7 +35,7 @@ namespace LagFreeScreenshots
                 }
             }
         }
-        
+
         public YieldAwaitable Yield()
         {
             return new YieldAwaitable(myToMainThreadQueue);
@@ -54,7 +54,8 @@ namespace LagFreeScreenshots
 
             public YieldAwaitable GetAwaiter() => this;
 
-            public void GetResult() { }
+            public void GetResult()
+            { }
 
             public void OnCompleted(Action continuation)
             {

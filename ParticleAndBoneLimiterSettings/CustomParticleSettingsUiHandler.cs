@@ -7,7 +7,7 @@ namespace ParticleAndBoneLimiterSettings
     public class CustomParticleSettingsUiHandler : MonoBehaviour
     {
         internal static PreloadedBundleContents UixBundle;
-        
+
         public CustomParticleSettingsUiHandler(IntPtr ptr) : base(ptr)
         {
         }

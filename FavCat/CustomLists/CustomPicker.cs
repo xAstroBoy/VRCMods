@@ -19,9 +19,9 @@ namespace FavCat.CustomLists
         private Action<string>? myOnClick;
 
         private Texture2D? myTexture;
-        
+
         [HideFromIl2Cpp]
-        public CustomPicker(IntPtr ptr) : base(ptr) {}
+        public CustomPicker(IntPtr ptr) : base(ptr) { }
 
         [HideFromIl2Cpp]
         public void Initialize(IPickerElement pickerElement, Action<string> onClick)
@@ -32,7 +32,7 @@ namespace FavCat.CustomLists
 
             if (myLabelText == null)
                 return;
-            
+
             myLabelText.text = pickerElement.Name;
 
             myCornerImage.gameObject.SetActive(true);
@@ -55,7 +55,7 @@ namespace FavCat.CustomLists
             }
 
             myPrivateImage.SetActive(pickerElement.IsPrivate);
-            
+
             if (gameObject.activeSelf)
                 DoDownloadImage();
         }
@@ -95,7 +95,6 @@ namespace FavCat.CustomLists
             if (gameObject.activeSelf)
                 myImage.texture = texture;
         }
-        
 
         private void Awake()
         {
@@ -104,16 +103,16 @@ namespace FavCat.CustomLists
             myCornerImage = transform.Find("CornerIcon").GetComponent<Image>();
             myLowerCornerImage = transform.Find("LowerCornerIcon").GetComponent<Image>();
             myPrivateImage = transform.Find("CornerLock").gameObject;
-            
+
             GetComponent<Button>().onClick.AddListener(new Action(() => myOnClick?.Invoke(myListElement?.Id)));
-            
+
             if (myListElement != null)
                 Initialize(myListElement, myOnClick!);
         }
 
         private void OnEnable()
         {
-            if (myTexture != null) 
+            if (myTexture != null)
                 myImage.texture = myTexture;
             else
                 DoDownloadImage();

@@ -7,7 +7,7 @@ namespace AdvancedSafety
     public class QuickMenuHideAvatarButtonHandler : MonoBehaviour
     {
         private float myTimeAccumulator;
-        
+
         public QuickMenuHideAvatarButtonHandler(IntPtr ptr) : base(ptr)
         {
         }
@@ -18,7 +18,7 @@ namespace AdvancedSafety
             if (myTimeAccumulator < .5f) return;
 
             myTimeAccumulator = 0;
-            
+
             var player = UiExpansionKitSupport.GetUserSelectedInQm()?.GetPlayer();
             if (player == null) return;
             var vrcPlayer = player.prop_VRCPlayer_0;

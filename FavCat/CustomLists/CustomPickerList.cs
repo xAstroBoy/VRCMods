@@ -1,8 +1,8 @@
+using FavCat.Database.Stored;
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FavCat.Database.Stored;
-using MelonLoader;
 using UnhollowerBaseLib;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
@@ -17,11 +17,11 @@ namespace FavCat.CustomLists
     {
         private int myDisplayedRows = 1;
         private int myColumns = 5;
-        
+
         private RectTransform myContentRoot;
         private RectTransform myRectTransform;
         private ScrollRect myContentScrollRect;
-        
+
         private const int FullWidth = 1500; // 1526
         private const int AvatarWidth = 1139; // 1144
         private const int FullCellX = 305;
@@ -55,9 +55,9 @@ namespace FavCat.CustomLists
         public StoredCategory Category;
 
         private readonly List<IPickerElement> myModels = new List<IPickerElement>();
-        
+
         private readonly Dictionary<(int X, int Y), GameObject> myPickersByCoordinate = new Dictionary<(int, int), GameObject>();
-        
+
         public IReadOnlyList<IPickerElement> Models
         {
             [HideFromIl2Cpp]
@@ -109,7 +109,7 @@ namespace FavCat.CustomLists
             myFavButtonEnabled = enabled;
 
             if (myFavText == null) return;
-            
+
             myFavText.text = text;
             myFavButton.enabled = enabled;
         }
@@ -127,16 +127,16 @@ namespace FavCat.CustomLists
                 myContentRoot = transform.Find("Scroll View/Viewport/ContentRoot").Cast<RectTransform>();
                 myRectTransform = transform.Cast<RectTransform>();
 
-                transform.Find("Header/LessButton").GetComponent<Button>().onClick.AddListener((Action) CollapseClick);
-                transform.Find("Header/MoreButton").GetComponent<Button>().onClick.AddListener((Action) ExpandClick);
-                transform.Find("Header/FavButton").GetComponent<Button>().onClick.AddListener((Action) FavClick);
-                transform.Find("Header/SettingsButton").GetComponent<Button>().onClick.AddListener((Action) SettingsClick);
+                transform.Find("Header/LessButton").GetComponent<Button>().onClick.AddListener((Action)CollapseClick);
+                transform.Find("Header/MoreButton").GetComponent<Button>().onClick.AddListener((Action)ExpandClick);
+                transform.Find("Header/FavButton").GetComponent<Button>().onClick.AddListener((Action)FavClick);
+                transform.Find("Header/SettingsButton").GetComponent<Button>().onClick.AddListener((Action)SettingsClick);
 
-                transform.Find("Header/HomeButton").GetComponent<Button>().onClick.AddListener((Action) HomeClick);
-                transform.Find("Header/EndButton").GetComponent<Button>().onClick.AddListener((Action) EndClick);
+                transform.Find("Header/HomeButton").GetComponent<Button>().onClick.AddListener((Action)HomeClick);
+                transform.Find("Header/EndButton").GetComponent<Button>().onClick.AddListener((Action)EndClick);
 
                 myContentScrollRect = AddScrollRectEx(transform.Find("Scroll View"));
-                myContentScrollRect.onValueChanged.AddListener((Action<Vector2>) ScrollValueChanged);
+                myContentScrollRect.onValueChanged.AddListener((Action<Vector2>)ScrollValueChanged);
 
                 SetAvatarListSizing(myIsAvatarListSizing);
                 DoResize();
@@ -205,10 +205,9 @@ namespace FavCat.CustomLists
                 keyValuePair.Value.GetComponent<CustomPicker>().Clean();
                 PickerPool.Instance.Release(keyValuePair.Value);
             }
-            
+
             myPickersByCoordinate.Clear();
         }
-
 
         [HideFromIl2Cpp]
         private void RecreatePickers()
@@ -221,7 +220,7 @@ namespace FavCat.CustomLists
             }
 
             var clampedNormalizedPosition = Mathf.Clamp01(myContentScrollRect.horizontalNormalizedPosition);
-            var currentViewportStart = (int) (clampedNormalizedPosition * (myModels.Count - myDisplayedRows * myColumns + myDisplayedRows - 1) / myDisplayedRows - 1);
+            var currentViewportStart = (int)(clampedNormalizedPosition * (myModels.Count - myDisplayedRows * myColumns + myDisplayedRows - 1) / myDisplayedRows - 1);
             if (currentViewportStart < 0) currentViewportStart = 0;
 
             var currentViewportEnd = currentViewportStart + myColumns + 2;
@@ -229,15 +228,15 @@ namespace FavCat.CustomLists
             if (myModels.Count <= myDisplayedRows * myColumns)
                 myCountText.text = myModels.Count.ToString();
             else
-                myCountText.text = $"{(int) (clampedNormalizedPosition * myModels.Count + 0.5f)} / {myModels.Count}";
+                myCountText.text = $"{(int)(clampedNormalizedPosition * myModels.Count + 0.5f)} / {myModels.Count}";
 
             var pickersToRecycle = myPickersByCoordinate
                 .Where(it => it.Key.X < currentViewportStart || it.Key.X > currentViewportEnd).ToList();
-            
+
             foreach (var keyValuePair in pickersToRecycle)
             {
                 myPickersByCoordinate.Remove(keyValuePair.Key);
-                
+
                 keyValuePair.Value.SetActive(false);
                 keyValuePair.Value.GetComponent<CustomPicker>().Clean();
                 PickerPool.Instance.Release(keyValuePair.Value);
@@ -247,9 +246,9 @@ namespace FavCat.CustomLists
             {
                 for (var y = 0; y < myDisplayedRows; y++)
                 {
-                    if(myPickersByCoordinate.ContainsKey((x, y)))
+                    if (myPickersByCoordinate.ContainsKey((x, y)))
                         continue;
-                    
+
                     var modelIndex = x * myDisplayedRows + y;
                     if (modelIndex >= myModels.Count)
                         continue;
@@ -262,7 +261,7 @@ namespace FavCat.CustomLists
                     newPicker.SetActive(true);
 
                     var model = myModels[modelIndex];
-                    
+
                     InitPicker(model, newPicker);
                     myPickersByCoordinate[(x, y)] = newPicker;
                 }
@@ -281,14 +280,14 @@ namespace FavCat.CustomLists
         {
             if (myContentRoot == null)
                 return;
-            
+
             // y anchors are set to (0, 1) aka fill, so yDelta = 0 is normal
             myContentRoot.sizeDelta = new Vector2((myModels.Count + (myDisplayedRows - 1)) / Math.Max(1, myDisplayedRows) * myCellSize, 0);
-            
+
             myRectTransform.GetComponent<LayoutElement>().minHeight = 58 + CellY * myDisplayedRows;
-            
+
             myContentRoot.gameObject.SetActive(myDisplayedRows > 0);
-            
+
             RemoveAllPickers();
         }
 
@@ -301,7 +300,7 @@ namespace FavCat.CustomLists
                 return;
 
             VisibleRowsChanged?.Invoke(myDisplayedRows);
-            
+
             DoResize();
             RecreatePickers();
         }
@@ -315,21 +314,22 @@ namespace FavCat.CustomLists
                 return;
 
             VisibleRowsChanged?.Invoke(myDisplayedRows);
-            
+
             DoResize();
             RecreatePickers();
         }
 
         [HideFromIl2Cpp]
         private void FavClick() => OnFavClick?.Invoke();
+
         [HideFromIl2Cpp]
         private void SettingsClick() => OnSettingsClick?.Invoke();
-        
+
         [HideFromIl2Cpp]
         private void HomeClick()
         {
             myContentScrollRect.horizontalNormalizedPosition = 0f;
-            
+
             RecreatePickers();
         }
 
@@ -337,7 +337,7 @@ namespace FavCat.CustomLists
         private void EndClick()
         {
             myContentScrollRect.horizontalNormalizedPosition = 1f;
-            
+
             RecreatePickers();
         }
 
@@ -347,7 +347,7 @@ namespace FavCat.CustomLists
             myDisplayedRows = i;
 
             if (myRectTransform == null) return;
-            
+
             DoResize();
             RecreatePickers();
         }
@@ -387,7 +387,7 @@ namespace FavCat.CustomLists
 
             myParentScrollRect.viewport.GetWorldCorners(ourParentViewportCorners);
             myRectTransform.GetWorldCorners(ourCorners);
-            
+
             myContentRoot.gameObject.SetActive(RectsIntersect(ourParentViewportCorners, ourCorners, myRectTransform.up));
         }
 

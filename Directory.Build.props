@@ -5,7 +5,7 @@
         <VRChatFolder>D:\Steam Library\steamapps\common\VRChat</VRChatFolder>
         <MelonManaged>$(VRChatFolder)\MelonLoader\Managed</MelonManaged>
         <MelonLoader>$(VRChatFolder)\MelonLoader</MelonLoader>
-        <GithubRepoUrl>https://github.com/gompoc/VRChatMods</GithubRepoUrl>
+        <GithubRepoUrl>https://github.com/xAstroBoy/VRCMods-Unchained</GithubRepoUrl>
         <CIVAR>$(CI)</CIVAR>
     </PropertyGroup>
     <ItemGroup Condition="'$(NoModReferences)' != 'true'">

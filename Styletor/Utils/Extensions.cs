@@ -47,7 +47,7 @@ namespace Styletor.Utils
             builder.Append(")");
             return builder.ToString();
         }
-        
+
         public static string ToStringNormalized(this Selector selector)
         {
             var builder = new StringBuilder();
@@ -77,7 +77,7 @@ namespace Styletor.Utils
 
                 builder.Append("],");
             }
-            
+
             return builder.ToString();
         }
 
@@ -109,7 +109,7 @@ namespace Styletor.Utils
             }
             builder.Append("])");
         }
-        
+
         private static void ToStringNormalized(this Selector.SubSelector sub, StringBuilder builder)
         {
             builder.Append("(");
@@ -122,15 +122,15 @@ namespace Styletor.Utils
                 builder.Append(",");
             }
             builder.Append("c=");
-            builder.Append((int) sub.field_Public_Connector_0);
+            builder.Append((int)sub.field_Public_Connector_0);
             builder.Append(",");
             builder.Append("s[");
             foreach (var statement in sub.field_Private_List_1_Statement_0)
             {
                 builder.Append("(");
-                builder.Append((int) statement.field_Public_Operation_0);
+                builder.Append((int)statement.field_Public_Operation_0);
                 builder.Append(",");
-                builder.Append((int) statement.field_Public_Type_0);
+                builder.Append((int)statement.field_Public_Type_0);
                 builder.Append(",");
                 builder.Append(statement.field_Public_String_0);
                 builder.Append("),");
@@ -140,7 +140,7 @@ namespace Styletor.Utils
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Grayscale(this Color c) => 0.29899999499321f * c.r + 0.587000012397766f * c.g + 57.0f / 500.0f * c.b;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Color RGBMultipliedClamped(this Color c, float m) => new() { r = Math.Min(c.r * m, 1f), g = Math.Min(c.g * m, 1f), b = Math.Min(c.b * m, 1f), a = c.a };
 
@@ -149,14 +149,14 @@ namespace Styletor.Utils
             newColor.a = graphic.color.a;
             graphic.color = newColor;
         }
-        
+
         public static byte[] ReadAllBytes(this Stream stream)
         {
             using var memStream = new MemoryStream();
             stream.CopyTo(memStream);
             return memStream.ToArray();
         }
-        
+
         public static string ReadAllText(this Stream stream)
         {
             return Encoding.UTF8.GetString(stream.ReadAllBytes());
@@ -169,7 +169,7 @@ namespace Styletor.Utils
             var result = new List<string>();
             while (!reader.EndOfStream)
                 result.Add(reader.ReadLine());
-            
+
             return result;
         }
     }

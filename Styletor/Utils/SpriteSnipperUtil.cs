@@ -1,8 +1,8 @@
-using System;
 using Il2CppSystem.Collections.Generic;
 using Il2CppSystem.IO;
 using MelonLoader.TinyJSON;
 using Styletor.Jsons;
+using System;
 using UnhollowerBaseLib;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -26,7 +26,7 @@ namespace Styletor.Utils
                 var metadata = new SpriteJson(original);
                 System.IO.File.WriteAllText(path + ".json", JSON.Dump(metadata));
             }
-            
+
             Object.Destroy(newTexture);
         }
 
@@ -67,7 +67,7 @@ namespace Styletor.Utils
                 return ourGrayscaledTexturesMap[original];
 
             var newTexture = Copy(EnsureReadable(original), normalizeWhite ? ProcessPixelsToGrayscaleNormalized : ProcessPixelsToGrayscale);
-            
+
             newTexture.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 
             return ourGrayscaledTexturesMap[original] = newTexture;
@@ -142,7 +142,7 @@ namespace Styletor.Utils
 
             RenderTexture.active = null;
             tex.filterMode = origFilter;
-            
+
             RenderTexture.ReleaseTemporary(rt);
 
             return newTex;

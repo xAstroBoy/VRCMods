@@ -1,9 +1,9 @@
+using FavCat.Database;
+using FavCat.Database.Stored;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using FavCat.Database;
-using FavCat.Database.Stored;
 
 namespace FavCat
 {
@@ -12,7 +12,8 @@ namespace FavCat
         public static bool IsExportingFavorites;
         public static int TotalCategories;
         public static int ProcessedCategories;
-        public static async Task DoExportFavorites<T>(DatabaseFavoriteHandler<T> favorites) where T:class, INamedStoredObject
+
+        public static async Task DoExportFavorites<T>(DatabaseFavoriteHandler<T> favorites) where T : class, INamedStoredObject
         {
             IsExportingFavorites = true;
             ProcessedCategories = 0;
@@ -48,7 +49,8 @@ namespace FavCat
             }
         }
 
-        private static readonly Regex ourBadFileChars = new Regex("[\\/+:*?<>\"|]"); 
+        private static readonly Regex ourBadFileChars = new Regex("[\\/+:*?<>\"|]");
+
         private static string SanitizeForFileName(string s)
         {
             return ourBadFileChars.Replace(s, "");

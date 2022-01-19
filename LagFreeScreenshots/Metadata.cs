@@ -1,7 +1,7 @@
-﻿using System;
+﻿using LagFreeScreenshots.API;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
-using LagFreeScreenshots.API;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -26,11 +26,10 @@ namespace LagFreeScreenshots
             PlayerList = playerList;
         }
 
-        public Metadata(MetadataV2 newMetadata) : this((int) newMetadata.ImageRotation, newMetadata.ApiUser,
+        public Metadata(MetadataV2 newMetadata) : this((int)newMetadata.ImageRotation, newMetadata.ApiUser,
             newMetadata.WorldInstance, newMetadata.Position,
             newMetadata.PlayerList.ConvertAll(it => Tuple.Create(it.Item1, it.Item2)))
         {
-            
         }
 
         public string ConvertToString()

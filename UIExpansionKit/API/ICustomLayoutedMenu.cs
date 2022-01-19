@@ -21,14 +21,14 @@ namespace UIExpansionKit.API
         /// <param name="getInitialState">(optional) this func will be called to get the initial state of this button. If will default to not-set if this is not provided.</param>
         /// <param name="instanceConsumer">(optional) this action will be invoked when the button is instantiated</param>
         void AddToggleButton(string text, Action<bool> onClick, Func<bool> getInitialState = null, Action<GameObject> instanceConsumer = null);
-        
+
         /// <summary>
-        /// Registers a custom button prefab. This prefab can be instantiated multiple times. 
+        /// Registers a custom button prefab. This prefab can be instantiated multiple times.
         /// </summary>
         /// <param name="gameObject">Button prefab</param>
         /// <param name="instanceConsumer">(optional) this action will be invoked when the prefab is instantiated</param>
         void AddCustomButton(GameObject gameObject, Action<GameObject> instanceConsumer = null);
-        
+
         /// <summary>
         /// Adds a label to custom menu
         /// </summary>
@@ -46,7 +46,7 @@ namespace UIExpansionKit.API
         /// Your mod code should subscribe to this event if you want to add custom gameobjects to the menu.
         /// </summary>
         event Action<GameObject> OnContentRootCreated;
-        
+
         /// <summary>
         /// If true, created buttons will be more appropriate for quick menu usage (i.e. square buttons) as opposed to plain menu lists.
         /// </summary>

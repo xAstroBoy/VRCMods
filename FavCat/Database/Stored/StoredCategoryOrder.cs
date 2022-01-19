@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using LiteDB;
+using System.Collections.Generic;
 
 namespace FavCat.Database.Stored
 {
@@ -8,7 +8,7 @@ namespace FavCat.Database.Stored
         public string Name { get; set; }
         public bool IsExternal { get; set; }
     }
-    
+
     public class StoredCategoryOrder
     {
         [BsonId] public DatabaseEntity EntityType { get; set; }

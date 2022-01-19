@@ -1,9 +1,8 @@
-using System;
-using System.Reflection;
 using Il2CppSystem.Collections.Generic;
 using MelonLoader;
+using System;
+using System.Reflection;
 using UnhollowerBaseLib;
-using UnhollowerBaseLib.Attributes;
 
 namespace Turbones
 {
@@ -13,7 +12,7 @@ namespace Turbones
         {
             var result = IL2CPP.il2cpp_resolve_icall(name);
             if (result == IntPtr.Zero) MelonLogger.Error($"ICall {name} not found, crash will likely follow");
-            
+
             MelonDebug.Msg($"ICall pointer for {name} is {result}");
             return result;
         }
@@ -36,7 +35,7 @@ namespace Turbones
                     MelonLogger.Error($"Field {fieldName} is not found on type {typeof(T)} (managed)");
                     return 0;
                 }
-                fieldPtr = (IntPtr) managedField.GetValue(null);
+                fieldPtr = (IntPtr)managedField.GetValue(null);
 
                 if (fieldPtr == IntPtr.Zero)
                 {
@@ -46,9 +45,9 @@ namespace Turbones
             }
 
             var fieldOffset = IL2CPP.il2cpp_field_get_offset(fieldPtr);
-            if (fieldOffset <= 0) 
+            if (fieldOffset <= 0)
                 MelonLogger.Error($"Field offset for field {typeof(T)}.{fieldName} is {fieldOffset}");
-            
+
             MelonDebug.Msg($"Field offset for field {typeof(T)}.{fieldName} is {fieldOffset}");
 
             return fieldOffset;
@@ -82,11 +81,11 @@ namespace Turbones
                 get_component_enabled = GetICall("UnityEngine.Behaviour::get_enabled"),
                 get_transform_child_count = GetICall("UnityEngine.Transform::get_childCount"),
                 set_transform_position_and_rotation = GetICall("UnityEngine.Transform::SetPositionAndRotation_Injected"),
-                
+
                 gchandle_create = GetProcAddressSafe(ga, nameof(IL2CPP.il2cpp_gchandle_new)),
                 gchandle_drop = GetProcAddressSafe(ga, nameof(IL2CPP.il2cpp_gchandle_free)),
                 gchandle_get = GetProcAddressSafe(ga, nameof(IL2CPP.il2cpp_gchandle_get_target)),
-                
+
                 transform_get_local_rotation = GetICall("UnityEngine.Transform::get_localRotation_Injected")
             };
 
@@ -108,7 +107,7 @@ namespace Turbones
             {
                 size = GetFieldOffset<List<Il2CppSystem.Object>>(nameof(List<int>._size)),
                 store = GetFieldOffset<List<Il2CppSystem.Object>>(nameof(List<int>._items)),
-                array_store = (uint) IntPtr.Size * 4 // classPtr, monitor, bounds, maxSize
+                array_store = (uint)IntPtr.Size * 4 // classPtr, monitor, bounds, maxSize
             };
 
             var boneOffsets = new BoneComponentOffsets
@@ -121,20 +120,19 @@ namespace Turbones
                 freeze_axis = GetFieldOffset<DynamicBone>(nameof(DynamicBone.m_FreezeAxis)),
                 update_rate = GetFieldOffset<DynamicBone>(nameof(DynamicBone.m_UpdateRate)),
                 root = GetFieldOffset<DynamicBone>(nameof(DynamicBone.m_Root)),
-                
             };
 
             var particleOffsets = new ParticleClassOffsets
             {
                 transform = GetFieldOffset<DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique>(nameof(DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique.field_Public_Transform_0)),
                 parent_index = GetFieldOffset<DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique>(nameof(DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique.field_Public_Int32_0)),
-                
+
                 damping = GetFieldOffset<DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique>(nameof(DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique.field_Public_Single_0)),
                 elasticity = GetFieldOffset<DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique>(nameof(DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique.field_Public_Single_1)),
                 stiffness = GetFieldOffset<DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique>(nameof(DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique.field_Public_Single_2)),
                 inert = GetFieldOffset<DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique>(nameof(DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique.field_Public_Single_3)),
                 radius = GetFieldOffset<DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique>(nameof(DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique.field_Public_Single_4)),
-                
+
                 end_offset = GetFieldOffset<DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique>(nameof(DynamicBone.ObjectNPrivateTrInSiVeSiQuVeSiVeSiUnique.field_Public_Vector3_2)),
             };
 

@@ -1,7 +1,7 @@
+using MelonLoader;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using MelonLoader;
 using UIExpansionKit.API;
 using UnityEngine;
 
@@ -11,12 +11,12 @@ namespace FavCat
     {
         private const int MaxRunningRequests = 2;
         private const float RequestDelay = .1f;
-        
+
         private static readonly Dictionary<string, List<Action<Texture2D>>> QueuedRequests = new Dictionary<string, List<Action<Texture2D>>>();
         private static readonly Queue<string> RequestOrderQueue = new Queue<string>();
         private static readonly Dictionary<string, List<Action<Texture2D>>> InFlightRequests = new Dictionary<string, List<Action<Texture2D>>>();
         private static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
-        
+
         public static void DownloadImage(string? url, Action<Texture2D> onDone)
         {
             if (url == null)
@@ -43,7 +43,7 @@ namespace FavCat
                 return;
             }
 
-            QueuedRequests[url] = new List<Action<Texture2D>> {onDone};
+            QueuedRequests[url] = new List<Action<Texture2D>> { onDone };
             RequestOrderQueue.Enqueue(url);
         }
 
@@ -73,15 +73,15 @@ namespace FavCat
                         return;
 
                     InFlightRequests.Remove(url);
-                
-                    foreach (var action in list) 
+
+                    foreach (var action in list)
                         action(tex);
                 }).NoAwait();
                 return;
             }
-            
+
             ourNextAllowedUpdate = Time.time + RequestDelay;
-            
+
             MelonLogger.Msg($"Performing image request to {url}");
             ImageDownloader.DownloadImage(url, 256, new Action<Texture2D>(tex =>
             {
@@ -96,8 +96,8 @@ namespace FavCat
                     return;
 
                 InFlightRequests.Remove(url);
-                
-                foreach (var action in list) 
+
+                foreach (var action in list)
                     action(tex);
             }), new Action(() =>
             {
@@ -108,8 +108,8 @@ namespace FavCat
                     return;
 
                 InFlightRequests.Remove(url);
-                
-                foreach (var action in list) 
+
+                foreach (var action in list)
                     action(AssetsHandler.PreviewError.texture);
             }));
         }
@@ -128,21 +128,21 @@ namespace FavCat
         {
             if (RequestOrderQueue.Count == 0)
                 return;
-            
+
             if (InFlightRequests.Count >= MaxRunningRequests)
                 return;
 
             var currentTime = Time.time;
             if (currentTime < ourNextAllowedUpdate)
                 return;
-            
+
             RunRequest(RequestOrderQueue.Dequeue());
         }
 
         public static void CancelRequest(string? url, Action<Texture2D> callback)
         {
             if (url == null) return;
-            
+
             if (QueuedRequests.TryGetValue(url, out var queuedList))
                 queuedList.Remove(callback);
 

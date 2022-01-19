@@ -1,8 +1,8 @@
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using MelonLoader;
 
 namespace UIExpansionKit.API.Classes
 {
@@ -12,6 +12,7 @@ namespace UIExpansionKit.API.Classes
     public class AwaitProvider
     {
         private readonly Queue<Action> myToMainThreadQueue = new();
+
         /// <summary>
         /// The name of this queue specified in constructor; used in exception messages
         /// </summary>
@@ -35,7 +36,7 @@ namespace UIExpansionKit.API.Classes
 
             if (myToMainThreadQueue.Count == 0)
                 return;
-            
+
             lock (myToMainThreadQueue)
             {
                 toProcess = myToMainThreadQueue.ToList();
@@ -64,7 +65,7 @@ namespace UIExpansionKit.API.Classes
             lock (myToMainThreadQueue)
                 myToMainThreadQueue.Enqueue(action);
         }
-        
+
         /// <summary>
         /// Returns an awaitable object (usable with `await` keyword). After it is awaited, async method execution execution will continue when `Flush` is invoked
         /// </summary>
@@ -86,7 +87,8 @@ namespace UIExpansionKit.API.Classes
 
             public YieldAwaitable GetAwaiter() => this;
 
-            public void GetResult() { }
+            public void GetResult()
+            { }
 
             public void OnCompleted(Action continuation)
             {

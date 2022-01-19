@@ -7,16 +7,20 @@ namespace UIExpansionKit
     internal abstract class CustomLayoutedPageWithOwnedMenuImpl : CustomLayoutedPageImpl, ICustomShowableLayoutedMenu
     {
         private static readonly Stack<CustomLayoutedPageWithOwnedMenuImpl> ourCurrentlyVisibleMenus = new();
-        
+
         public CustomLayoutedPageWithOwnedMenuImpl(LayoutDescription? layoutDescription) : base(layoutDescription)
         {
         }
 
         protected abstract Transform ParentTransform { get; }
         protected abstract GameObject MenuPrefab { get; }
+
         protected abstract Transform GetContentRoot(Transform instantiatedMenu);
+
         protected abstract RectTransform GetTopLevelUiObject(Transform instantiatedMenu);
+
         protected abstract void AdjustMenuTransform(Transform instantiatedMenu, int layer);
+
         protected virtual bool CloseOnMenuClose => true;
         protected virtual Stack<CustomLayoutedPageWithOwnedMenuImpl> PanelStack => ourCurrentlyVisibleMenus;
 
@@ -24,12 +28,12 @@ namespace UIExpansionKit
 
         public void Show(bool onTop = false)
         {
-            if (myMenuInstance != null) 
+            if (myMenuInstance != null)
                 return;
 
             if (!onTop)
             {
-                while (PanelStack.Count > 0) 
+                while (PanelStack.Count > 0)
                     PanelStack.Pop().Hide();
             }
 
@@ -60,15 +64,15 @@ namespace UIExpansionKit
 
         public void Hide()
         {
-            if (myMenuInstance == null) 
+            if (myMenuInstance == null)
                 return;
-            
+
             while (PanelStack.Count > 0)
             {
                 var topObject = PanelStack.Pop();
                 if (ReferenceEquals(topObject, this))
                     break;
-                    
+
                 topObject.Hide();
             }
 
@@ -84,7 +88,7 @@ namespace UIExpansionKit
 
         public static void HideAll()
         {
-            while (ourCurrentlyVisibleMenus.Count > 0) 
+            while (ourCurrentlyVisibleMenus.Count > 0)
                 ourCurrentlyVisibleMenus.Pop().Hide();
         }
     }

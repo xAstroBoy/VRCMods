@@ -13,7 +13,7 @@ namespace MirrorResolutionUnlimiter
         private static int UiMenuLayer = 1 << 12;
         private static int UiInternalLayer = 1 << 19;
         private static int MirrorReflectionLayer = 1 << 18;
-        
+
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static void Init()
         {
@@ -22,7 +22,7 @@ namespace MirrorResolutionUnlimiter
 
             ExpansionKitApi.RegisterSettingAsStringEnum(MirrorResolutionUnlimiterMod.ModCategory,
                 MirrorResolutionUnlimiterMod.PixelLightsSetting,
-                new[] {("default", "World default"), ("allow", "Force allow"), ("disable", "Force disable")});
+                new[] { ("default", "World default"), ("allow", "Force allow"), ("disable", "Force disable") });
         }
 
         private static void BeautifyMirrors()
@@ -34,7 +34,6 @@ namespace MirrorResolutionUnlimiter
                     else
                         vrcMirrorReflection.m_ReflectLayers =
                             -1 & ~UiLayer & ~UiMenuLayer & ~PlayerLocalLayer & ~UiInternalLayer;
-
         }
 
         private static void OptimizeMirrors()

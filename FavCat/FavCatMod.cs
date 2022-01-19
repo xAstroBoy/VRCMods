@@ -1,14 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using FavCat;
+﻿using FavCat;
 using FavCat.CustomLists;
 using FavCat.Database;
 using FavCat.Modules;
 using HarmonyLib;
 using MelonLoader;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using UIExpansionKit.API;
 using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
@@ -24,7 +24,7 @@ using Object = UnityEngine.Object;
 
 namespace FavCat
 {
-    internal partial class FavCatMod : MelonMod
+    public partial class FavCatMod : MelonMod
     {
         public static LocalStoreDatabase? Database;
         internal static FavCatMod Instance;

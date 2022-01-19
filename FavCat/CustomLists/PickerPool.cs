@@ -17,7 +17,7 @@ namespace FavCat.CustomLists
         {
             myPickerPrefab = pickerPrefab;
             myPoolRoot = poolRoot.transform;
-            
+
             poolRoot.SetActive(false);
 
             Instance = this;
@@ -46,7 +46,7 @@ namespace FavCat.CustomLists
                 Object.Destroy(go);
                 return;
             }*/ // todo: better shrinking?
-            
+
             go.transform.SetParent(myPoolRoot, false);
             myObjects.Push(go);
         }

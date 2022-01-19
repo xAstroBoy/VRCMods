@@ -1,11 +1,11 @@
+using MelonLoader;
+using Styletor.API;
+using Styletor.Jsons;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MelonLoader;
-using Styletor.API;
-using Styletor.Jsons;
 using UnityEngine;
 using VRC.UI.Core.Styles;
 
@@ -22,13 +22,13 @@ namespace Styletor.Styles
         private readonly SettingsHolder mySettings;
         private readonly ColorizerManager myColorizer;
 
-        public StylesLoader(StyleEngineWrapper styleEngineWrapper, SettingsHolder settings) 
+        public StylesLoader(StyleEngineWrapper styleEngineWrapper, SettingsHolder settings)
         {
             myStyleEngineWrapper = styleEngineWrapper;
             mySettings = settings;
 
             myColorizer = new ColorizerManager(settings);
-            
+
             ReloadStyles();
 
             MelonCoroutines.Start(WarmUpGrayImages());
@@ -67,7 +67,7 @@ namespace Styletor.Styles
 
             mySettings.BaseColorEntry.OnValueChanged += (_, _) => ApplyStyle(mySettings.StyleEntry.Value);
             mySettings.AccentColorEntry.OnValueChanged += (_, _) => ApplyStyle(mySettings.StyleEntry.Value);
-            
+
             ApplyStyle(mySettings.StyleEntry.Value);
         }
 
@@ -88,7 +88,7 @@ namespace Styletor.Styles
         {
             foreach (var overrideStyle in myStyles.Values) overrideStyle.Dispose();
             myStyles.Clear();
-            
+
             foreach (var overrideStyle in myMixins.Values) overrideStyle.Dispose();
             myMixins.Clear();
 
@@ -102,17 +102,17 @@ namespace Styletor.Styles
             foreach (var zipFile in Directory.EnumerateFiles(stylesDir, "*.zip", SearchOption.TopDirectoryOnly))
                 DoLoadStyle(Path.GetFileNameWithoutExtension(zipFile),
                     () => OverrideStyle.LoadFromZip(myStyleEngineWrapper, zipFile));
-            
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(it => !it.IsDynamic))
-            foreach (var manifestResourceName in assembly.GetManifestResourceNames())
-            {
-                if (!manifestResourceName.EndsWith(".styletor.zip", StringComparison.InvariantCultureIgnoreCase)) continue;
 
-                DoLoadStyle(manifestResourceName,
-                    () => OverrideStyle.LoadFromZip(myStyleEngineWrapper, manifestResourceName,
-                        assembly.GetManifestResourceStream(manifestResourceName)!));
-            }
-            
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(it => !it.IsDynamic))
+                foreach (var manifestResourceName in assembly.GetManifestResourceNames())
+                {
+                    if (!manifestResourceName.EndsWith(".styletor.zip", StringComparison.InvariantCultureIgnoreCase)) continue;
+
+                    DoLoadStyle(manifestResourceName,
+                        () => OverrideStyle.LoadFromZip(myStyleEngineWrapper, manifestResourceName,
+                            assembly.GetManifestResourceStream(manifestResourceName)!));
+                }
+
             foreach (var style in StyletorApi.StyleProviders.SelectMany(it => it()))
                 DoLoadStyle(style.Key, () => OverrideStyle.LoadFromZip(myStyleEngineWrapper, style.Key, style.Value, true));
 
@@ -145,25 +145,25 @@ namespace Styletor.Styles
             }
             else
                 MelonLogger.Msg($"Style {styleName} not found");
-            
+
             foreach (var overrideStyle in mixinsToUse.Where(it => it.Metadata.MixinPriority >= 0))
                 overrideStyle.ApplyOverrides(myColorizer);
-            
+
             myStyleEngineWrapper.UpdateStylesForSpriteOverrides();
 
             foreach (var styleElement in myStyleEngineWrapper.StyleEngine.GetComponentsInChildren<StyleElement>(true))
                 styleElement.Method_Protected_Void_0(); // makes the element reload its styles
         }
-        
+
         private OverrideStyle? LoadDirectOverrides(string stylesDir)
         {
             var images = Directory.EnumerateFiles(stylesDir, "*", SearchOption.TopDirectoryOnly)
                 .Where(it => Path.GetExtension(it).ToLower() is ".jpg" or ".jpeg" or ".png").ToList();
 
             if (images.Count == 0) return null;
-            
-            var style = new OverrideStyle(myStyleEngineWrapper, new OverridesStyleSheet("<empty>", myStyleEngineWrapper), new StyleMetadata {Name = "Direct overrides", IsMixin = true, MixinPriority = 1_000_000});
-            
+
+            var style = new OverrideStyle(myStyleEngineWrapper, new OverridesStyleSheet("<empty>", myStyleEngineWrapper), new StyleMetadata { Name = "Direct overrides", IsMixin = true, MixinPriority = 1_000_000 });
+
             foreach (var imagePath in images)
             {
                 var normalizedName = Path.GetFileNameWithoutExtension(imagePath);
@@ -185,7 +185,7 @@ namespace Styletor.Styles
 
                 texture.hideFlags |= HideFlags.DontUnloadUnusedAsset;
                 style.AttachResourceToDelete(texture);
-                
+
                 var rect = new Rect(0, 0, texture.width, texture.height);
                 var pivot = Vector2.one / 2;
                 var border = Vector4.zero;
@@ -196,7 +196,7 @@ namespace Styletor.Styles
                 style.AttachResourceToDelete(sprite);
                 style.AddSpriteOverride(originalSpriteFullKey, sprite);
             }
-            
+
             return style;
         }
 
@@ -204,7 +204,7 @@ namespace Styletor.Styles
         {
             mySettings.EnumSettingsInfo.Clear();
             mySettings.EnumSettingsInfo.Add(("default", "VRChat Default"));
-            
+
             foreach (var keyValuePair in myStyles)
                 mySettings.EnumSettingsInfo.Add((keyValuePair.Key, keyValuePair.Value.Metadata.Name));
         }

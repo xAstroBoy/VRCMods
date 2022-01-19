@@ -25,34 +25,34 @@ namespace Styletor.ExtraHandlers
         public UiLasersHandler(SettingsHolder settings)
         {
             mySettings = settings;
-            
+
             myMouseCursorSprite = UnityUtils
                 .FindInactiveObjectInActiveRoot("_Application/CursorManager/MouseArrow/VRCUICursorIcon")!
                 .GetComponent<SpriteRenderer>();
 
             myDefaultCursorColor = myMouseCursorSprite.color;
-            
+
             myLeftDotSprite = UnityUtils
                 .FindInactiveObjectInActiveRoot("_Application/CursorManager/DotLeftHand/VRCUICursorIcon")!
                 .GetComponent<SpriteRenderer>();
 
             myDefaultDotColor = myLeftDotSprite.color;
-            
+
             myRightDotSprite = UnityUtils
                 .FindInactiveObjectInActiveRoot("_Application/CursorManager/DotRightHand/VRCUICursorIcon")!
                 .GetComponent<SpriteRenderer>();
-            
+
             myLeftHand = UnityUtils
                 .FindInactiveObjectInActiveRoot("_Application/CursorManager/DotLeftHand")!
                 .GetComponent<HandDotCursor>();
 
             myDefaultLaserColorDark = myLeftHand.field_Public_Color_0;
             myDefaultLaserColorBright = myLeftHand.field_Public_Color_1;
-            
+
             myRightHand = UnityUtils
                 .FindInactiveObjectInActiveRoot("_Application/CursorManager/DotRightHand")!
                 .GetComponent<HandDotCursor>();
-            
+
             mySettings.RegisterUpdateDelegate(mySettings.UiLasersModeEntry, mySettings.UiLasersColorEntry, UpdateColors);
         }
 

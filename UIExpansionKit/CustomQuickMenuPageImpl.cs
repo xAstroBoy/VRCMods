@@ -9,10 +9,12 @@ namespace UIExpansionKit
         {
             IsQuickMenu = true;
         }
-        
+
         protected override Transform ParentTransform => UiExpansionKitMod.GetQuickMenu().transform.Find("Container");
         protected override GameObject MenuPrefab => UiExpansionKitMod.Instance.StuffBundle.GenericPopupWindow;
+
         protected override Transform GetContentRoot(Transform instantiatedMenu) => instantiatedMenu.Find("Content/Scroll View/Viewport/Content");
+
         protected override RectTransform GetTopLevelUiObject(Transform instantiatedMenu) => instantiatedMenu.Cast<RectTransform>();
 
         protected override void AdjustMenuTransform(Transform transform, int layer)

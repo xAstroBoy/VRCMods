@@ -22,6 +22,5 @@ namespace FavCat.Adapters
         public bool IsInaccessible => IsPrivate && myAvatar.authorId != APIUser.CurrentUser.id;
 
         public Color? CornerIconColor => null;
-
     }
 }

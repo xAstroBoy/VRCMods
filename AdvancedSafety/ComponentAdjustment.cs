@@ -1,8 +1,7 @@
-using System;
 using Il2CppSystem.Collections.Generic;
+using System;
 using UnhollowerBaseLib;
 using UnityEngine;
-using UnityEngine.Animations;
 using Object = UnityEngine.Object;
 
 namespace AdvancedSafety
@@ -12,7 +11,7 @@ namespace AdvancedSafety
         public static void VisitAudioSource(this AudioSource audioSource, ref int totalCount, ref int deletedCount, ref int specificCount, GameObject obj, System.Collections.Generic.List<AudioSource> sourcesOutList, bool activeInHierarchy)
         {
             totalCount++;
-            
+
             if (specificCount++ >= AdvancedSafetySettings.MaxAudioSources.Value)
             {
                 Object.DestroyImmediate(audioSource, true);
@@ -47,7 +46,7 @@ namespace AdvancedSafety
                     spatializer.enableSpatialization = true;
                     spatializer.gain = Mathf.Min(spatializer.gain, 1f);
                 }
-                
+
                 audioSource.volume = Mathf.Max(audioSource.volume, 1f);
                 audioSource.maxDistance = Mathf.Max(audioSource.maxDistance, 10f);
                 audioSource.minDistance = Mathf.Max(audioSource.minDistance, 1f);
@@ -83,7 +82,7 @@ namespace AdvancedSafety
                 Object.DestroyImmediate(collider, true);
             }
         }
-        
+
         public static void VisitGeneric(this Component rigidbody, ref int totalCount, ref int deletedCount, ref int specificCount, int maxComponents)
         {
             totalCount++;
@@ -110,16 +109,16 @@ namespace AdvancedSafety
                 Object.DestroyImmediate(cloth, true);
             }
         }
-        
+
         private static readonly List<Material> ourMaterialsList = new List<Material>();
-        
+
         public static void VisitRenderer(this Renderer renderer, ref int totalCount, ref int deletedCount, ref int polyCount, ref int materialCount, GameObject obj, System.Collections.Generic.List<SkinnedMeshRenderer> skinnedRendererList)
         {
             totalCount++;
-            
+
             var skinnedMeshRenderer = renderer.TryCast<SkinnedMeshRenderer>();
             var meshFilter = obj.GetComponent<MeshFilter>();
-            
+
             if (skinnedMeshRenderer != null)
                 skinnedRendererList.Add(skinnedMeshRenderer);
 
@@ -131,7 +130,7 @@ namespace AdvancedSafety
 
             renderer.GetSharedMaterials(ourMaterialsList);
             if (ourMaterialsList.Count == 0) return;
-            
+
             var mesh = skinnedMeshRenderer?.sharedMesh ?? meshFilter?.sharedMesh;
             var submeshCount = 0;
             if (mesh != null)
@@ -143,7 +142,7 @@ namespace AdvancedSafety
                 if (firstBadSubmesh != -1)
                 {
                     ourMaterialsList.RemoveRange(firstBadSubmesh, ourMaterialsList.Count - firstBadSubmesh);
-                    renderer.SetMaterialArray((Il2CppReferenceArray<Material>) ourMaterialsList.ToArray());
+                    renderer.SetMaterialArray((Il2CppReferenceArray<Material>)ourMaterialsList.ToArray());
                 }
 
                 polyCount += meshPolyCount;
@@ -165,16 +164,16 @@ namespace AdvancedSafety
             var allowedCountBasedOnSubmeshes = submeshCount + AdvancedSafetySettings.MaxMaterialSlotsOverSubmeshCount.Value;
             if (AdvancedSafetySettings.RemoveSuspiciousThings.Value && allowedCountBasedOnSubmeshes < renderer.GetMaterialCount())
                 Object.Destroy(renderer.gameObject);
-            
+
             var allowedMaterialCount = Math.Min(AdvancedSafetySettings.MaxMaterialSlots.Value - materialCount, allowedCountBasedOnSubmeshes);
             if (allowedMaterialCount < renderer.GetMaterialCount())
             {
                 renderer.GetSharedMaterials(ourMaterialsList);
-                
+
                 deletedCount += ourMaterialsList.Count - allowedMaterialCount;
 
                 ourMaterialsList.RemoveRange(allowedMaterialCount, ourMaterialsList.Count - allowedMaterialCount);
-                renderer.materials = (Il2CppReferenceArray<Material>) ourMaterialsList.ToArray();
+                renderer.materials = (Il2CppReferenceArray<Material>)ourMaterialsList.ToArray();
             }
 
             materialCount += renderer.GetMaterialCount();
@@ -190,16 +189,16 @@ namespace AdvancedSafety
                 Object.Destroy(particleSystem);
                 return;
             }
-            
+
             var particleLimit = AdvancedSafetySettings.MaxParticles.Value - particleCount;
 
-            if (particleSystem.maxParticles > particleLimit) 
+            if (particleSystem.maxParticles > particleLimit)
                 particleSystem.maxParticles = particleLimit;
 
             if (particleSystem.collision.maxCollisionShapes > 256)
                 particleSystem.collision.maxCollisionShapes = 256;
 
-            if (particleSystem.trails.ribbonCount > trailLimit) 
+            if (particleSystem.trails.ribbonCount > trailLimit)
                 particleSystem.trails.ribbonCount = trailLimit;
 
             trailLimit -= particleSystem.trails.ribbonCount;
@@ -214,21 +213,21 @@ namespace AdvancedSafety
                 var polySum = 1;
 
                 foreach (var mesh in meshes)
-                    polySum += CountMeshPolygons(mesh, Int32.MaxValue).TotalPolys;
+                    polySum += CountMeshPolygons(mesh, int.MaxValue).TotalPolys;
 
                 var requestedVertexCount = polySum * particleSystem.maxParticles;
                 var vertexLimit = AdvancedSafetySettings.MaxMeshParticleVertices.Value - meshParticleVertexCount;
-                if (requestedVertexCount > vertexLimit) 
+                if (requestedVertexCount > vertexLimit)
                     particleSystem.maxParticles = vertexLimit / polySum;
 
                 meshParticleVertexCount += polySum * particleSystem.maxParticles;
             }
-            
+
             if (particleSystem.maxParticles == 0)
             {
                 Object.DestroyImmediate(renderer, true);
                 Object.DestroyImmediate(particleSystem, true);
-                
+
                 deletedCount++;
             }
         }
@@ -246,13 +245,15 @@ namespace AdvancedSafety
                     case MeshTopology.Triangles:
                         polysInSubmesh /= 3;
                         break;
+
                     case MeshTopology.Quads:
                         polysInSubmesh /= 4;
                         break;
+
                     case MeshTopology.Lines:
                         polysInSubmesh /= 2;
                         break;
-                    // keep LinesStrip/Points as-is
+                        // keep LinesStrip/Points as-is
                 }
 
                 if (polyCount + polysInSubmesh >= remainingLimit)
@@ -261,7 +262,7 @@ namespace AdvancedSafety
                     break;
                 }
 
-                polyCount += (int) polysInSubmesh;
+                polyCount += (int)polysInSubmesh;
             }
 
             return (polyCount, firstSubmeshOverLimit);
@@ -279,7 +280,7 @@ namespace AdvancedSafety
                 for (var i = 0; i < bones.Count; i++)
                 {
                     if (bones[i] != null) continue;
-                    
+
                     // this prevents stretch-to-zero uglies
                     if (ReferenceEquals(zeroScaleRoot, null))
                     {
@@ -288,7 +289,7 @@ namespace AdvancedSafety
                         zeroScaleRoot.SetParent(skinnedMeshRenderer.rootBone, false);
                         zeroScaleRoot.localScale = Vector3.zero;
                     }
-                        
+
                     bones[i] = zeroScaleRoot;
                 }
 

@@ -24,7 +24,7 @@ namespace FavCat.Adapters
 
         public bool SupportsDesktop => (myWorld.SupportedPlatforms & ApiModel.SupportedPlatforms.StandaloneWindows) != 0;
         public bool SupportsQuest => (myWorld.SupportedPlatforms & ApiModel.SupportedPlatforms.Android) != 0;
-        
+
         public StoredWorld Model => myWorld;
         public StoredFavorite? StoredFavorite => myFavorite;
 

@@ -18,7 +18,7 @@ namespace AdvancedSafety
             myBackingStorage.Add(value);
             SiftUp(myBackingStorage.Count - 1);
         }
-        
+
         public T Dequeue()
         {
             if (myBackingStorage.Count == 0)

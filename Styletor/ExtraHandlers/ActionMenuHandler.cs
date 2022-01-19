@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Linq;
-using System.Reflection;
 using Il2CppSystem.Collections.Generic;
 using MelonLoader;
 using Styletor.Utils;
+using System.Collections;
+using System.Linq;
+using System.Reflection;
 using UIExpansionKit;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +13,7 @@ namespace Styletor.ExtraHandlers
     public class ActionMenuHandler
     {
         private readonly SettingsHolder mySettings;
-        
+
         private readonly GameObject myLeftMenuRoot;
         private readonly GameObject myRightMenuRoot;
         private readonly GameObject myPedalPrefab;
@@ -21,7 +21,7 @@ namespace Styletor.ExtraHandlers
 
         private readonly Dictionary<Texture2D, Texture2D> myGrayTexturesToColorTextures = new();
         private readonly Dictionary<Texture2D, Texture2D> myColorTexturesToGrayTextures = new();
-        
+
         private readonly Dictionary<Sprite, Sprite> myGraySpritesToColorSprites = new();
         private readonly Dictionary<Sprite, Sprite> myColorSpritesToGraySprites = new();
 
@@ -33,18 +33,32 @@ namespace Styletor.ExtraHandlers
         private static readonly System.Collections.Generic.HashSet<string> ourTexturesToGrayscale = new() { "background_main", "background_puppet", "divider", "joystick", "arrow" };
 
         private static readonly System.Collections.Generic.HashSet<string> ourDarkObjectNames = new() { "Main/Center", "Container/Center" };
+
         private static readonly System.Collections.Generic.HashSet<string> ourAccentObjectNames = new()
         {
-            "PedalOption/Select", "/Select", "PedalOption(Clone)/Select", "Inner/Folder Icon", "Inner/Status Icon", "Inner/Playing", "Inner/Waiting",
-            "Main/Cursor", "Container/Fill", "Container/Cursor", "Container/Arrow",
-            "Container/Fill Up", "Container/Fill Down", "Container/Fill Right", "Container/Fill Left"
+            "PedalOption/Select",
+            "/Select",
+            "PedalOption(Clone)/Select",
+            "Inner/Folder Icon",
+            "Inner/Status Icon",
+            "Inner/Playing",
+            "Inner/Waiting",
+            "Main/Cursor",
+            "Container/Fill",
+            "Container/Cursor",
+            "Container/Arrow",
+            "Container/Fill Up",
+            "Container/Fill Down",
+            "Container/Fill Right",
+            "Container/Fill Left"
         };
-        private static readonly System.Collections.Generic.HashSet<string> ourBaseObjectNames = new() { "Main/Background", "Divider/Image", "/Image", "Divider/Divider", "Divider(Clone)/Image", "Inner/Center", "Container/Background", "Container/Title"  };
+
+        private static readonly System.Collections.Generic.HashSet<string> ourBaseObjectNames = new() { "Main/Background", "Divider/Image", "/Image", "Divider/Divider", "Divider(Clone)/Image", "Inner/Center", "Container/Background", "Container/Title" };
 
         public ActionMenuHandler(SettingsHolder settings)
         {
             mySettings = settings;
-            myLeftMenuRoot = UnityUtils.FindInactiveObjectInActiveRoot("UserInterface/ActionMenu/Container/MenuL/ActionMenu")!; 
+            myLeftMenuRoot = UnityUtils.FindInactiveObjectInActiveRoot("UserInterface/ActionMenu/Container/MenuL/ActionMenu")!;
             myRightMenuRoot = UnityUtils.FindInactiveObjectInActiveRoot("UserInterface/ActionMenu/Container/MenuR/ActionMenu")!;
 
             var leftAmComponent = myLeftMenuRoot.GetComponent<ActionMenu>();
@@ -52,12 +66,12 @@ namespace Styletor.ExtraHandlers
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
                 .Where(it => it.PropertyType == typeof(GameObject))
                 .Select(it => (GameObject)it.GetValue(leftAmComponent)).Single(it => it?.name == "PedalOption");
-            
+
             myDividerPrefab = typeof(ActionMenu)
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
                 .Where(it => it.PropertyType == typeof(GameObject))
                 .Select(it => (GameObject)it.GetValue(leftAmComponent)).Single(it => it?.name == "Divider");
-            
+
             MelonCoroutines.Start(PrepareActionMenuBackup());
         }
 
@@ -69,7 +83,7 @@ namespace Styletor.ExtraHandlers
             ProcessObjectForSave(myDividerPrefab.transform, "");
 
             yield return null;
-            
+
             foreach (var textureName in ourTexturesToGrayscale)
             {
                 if (myTexturesByName.TryGetValue(textureName, out var texture))
@@ -78,10 +92,10 @@ namespace Styletor.ExtraHandlers
 
                     myGrayTexturesToColorTextures[grayscaled] = texture;
                     myColorTexturesToGrayTextures[texture] = grayscaled;
-                    
+
                     yield return null;
                 }
-                
+
                 if (mySpritesByName.TryGetValue(textureName, out var sprite))
                 {
                     var grayscaled = SpriteSnipperUtil.GetGrayscaledSprite(sprite, true);
@@ -135,13 +149,13 @@ namespace Styletor.ExtraHandlers
             if (texture == null) return;
 
             var name = texture.name;
-            
+
             if (myTexturesByName.TryGetValue(name, out var previous) && previous != texture)
                 MelonLogger.Msg($"Object named {name} as a texture different from previous one: {previous.name} != {texture.name}");
 
             myTexturesByName[name] = texture;
         }
-        
+
         private Texture2D? RestoreTexture(Texture2D? texture)
         {
             if (texture == null) return null;
@@ -171,7 +185,7 @@ namespace Styletor.ExtraHandlers
             if (texture == null) return;
 
             var name = texture.name;
-            
+
             if (mySpritesByName.TryGetValue(name, out var previous) && previous != texture)
                 MelonLogger.Msg($"Object named {name} as a texture different from previous one: {previous.name} != {texture.name}");
 
@@ -182,7 +196,7 @@ namespace Styletor.ExtraHandlers
         {
             var name = t.gameObject.name;
             var fullName = parentName + "/" + name;
-            
+
             var graphics = t.GetComponents<Graphic>();
             if (graphics.Count > 0)
             {
@@ -194,15 +208,15 @@ namespace Styletor.ExtraHandlers
                     MelonLogger.Msg($"Object named {fullName} was seen with two different colors: {oldColor.ToString()} vs {color.ToString()}");
 
                 myOriginalGraphicColorsByObjectName[fullName] = color;
-                
+
                 foreach (var graphic in graphics)
                 {
                     var maybePedalImage = graphic.TryCast<PedalGraphic>();
-                    if (maybePedalImage != null) 
+                    if (maybePedalImage != null)
                         EncacheTexture(maybePedalImage._texture?.Cast<Texture2D>());
 
                     var maybeRawImage = graphic.TryCast<RawImage>();
-                    if (maybeRawImage != null) 
+                    if (maybeRawImage != null)
                         EncacheTexture(maybeRawImage.texture?.Cast<Texture2D>());
 
                     var maybeNormalImage = graphic.TryCast<Image>();
@@ -214,13 +228,12 @@ namespace Styletor.ExtraHandlers
             var childCount = t.childCount;
             for (var i = 0; i < childCount; i++) ProcessObjectForSave(t.GetChild(i), name);
         }
-        
-        
+
         private void ProcessObjectForRevert(Transform t, string parentName)
         {
             var name = t.gameObject.name;
             var fullName = parentName + "/" + name;
-            
+
             var graphics = t.GetComponents<Graphic>();
             if (graphics.Count > 0)
             {
@@ -237,7 +250,6 @@ namespace Styletor.ExtraHandlers
                     var maybeRawImage = graphic.TryCast<RawImage>();
                     if (maybeRawImage != null)
                         maybeRawImage.texture = RestoreTexture(maybeRawImage.texture?.Cast<Texture2D>());
-                    
 
                     var maybeNormalImage = graphic.TryCast<Image>();
                     if (maybeNormalImage != null)
@@ -248,12 +260,12 @@ namespace Styletor.ExtraHandlers
             var childCount = t.childCount;
             for (var i = 0; i < childCount; i++) ProcessObjectForRevert(t.GetChild(i), name);
         }
-        
+
         private void ProcessObjectForApply(Transform t, string parentName, ref Color baseColor, ref Color iconColor)
         {
             var name = t.gameObject.name;
             var fullName = parentName + "/" + name;
-            
+
             var graphics = t.GetComponents<Graphic>();
             if (graphics.Count > 0)
             {
@@ -266,12 +278,11 @@ namespace Styletor.ExtraHandlers
                     var maybeRawImage = graphic.TryCast<RawImage>();
                     if (maybeRawImage != null)
                         maybeRawImage.texture = ApplyTexture(maybeRawImage.texture?.Cast<Texture2D>());
-                    
 
                     var maybeNormalImage = graphic.TryCast<Image>();
                     if (maybeNormalImage != null)
                         maybeNormalImage.sprite = ApplySprite(maybeNormalImage.sprite);
-                    
+
                     if (ourBaseObjectNames.Contains(fullName))
                         graphic.RecolorKeepAlpha(baseColor);
                     else if (ourAccentObjectNames.Contains(fullName))

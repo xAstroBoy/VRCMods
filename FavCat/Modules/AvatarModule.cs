@@ -1,14 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using FavCat.Adapters;
 using FavCat.CustomLists;
 using FavCat.Database.Stored;
 using MelonLoader;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UIExpansionKit.API;
-using UIExpansionKit.Components;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,7 +18,7 @@ namespace FavCat.Modules
     public sealed class AvatarModule : ExtendedFavoritesModuleBase<StoredAvatar>
     {
         private readonly PageAvatar myPageAvatar;
-        
+
         private string myCurrentUiAvatarId = "";
 
         private readonly bool myInitialised;
@@ -34,12 +32,12 @@ namespace FavCat.Modules
             var foundAvatarPage = Resources.FindObjectsOfTypeAll<PageAvatar>()?.FirstOrDefault(p => p.transform.Find("Change Button") != null);
             if (foundAvatarPage == null)
                 throw new ApplicationException("No avatar page, can't initialize extended favorites");
-            
+
             myPageAvatar = foundAvatarPage;
-            
+
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserDetailsMenu).AddSimpleButton("Search known public avatars", DoSearchKnownAvatars);
 
-            var expandEnforcer = new GameObject(ExpandEnforcerGameObjectName, new[] {Il2CppType.Of<RectTransform>(), Il2CppType.Of<LayoutElement>()});
+            var expandEnforcer = new GameObject(ExpandEnforcerGameObjectName, new[] { Il2CppType.Of<RectTransform>(), Il2CppType.Of<LayoutElement>() });
             expandEnforcer.transform.SetParent(GetListsParent(), false);
             var layoutElement = expandEnforcer.GetComponent<LayoutElement>();
             layoutElement.minWidth = 1534;
@@ -52,8 +50,8 @@ namespace FavCat.Modules
         {
             if (FavCatMod.PageUserInfo == null)
                 return;
-            
-            VRCUiManager.prop_VRCUiManager_0.Method_Public_Void_String_Boolean_0("UserInterface/MenuContent/Screens/Avatar", false);
+
+            FavCatMod.GetUiManager().Method_Public_Void_String_Boolean_0("UserInterface/MenuContent/Screens/Avatar", false);
             SetSearchListHeaderAndScrollToIt("Search running...");
             LastSearchRequest = "Created by " + FavCatMod.PageUserInfo.field_Private_APIUser_0.displayName;
             FavCatMod.Database.RunBackgroundAvatarSearchByUser(FavCatMod.PageUserInfo.field_Private_APIUser_0.id, AcceptSearchResult);
@@ -68,7 +66,7 @@ namespace FavCat.Modules
             var randomList = foundAvatarPage.GetComponentInChildren<UiAvatarList>();
             return randomList.transform.parent;
         }
-        
+
         protected override void OnFavButtonClicked(StoredCategory storedCategory)
         {
             ApiAvatar currentApiAvatar = myPageAvatar.field_Public_SimpleAvatarPedestal_0.field_Internal_ApiAvatar_0;
@@ -81,7 +79,7 @@ namespace FavCat.Modules
             {
                 if (disallowRecursiveRequests)
                     return;
-                
+
                 // something showed an unknown avatar, request it before favoriting
                 new ApiAvatar { id = avatarId }.Fetch(new Action<ApiContainer>(model =>
                 {
@@ -103,7 +101,6 @@ namespace FavCat.Modules
             OnFavButtonClicked(category, id, true);
         }
 
-
         public static void SetSearchHeader(string Header = "Search running...", bool Scroll = true)
         {
             instance.SetSearchListHeaderAndScrollToIt(Header, Scroll);
@@ -114,7 +111,6 @@ namespace FavCat.Modules
             ExtendedFavoritesModuleBase<StoredAvatar>.LastSearchRequest = searchText;
             ExtendedFavoritesModuleBase<StoredAvatar>.AcceptSearchResult(list);
         }
-
 
         public static void GetStoredFromID(string id, System.Action<StoredAvatar> Result = null, bool ForceLatest = false, bool AllowRecursive = false)
         {
@@ -149,9 +145,7 @@ namespace FavCat.Modules
             }
         }
 
-    
-
-    public static void GetApiAvatarFromID(string id, System.Action<ApiAvatar> AfterSuccess = null, System.Action<ApiContainer> OnFailure = null, bool ShowOnPedestal = false)
+        public static void GetApiAvatarFromID(string id, System.Action<ApiAvatar> AfterSuccess = null, System.Action<ApiContainer> OnFailure = null, bool ShowOnPedestal = false)
         {
             try
             {
@@ -184,7 +178,7 @@ namespace FavCat.Modules
             foreach (var customPickerList in PickerLists)
             {
                 bool favorited = FavCatMod.Database.AvatarFavorites.IsFavorite(myCurrentUiAvatarId, customPickerList.Key);
-                    
+
                 var isNonPublic = apiAvatar?.releaseStatus != "public";
                 if (favorited)
                     customPickerList.Value.SetFavButtonText(isNonPublic ? "Unfav (p)" : "Unfav", true);
@@ -196,8 +190,8 @@ namespace FavCat.Modules
         protected override void OnPickerSelected(IPickerElement model)
         {
             PlaySound();
-            
-            var avatar = new ApiAvatar() {id = model.Id};
+
+            var avatar = new ApiAvatar() { id = model.Id };
             if (Imports.IsDebugMode())
                 MelonLogger.Log($"Performing an API request for {model.Id}");
             avatar.Fetch(new Action<ApiContainer>((_) =>
@@ -208,7 +202,7 @@ namespace FavCat.Modules
                 FavCatMod.Database?.UpdateStoredAvatar(avatar);
                 myPageAvatar.field_Public_SimpleAvatarPedestal_0.Refresh(avatar);
 
-                // VRC has a tendency to change visibility of its lists after pedestal refresh 
+                // VRC has a tendency to change visibility of its lists after pedestal refresh
                 ReorderLists();
                 RefreshFavButtons();
             }), new Action<ApiContainer>(c =>
@@ -235,7 +229,7 @@ namespace FavCat.Modules
         internal override void Update()
         {
             if (!myInitialised) return;
-            
+
             base.Update();
 
             var pedestal = myPageAvatar.field_Public_SimpleAvatarPedestal_0;
@@ -263,6 +257,7 @@ namespace FavCat.Modules
         }
 
         protected override bool FavButtonsOnLists => true;
+
         protected override IPickerElement WrapModel(StoredFavorite? favorite, StoredAvatar model) => new DbAvatarAdapter(model, favorite);
 
         protected override void SortModelList(string sortCriteria, string category, List<(StoredFavorite?, StoredAvatar)> avatars)
@@ -274,16 +269,19 @@ namespace FavCat.Modules
                 case "name":
                 case "!name":
                 default:
-                    comparison = (a, b) => string.Compare(a.Model.Name, b.Model.Name, StringComparison.InvariantCultureIgnoreCase) * (inverted ? -1 : 1); 
+                    comparison = (a, b) => string.Compare(a.Model.Name, b.Model.Name, StringComparison.InvariantCultureIgnoreCase) * (inverted ? -1 : 1);
                     break;
+
                 case "updated":
                 case "!updated":
                     comparison = (a, b) => a.Model.UpdatedAt.CompareTo(b.Model.UpdatedAt) * (inverted ? -1 : 1);
                     break;
+
                 case "created":
                 case "!created":
                     comparison = (a, b) => a.Model.CreatedAt.CompareTo(b.Model.CreatedAt) * (inverted ? -1 : 1);
                     break;
+
                 case "added":
                 case "!added":
                     comparison = (a, b) => (a.Fav?.AddedOn ?? DateTime.MinValue).CompareTo(b.Fav?.AddedOn ?? DateTime.MinValue) * (inverted ? -1 : 1);

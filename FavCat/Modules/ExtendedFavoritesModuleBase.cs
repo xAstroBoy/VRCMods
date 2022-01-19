@@ -1,29 +1,27 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using FavCat.Adapters;
 using FavCat.CustomLists;
 using FavCat.Database;
 using FavCat.Database.Stored;
 using MelonLoader;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using UIExpansionKit.API;
 using UIExpansionKit.Components;
-using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace FavCat.Modules
 {
-    public abstract class ExtendedFavoritesModuleBase<T> where T: class, INamedStoredObject
+    public abstract class ExtendedFavoritesModuleBase<T> where T : class, INamedStoredObject
     {
         protected const string SearchCategoryName = "Local search results";
         protected const string ExpandEnforcerGameObjectName = "ExpandEnforcer";
-        
+
         protected readonly Dictionary<string, CustomPickerList> PickerLists = new Dictionary<string, CustomPickerList>();
         protected readonly CustomPickerList SearchList;
         protected readonly Transform listsParent;
@@ -35,7 +33,7 @@ namespace FavCat.Modules
         public static string LastSearchRequest { get; set; } = "";
 
         public static List<T> mySearchResult;
-        
+
         private StoredCategory myCurrentlySelectedCategory;
         private CustomPickerList myCurrentlySelectedList;
         private UISoundCollection mySoundCollection;
@@ -50,10 +48,13 @@ namespace FavCat.Modules
         }
 
         protected abstract void OnPickerSelected(IPickerElement picker);
+
         protected abstract void OnFavButtonClicked(StoredCategory storedCategory);
 
         protected abstract void SortModelList(string sortCriteria, string category, List<(StoredFavorite?, T)> list);
+
         protected abstract IPickerElement WrapModel(StoredFavorite? favorite, T model);
+
         protected internal abstract void RefreshFavButtons();
 
         protected abstract void SearchButtonClicked();
@@ -65,26 +66,26 @@ namespace FavCat.Modules
             ExpansionKitApi.GetExpandedMenu(myExpandedMenu).AddSimpleButton("Local Search", SearchButtonClicked);
             ExpansionKitApi.GetExpandedMenu(myExpandedMenu).AddSimpleButton("New Category", CreateCategory);
             ExpansionKitApi.GetExpandedMenu(myExpandedMenu).AddSimpleButton("More FavCat...", ShowExtraOptionsMenu);
-            
+
             this.listsParent = listsParent;
             myHasUpdateAndCreationDates = hasUpdateAndCreationDates;
 
-                var knownCategories = Favorites.GetCategories().ToList();
-                if (knownCategories.Count == 0)
-                {
-                    var newCategory = new StoredCategory {CategoryName = "Local Favorites", SortType = "!added"};
-                    Favorites.UpdateCategory(newCategory);
-                    CreateList(newCategory);
-                }
-                else
-                    foreach (var categoryName in knownCategories)
-                        if (categoryName.CategoryName != SearchCategoryName)
-                            CreateList(categoryName);
-            
+            var knownCategories = Favorites.GetCategories().ToList();
+            if (knownCategories.Count == 0)
+            {
+                var newCategory = new StoredCategory { CategoryName = "Local Favorites", SortType = "!added" };
+                Favorites.UpdateCategory(newCategory);
+                CreateList(newCategory);
+            }
+            else
+                foreach (var categoryName in knownCategories)
+                    if (categoryName.CategoryName != SearchCategoryName)
+                        CreateList(categoryName);
+
             var searchCategory = Favorites.GetCategory(SearchCategoryName) ??
-                                 new StoredCategory {CategoryName = SearchCategoryName, SortType = hasUpdateAndCreationDates ? "!updated" : "name"};
+                                 new StoredCategory { CategoryName = SearchCategoryName, SortType = hasUpdateAndCreationDates ? "!updated" : "name" };
             Favorites.UpdateCategory(searchCategory);
-            
+
             Favorites.OnCategoryContentsChanged += categoryName =>
             {
                 if (PickerLists.TryGetValue(categoryName, out var list))
@@ -93,7 +94,7 @@ namespace FavCat.Modules
                     RefreshFavButtons();
                 }
             };
-            
+
             ReorderLists();
 
             SearchList = FavCatMod.Instance.CreateCustomList(this.listsParent);
@@ -105,7 +106,7 @@ namespace FavCat.Modules
             {
                 myCurrentlySelectedList = SearchList;
                 myCurrentlySelectedCategory = searchCategory;
-                
+
                 ShowListSettingsMenu(searchCategory);
             };
             SearchList.OnFavClick += () =>
@@ -124,7 +125,7 @@ namespace FavCat.Modules
             SearchList.OnModelClick += OnPickerSelected;
             SearchList.transform.SetSiblingIndex(this.listsParent.transform.childCount);
 
-            // assign these to something random by default - 
+            // assign these to something random by default -
             myCurrentlySelectedCategory = searchCategory;
             myCurrentlySelectedList = SearchList;
 
@@ -149,7 +150,7 @@ namespace FavCat.Modules
         private void ShowListSortingMenu()
         {
             var myListSortingMenu = ExpansionKitApi.CreateCustomFullMenuPopup(LayoutDescription.WideSlimList);
-            
+
             myListSortingMenu.AddSimpleButton("Name (ascending)", () => UpdateSelectedListSort("name", myListSortingMenu));
             myListSortingMenu.AddSimpleButton("Name (descending)", () => UpdateSelectedListSort("!name", myListSortingMenu));
 
@@ -170,7 +171,7 @@ namespace FavCat.Modules
 
             myListSortingMenu.AddSpacer();
             myListSortingMenu.AddSimpleButton("Cancel", myListSortingMenu.Hide);
-            
+
             myListSortingMenu.Show(true);
         }
 
@@ -197,10 +198,9 @@ namespace FavCat.Modules
             yield return new WaitForSeconds(2f);
             ReorderLists();
         }
-        
+
         private void CreateCategory()
         {
-            
             BuiltinUiUtils.ShowInputPopup("Enter category name", "", InputField.InputType.Standard, false, "Create",
                 (s, _, __) =>
                 {
@@ -209,7 +209,9 @@ namespace FavCat.Modules
                     {
                         var newCategory = new StoredCategory
                         {
-                            CategoryName = s, SortType = "!added", VisibleRows = 1
+                            CategoryName = s,
+                            SortType = "!added",
+                            VisibleRows = 1
                         };
                         Favorites.UpdateCategory(newCategory);
                         CreateList(newCategory);
@@ -233,7 +235,7 @@ namespace FavCat.Modules
             if (mySearchResult != null)
                 ProcessSearchResults();
         }
-        
+
         internal void ReorderLists()
         {
             var storedOrderFull = Favorites.GetStoredOrder();
@@ -241,15 +243,15 @@ namespace FavCat.Modules
             Transform? lastSeenList;
             int lastSeenListIndex = -1;
 
-            var knownLists = new Dictionary<String, (Transform ListTransform, string ListName, bool IsCustom)>();
+            var knownLists = new Dictionary<string, (Transform ListTransform, string ListName, bool IsCustom)>();
             foreach (var list in GatherLists())
             {
                 if (MelonDebug.IsEnabled() && knownLists.ContainsKey(list.ListName))
                     MelonLogger.Msg($"List {list.ListName} is duplicated");
-                
+
                 knownLists[list.ListName] = list;
             }
-            
+
             foreach (var categoryInfo in storedOrder)
             {
                 if (categoryInfo.IsExternal)
@@ -269,7 +271,7 @@ namespace FavCat.Modules
                 lastSeenList.SetSiblingIndex2(lastSeenListIndex + 1);
                 lastSeenListIndex = lastSeenList.GetSiblingIndex();
             }
-            
+
             foreach (var listToHideName in storedOrderFull.DefaultListsToHide)
                 if (knownLists.TryGetValue(listToHideName ?? "", out var listToHide) && !listToHide.IsCustom)
                     listToHide.ListTransform.gameObject.SetActive(false);
@@ -278,7 +280,7 @@ namespace FavCat.Modules
         protected void ShowListSettingsMenu(StoredCategory category)
         {
             var listSettingsMenu = ExpansionKitApi.CreateCustomFullMenuPopup(LayoutDescription.QuickMenu3Columns);
-            
+
             listSettingsMenu.AddSimpleButton("Rename", RenameSelectedList);
             listSettingsMenu.AddSimpleButton($"Move", MoveSelectedList);
             listSettingsMenu.AddSimpleButton($"Sort (current: {HumanSort(category)}", ShowListSortingMenu);
@@ -288,13 +290,13 @@ namespace FavCat.Modules
             listSettingsMenu.AddSpacer();
 
             if (category.CategoryName == SearchCategoryName)
-                    listSettingsMenu.AddSimpleButton("Save as new category", () => SaveSearchAsCategory());
+                listSettingsMenu.AddSimpleButton("Save as new category", () => SaveSearchAsCategory());
             else
                 listSettingsMenu.AddSimpleButton("Delete", DeleteSelectedList);
-            
+
             listSettingsMenu.AddSpacer();
             listSettingsMenu.AddSimpleButton("Back", listSettingsMenu.Hide);
-            
+
             listSettingsMenu.Show();
         }
 
@@ -313,7 +315,7 @@ namespace FavCat.Modules
             });
             confirmMenu.AddSpacer();
             confirmMenu.AddSimpleButton("Nooo no lags!", () => confirmMenu.Hide());
-            
+
             confirmMenu.Show(true);
         }
 
@@ -321,7 +323,7 @@ namespace FavCat.Modules
         {
             if (category.SortType.StartsWith("!"))
                 return category.SortType.Substring(1) + ", descending";
-            
+
             return category.SortType + ", ascending";
         }
 
@@ -344,16 +346,16 @@ namespace FavCat.Modules
         {
             PickerLists.Remove(myCurrentlySelectedCategory.CategoryName);
             Object.Destroy(myCurrentlySelectedList.gameObject);
-            
+
             Favorites.DeleteCategory(myCurrentlySelectedCategory);
-            
+
             ExpansionKitApi.HideAllCustomPopups();
         }
 
         private void SaveSearchAsCategory(bool confirmed = false)
         {
             ExpansionKitApi.HideAllCustomPopups();
-            
+
             if (SearchList.Models.Count > 1000 && !confirmed)
             {
                 ShowBigListWarning(SearchList.Models.Count, () => SaveSearchAsCategory(true));
@@ -411,7 +413,7 @@ namespace FavCat.Modules
             {
                 myCurrentlySelectedList = list;
                 myCurrentlySelectedCategory = storedCategory;
-                
+
                 ShowListSettingsMenu(storedCategory);
             };
             list.VisibleRowsChanged += newRows =>
@@ -432,7 +434,7 @@ namespace FavCat.Modules
         private void RenameSelectedList()
         {
             ExpansionKitApi.HideAllCustomPopups();
-            
+
             BuiltinUiUtils.ShowInputPopup($"Enter new name for '{myCurrentlySelectedCategory.CategoryName}'", "", InputField.InputType.Standard, false, "Rename!",
                 (s, _, __) =>
                 {
@@ -459,11 +461,11 @@ namespace FavCat.Modules
         private void MoveSelectedList()
         {
             ExpansionKitApi.HideAllCustomPopups();
-            
+
             var moveOptionsMenu = ExpansionKitApi.CreateCustomFullMenuPopup(LayoutDescription.WideSlimList);
-            
+
             moveOptionsMenu.AddSimpleButton("The beginning of the list", () => UpdateSelectedListOrder(0));
-            
+
             foreach (var subListObj in listsParent)
             {
                 var subList = subListObj.Cast<Transform>();
@@ -473,14 +475,14 @@ namespace FavCat.Modules
                 if (listName != null)
                     moveOptionsMenu.AddSimpleButton($"After '{listName}'", () => UpdateSelectedListOrder(subList.GetSiblingIndex() + 1));
             }
-            
+
             moveOptionsMenu.AddSimpleButton("The end of the list", () => UpdateSelectedListOrder(listsParent.childCount));
             moveOptionsMenu.AddSpacer();
             moveOptionsMenu.AddSimpleButton("Cancel", moveOptionsMenu.Hide);
-            
+
             moveOptionsMenu.Show();
         }
-        
+
         private static string? ExtractListName(GameObject listRoot)
         {
             var customList = listRoot.GetComponent<CustomPickerList>();
@@ -496,30 +498,30 @@ namespace FavCat.Modules
         private List<(Transform ListTransform, string ListName, bool IsCustom)> GatherLists()
         {
             var result = new List<(Transform, string, bool)>();
-            
+
             foreach (var subListObj in listsParent)
             {
                 var subList = subListObj.Cast<Transform>();
-                
+
                 if (subList.gameObject.name == ExpandEnforcerGameObjectName)
                     continue;
 
                 var listName = ExtractListName(subList.gameObject);
                 if (listName != null)
-                    result.Add((subList, listName, (bool) subList.GetComponent<CustomPickerList>()));
+                    result.Add((subList, listName, (bool)subList.GetComponent<CustomPickerList>()));
             }
 
             return result;
         }
-        
+
         private void UpdateSelectedListOrder(int position)
         {
             myCurrentlySelectedList.transform.SetSiblingIndex2(position);
 
             var oldOrder = Favorites.GetStoredOrder();
             Favorites.SetStoredOrder(GatherLists()
-                .Select(it => new CategoryInfo {Name = it.ListName, IsExternal = !it.IsCustom}).ToList(), oldOrder.DefaultListsToHide);
-            
+                .Select(it => new CategoryInfo { Name = it.ListName, IsExternal = !it.IsCustom }).ToList(), oldOrder.DefaultListsToHide);
+
             ExpansionKitApi.HideAllCustomPopups();
         }
 
@@ -537,12 +539,12 @@ namespace FavCat.Modules
             var categories = Favorites.GetCategories().ToList();
             var categoryOrder = new Dictionary<string, int>();
             var list = Favorites.GetStoredOrder().Order;
-            for (var i = 0; i < list.Count; i++) 
+            for (var i = 0; i < list.Count; i++)
                 categoryOrder[list[i].Name ?? ""] = i;
 
             categories.Sort((a, b) =>
-                categoryOrder.GetOrDefault(a.CategoryName, Int32.MaxValue)
-                    .CompareTo(categoryOrder.GetOrDefault(b.CategoryName, Int32.MaxValue)));
+                categoryOrder.GetOrDefault(a.CategoryName, int.MaxValue)
+                    .CompareTo(categoryOrder.GetOrDefault(b.CategoryName, int.MaxValue)));
 
             return categories;
         }
@@ -554,15 +556,15 @@ namespace FavCat.Modules
 
         protected void ProcessSearchResults()
         {
-            var results = mySearchResult?.Select(it => ((StoredFavorite?) null, it)).ToList();
+            var results = mySearchResult?.Select(it => ((StoredFavorite?)null, it)).ToList();
             mySearchResult = null;
             if (results == null) return;
-            
+
             MelonLogger.Msg("Local search done, {0} results", results.Count);
 
             SortModelList(SearchList.Category.SortType, SearchCategoryName, results);
             SearchList.SetList(results.Select(it => WrapModel(null, it.it)), true);
-            
+
             SetSearchListHeaderAndScrollToIt($"Search results ({LastSearchRequest})");
         }
 
@@ -581,28 +583,28 @@ namespace FavCat.Modules
             yield return new WaitForSeconds(0.5f);
             listsParent.GetComponentInParent<ScrollRect>().verticalNormalizedPosition = 0f;
         }
-        
+
         private void UpdateSelectedListSort(string sort, IShowableMenu menuToHide)
         {
             myCurrentlySelectedCategory.SortType = sort;
             Favorites.UpdateCategory(myCurrentlySelectedCategory);
             UpdateListElements(myCurrentlySelectedCategory.CategoryName, myCurrentlySelectedList, true);
-            
+
             menuToHide.Hide();
         }
 
         private void ShowExtraOptionsMenu()
         {
             var customMenu = ExpansionKitApi.CreateCustomFullMenuPopup(LayoutDescription.WideSlimList);
-            
+
             customMenu.AddSimpleButton("Hide default lists...", () =>
             {
                 customMenu.Hide();
                 ShowListHideMenu();
             });
-            
+
             customMenu.AddSpacer();
-            
+
             if (ImportFolderProcessor.ImportRunning)
                 customMenu.AddLabel(ImportFolderProcessor.ImportStatusOuter + "\n" + ImportFolderProcessor.ImportStatusInner);
             else
@@ -611,15 +613,15 @@ namespace FavCat.Modules
                     customMenu.Hide();
                     ImportFolderProcessor.ProcessImportsFolder().NoAwait();
                 });
-            
-                customMenu.AddSpacer();
-            
+
+            customMenu.AddSpacer();
+
             customMenu.AddSimpleButton("Open documentation in browser", () =>
             {
                 customMenu.Hide();
                 Process.Start("https://github.com/xAstroBoy/VRCMods-Unchained#favcat");
             });
-            
+
             if (ReFetchFavoritesProcessor.ImportRunning)
                 customMenu.AddLabel(ReFetchFavoritesProcessor.ImportStatusOuter + " " + ReFetchFavoritesProcessor.ImportStatusInner);
             else
@@ -628,7 +630,7 @@ namespace FavCat.Modules
                     customMenu.Hide();
                     ReFetchFavoritesProcessor.ReFetchFavorites().NoAwait();
                 });
-            
+
             if (ExportProcessor.IsExportingFavorites)
                 customMenu.AddLabel($"Exporting: {ExportProcessor.ProcessedCategories} / {ExportProcessor.TotalCategories}");
             else
@@ -638,9 +640,9 @@ namespace FavCat.Modules
                         customMenu.Hide();
                         ExportProcessor.DoExportFavorites(Favorites).NoAwait();
                     });
-            
+
             customMenu.AddSimpleButton("Close", customMenu.Hide);
-            
+
             customMenu.Show();
         }
 
@@ -650,7 +652,7 @@ namespace FavCat.Modules
 
             var currentData = Favorites.GetStoredOrder();
             var currentHiddenLists = currentData.DefaultListsToHide.ToHashSet();
-            
+
             foreach (var gatherList in GatherLists())
             {
                 if (gatherList.IsCustom)
@@ -669,15 +671,15 @@ namespace FavCat.Modules
                             currentHiddenLists.Remove(gatherList.ListName);
                         else
                             currentHiddenLists.Add(gatherList.ListName);
-                        
+
                         Favorites.SetStoredOrder(currentData.Order, currentHiddenLists.ToList());
 
                         buttonText!.text = $"{(currentHiddenLists.Contains(gatherList.ListName) ? "Show" : "Hide")} {gatherList.ListName}";
                     }, btn => buttonText = btn.GetComponentInChildren<Text>());
             }
-            
+
             customShowHideMenu.AddSimpleButton("Close", customShowHideMenu.Hide);
-            
+
             customShowHideMenu.Show();
         }
     }

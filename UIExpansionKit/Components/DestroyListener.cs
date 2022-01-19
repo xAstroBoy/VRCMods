@@ -8,8 +8,7 @@ namespace UIExpansionKit.Components
 {
     public class DestroyListener : MonoBehaviour
     {
-
-        [method:HideFromIl2Cpp]
+        [method: HideFromIl2Cpp]
         public event Action? OnDestroyed;
 
         public DestroyListener(IntPtr obj0) : base(obj0)

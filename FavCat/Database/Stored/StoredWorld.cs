@@ -1,5 +1,5 @@
-using System;
 using LiteDB;
+using System;
 using VRC.Core;
 
 #nullable disable
@@ -21,7 +21,7 @@ namespace FavCat.Database.Stored
         public DateTime UpdatedAt { get; set; }
         public int Version { get; set; }
         public ApiModel.SupportedPlatforms SupportedPlatforms { get; set; }
-        
+
         public string[] Tags { get; set; }
         public int Capacity { get; set; }
     }

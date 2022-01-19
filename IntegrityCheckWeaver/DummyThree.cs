@@ -1,7 +1,7 @@
-using System;
-using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System;
+using System.IO;
 
 namespace IntegrityCheckWeaver
 {
@@ -21,11 +21,11 @@ namespace IntegrityCheckWeaver
                                                                   MethodAttributes.Public, assembly.MainModule.ImportReference(typeof(void)));
                 invokeMethod.ImplAttributes = MethodImplAttributes.CodeTypeMask;
                 dgType.Methods.Add(invokeMethod);
-                
+
                 assembly.MainModule.Types.Add(dgType);
-                
+
                 dgType.Methods.Add(MakeCctor(assembly));
-                
+
                 // Try triggering type loads
                 moduleType.Fields.Add(new FieldDefinition(Utils.CompletelyRandomString(), FieldAttributes.Private | FieldAttributes.Static, dgType));
                 dgType.Fields.Add(new FieldDefinition(Utils.CompletelyRandomString(), FieldAttributes.Private | FieldAttributes.Static, dgType));
@@ -33,11 +33,11 @@ namespace IntegrityCheckWeaver
 
             for (var i = 0; i < Utils.RandomInt(5, 30); i++)
                 AddFunnyDelegate();
-            
+
             moduleType.Methods.Add(MakeCctor(assembly));
 
             var memoryStream = new MemoryStream();
-            
+
             assembly.Write(memoryStream);
 
             return memoryStream.ToArray();
@@ -49,7 +49,7 @@ namespace IntegrityCheckWeaver
             var cctorMethod = new MethodDefinition(".cctor", MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.SpecialName |
                                                              MethodAttributes.HideBySig | MethodAttributes.RTSpecialName, voidReference);
             var cctorBuilder = cctorMethod.Body.GetILProcessor();
-            
+
             cctorBuilder.Emit(OpCodes.Ldc_I4_1);
             cctorBuilder.Emit(OpCodes.Conv_I);
             cctorBuilder.Emit(OpCodes.Calli, new CallSite(voidReference));

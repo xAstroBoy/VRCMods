@@ -38,13 +38,17 @@ namespace FavCat.Adapters
                 {
                     case "join me":
                         return new Color(0, 0.75f, 0.75f, 1);
+
                     case "online":
                     case "active":
                         return new Color(0, 0.75f, 0, 1);
+
                     case "ask me":
                         return new Color(1f, 0.5f, 0, 1);
+
                     case "busy":
                         return new Color(0.75f, 0, 0, 1);
+
                     default:
                         return new Color(0.5f, 0.5f, 0, 1);
                 }

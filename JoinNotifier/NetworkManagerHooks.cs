@@ -1,5 +1,5 @@
-using System;
 using MelonLoader;
+using System;
 using VRC;
 using VRC.Core;
 
@@ -12,32 +12,33 @@ namespace JoinNotifier
         private static bool AFiredFirst;
 
         public static event Action<Player> OnJoin;
+
         public static event Action<Player> OnLeave;
-        
+
         public static void EventHandlerA(Player player)
         {
             if (!SeenFire)
             {
                 AFiredFirst = true;
                 SeenFire = true;
-                
+
                 MelonDebug.Msg("A fired first");
             }
 
             if (player == null) return;
             (AFiredFirst ? OnJoin : OnLeave)?.Invoke(player);
         }
-        
+
         public static void EventHandlerB(Player player)
         {
             if (!SeenFire)
             {
                 AFiredFirst = false;
                 SeenFire = true;
-                
+
                 MelonDebug.Msg("B fired first");
             }
-            
+
             if (player == null) return;
             (AFiredFirst ? OnLeave : OnJoin)?.Invoke(player);
         }
