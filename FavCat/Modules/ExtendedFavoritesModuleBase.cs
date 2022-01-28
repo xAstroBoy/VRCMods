@@ -30,7 +30,24 @@ namespace FavCat.Modules
         protected readonly DatabaseFavoriteHandler<T> Favorites;
         private readonly ExpandedMenu myExpandedMenu;
         protected abstract bool FavButtonsOnLists { get; }
-        private static ScrollRect AvatarPageScrollRect;
+        private static ScrollRect? _AvatarPageScrollRect;
+
+        private static ScrollRect? AvatarPageScrollRect
+        {
+
+            get
+            {
+                if (_AvatarPageScrollRect == null)
+                {
+                    var path = GameObject.Find("UserInterface/MenuContent/Screens/Avatar/");
+                    if (path != null)
+                    {
+                        return _AvatarPageScrollRect = path.GetComponent<ScrollRect>();
+                    }
+                }
+                return _AvatarPageScrollRect;
+            }
+        }
         public static string LastSearchRequest { get; set; } = "";
 
         public static List<T> mySearchResult;
@@ -146,7 +163,6 @@ namespace FavCat.Modules
 
             mySoundCollection = GameObject.Find("/UserInterface/MenuContent/Popups/AvatarStatsPopup/AvatarStatsMenu/_Buttons/_BackButton")?
                 .GetComponent<ButtonReaction>()?.field_Public_UISoundCollection_0;
-            AvatarPageScrollRect = GameObject.Find("UserInterface/MenuContent/Screens/Avatar/")?.GetComponent<ScrollRect>();
         }
 
         private void ShowListSortingMenu()
@@ -277,7 +293,12 @@ namespace FavCat.Modules
             foreach (var listToHideName in storedOrderFull.DefaultListsToHide)
                 if (knownLists.TryGetValue(listToHideName ?? "", out var listToHide) && !listToHide.IsCustom)
                     listToHide.ListTransform.gameObject.SetActive(false);
+            if (AvatarPageScrollRect != null)
+            {
+                AvatarPageScrollRect.SetVerticalNormalizedPosition(2);
+            }
             if (!isLocalSearch)
+            {
                 if (SearchList != null)
                 {
                     if (SearchList.transform != null)
@@ -285,11 +306,8 @@ namespace FavCat.Modules
                         SearchList.transform.SetSiblingIndex2(0);
                     }
                 }
-
-            if (AvatarPageScrollRect != null)
-            {
-                AvatarPageScrollRect.SetVerticalNormalizedPosition(1);
             }
+
         }
 
         protected void ShowListSettingsMenu(StoredCategory category)
