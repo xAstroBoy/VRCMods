@@ -52,7 +52,9 @@ namespace FavCat.Modules
                 return;
 
             FavCatMod.GetUiManager().Method_Public_Void_String_Boolean_0("UserInterface/MenuContent/Screens/Avatar", false);
-            SetSearchListHeaderAndScrollToIt("Search running...");
+            isLocalSearch = true;
+            SetSearchListHeader("Search running...");
+            ScrollToIt(true);
             LastSearchRequest = "Created by " + FavCatMod.PageUserInfo.field_Private_APIUser_0.displayName;
             FavCatMod.Database.RunBackgroundAvatarSearchByUser(FavCatMod.PageUserInfo.field_Private_APIUser_0.id, AcceptSearchResult);
         }
@@ -101,15 +103,15 @@ namespace FavCat.Modules
             OnFavButtonClicked(category, id, true);
         }
 
-        public static void SetSearchHeader(string Header = "Search running...", bool Scroll = true)
+        public static void AcceptRemoteResults(IEnumerable<StoredAvatar> result)
         {
-            instance.SetSearchListHeaderAndScrollToIt(Header, Scroll);
+            isLocalSearch = false;
+            AcceptSearchResult(result);
         }
 
-        public static void AvatarSearchResults(string searchText, System.Collections.Generic.IEnumerable<StoredAvatar> list)
+        public static void SetSearchHeaderText(string text)
         {
-            ExtendedFavoritesModuleBase<StoredAvatar>.LastSearchRequest = searchText;
-            ExtendedFavoritesModuleBase<StoredAvatar>.AcceptSearchResult(list);
+            instance.SearchList.SetMyHeaderText(text);
         }
 
         public static void GetStoredFromID(string id, System.Action<StoredAvatar> Result = null, bool ForceLatest = false, bool AllowRecursive = false)
@@ -250,7 +252,9 @@ namespace FavCat.Modules
             BuiltinUiUtils.ShowInputPopup("Local Search (Avatar)", "", InputField.InputType.Standard, false,
                 "Search!", (s, list, arg3) =>
                 {
-                    SetSearchListHeaderAndScrollToIt("Search running...");
+                    isLocalSearch = true;
+                    SetSearchListHeader("Search running...");
+                    ScrollToIt(true);
                     LastSearchRequest = s;
                     FavCatMod.Database.RunBackgroundAvatarSearch(s, AcceptSearchResult);
                 });

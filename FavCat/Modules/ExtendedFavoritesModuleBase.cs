@@ -25,11 +25,12 @@ namespace FavCat.Modules
         protected readonly Dictionary<string, CustomPickerList> PickerLists = new Dictionary<string, CustomPickerList>();
         protected readonly CustomPickerList SearchList;
         protected readonly Transform listsParent;
+        internal static bool isLocalSearch = false;
         private readonly bool myHasUpdateAndCreationDates;
         protected readonly DatabaseFavoriteHandler<T> Favorites;
         private readonly ExpandedMenu myExpandedMenu;
         protected abstract bool FavButtonsOnLists { get; }
-
+        private static ScrollRect AvatarPageScrollRect;
         public static string LastSearchRequest { get; set; } = "";
 
         public static List<T> mySearchResult;
@@ -123,7 +124,7 @@ namespace FavCat.Modules
             SearchList.SetList(Enumerable.Empty<IPickerElement>(), true);
             SearchList.SetVisibleRows(searchCategory.VisibleRows);
             SearchList.OnModelClick += OnPickerSelected;
-            SearchList.transform.SetSiblingIndex(this.listsParent.transform.childCount);
+            SearchList.transform.SetAsFirstSibling();
 
             // assign these to something random by default -
             myCurrentlySelectedCategory = searchCategory;
@@ -145,6 +146,7 @@ namespace FavCat.Modules
 
             mySoundCollection = GameObject.Find("/UserInterface/MenuContent/Popups/AvatarStatsPopup/AvatarStatsMenu/_Buttons/_BackButton")?
                 .GetComponent<ButtonReaction>()?.field_Public_UISoundCollection_0;
+            AvatarPageScrollRect = GameObject.Find("UserInterface/MenuContent/Screens/Avatar/")?.GetComponent<ScrollRect>();
         }
 
         private void ShowListSortingMenu()
@@ -275,6 +277,19 @@ namespace FavCat.Modules
             foreach (var listToHideName in storedOrderFull.DefaultListsToHide)
                 if (knownLists.TryGetValue(listToHideName ?? "", out var listToHide) && !listToHide.IsCustom)
                     listToHide.ListTransform.gameObject.SetActive(false);
+            if (!isLocalSearch)
+                if (SearchList != null)
+                {
+                    if (SearchList.transform != null)
+                    {
+                        SearchList.transform.SetSiblingIndex2(0);
+                    }
+                }
+
+            if (AvatarPageScrollRect != null)
+            {
+                AvatarPageScrollRect.SetVerticalNormalizedPosition(1);
+            }
         }
 
         protected void ShowListSettingsMenu(StoredCategory category)
@@ -549,7 +564,7 @@ namespace FavCat.Modules
             return categories;
         }
 
-        public static void AcceptSearchResult(IEnumerable<T> result)
+        internal static void AcceptSearchResult(IEnumerable<T> result)
         {
             mySearchResult = result.ToList();
         }
@@ -564,18 +579,27 @@ namespace FavCat.Modules
 
             SortModelList(SearchList.Category.SortType, SearchCategoryName, results);
             SearchList.SetList(results.Select(it => WrapModel(null, it.it)), true);
+            if (isLocalSearch)
+            {
 
-            SetSearchListHeaderAndScrollToIt($"Search results ({LastSearchRequest})");
+                SetSearchListHeader($"Search results ({LastSearchRequest})");
+                ScrollToIt(true);
+            }
         }
 
-        protected void SetSearchListHeaderAndScrollToIt(string text, bool Scroll = true)
+        public void SetSearchListHeader(string text, bool Scroll = true)
         {
             SearchList.HeaderString = text;
+        }
+
+        public void ScrollToIt(bool Scroll = true)
+        {
             if (Scroll && listsParent?.GetComponentInParent<ScrollRect>() != null)
             {
                 SearchList.SetVisibleRows(4);
                 MelonCoroutines.Start(ScrollDownAfterDelay());
             }
+
         }
 
         protected IEnumerator ScrollDownAfterDelay()

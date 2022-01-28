@@ -161,7 +161,9 @@ namespace FavCat.Modules
             BuiltinUiUtils.ShowInputPopup("Local Search (World)", "", InputField.InputType.Standard, false,
                 "Search!", (s, list, arg3) =>
                 {
-                    SetSearchListHeaderAndScrollToIt("Search running...");
+                    isLocalSearch = true;
+                    SetSearchListHeader("Search running...");
+                    ScrollToIt(true);
                     LastSearchRequest = s;
                     FavCatMod.Database.RunBackgroundWorldSearch(s, AcceptSearchResult);
                 });

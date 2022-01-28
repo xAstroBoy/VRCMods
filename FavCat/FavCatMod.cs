@@ -27,13 +27,13 @@ namespace FavCat
     public partial class FavCatMod : MelonMod
     {
         public static LocalStoreDatabase? Database;
-        internal static FavCatMod Instance;
+        public static FavCatMod Instance;
 
-        internal AvatarModule? AvatarModule;
-        internal WorldsModule? WorldsModule;
-        internal PlayersModule? PlayerModule;
+        public AvatarModule? AvatarModule;
+        public WorldsModule? WorldsModule;
+        public PlayersModule? PlayerModule;
 
-        internal static PageUserInfo PageUserInfo;
+        public static PageUserInfo PageUserInfo;
 
         public override void OnApplicationStart()
         {

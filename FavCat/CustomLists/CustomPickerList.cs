@@ -49,7 +49,14 @@ namespace FavCat.CustomLists
             {
                 myHeaderString = value;
                 if (myHeaderText != null) myHeaderText.text = value;
+
             }
+        }
+
+        public void SetMyHeaderText(string text)
+        {
+            HeaderString = text;
+            if (myHeaderText != null) myHeaderText.text = text;
         }
 
         public StoredCategory Category;
@@ -122,6 +129,19 @@ namespace FavCat.CustomLists
                 myHeaderText = transform.Find("Header/ListLabel").GetComponent<Text>();
                 myCountText = transform.Find("Header/PageLabel").GetComponent<Text>();
                 myFavText = transform.Find("Header/FavButton/Text").GetComponent<Text>();
+                if (myHeaderText != null)
+                {
+                    myHeaderText.supportRichText = true;
+                }
+                if (myCountText != null)
+                {
+                    myCountText.supportRichText = true;
+                }
+                if (myFavText != null)
+                {
+                    myFavText.supportRichText = true;
+                }
+
                 myFavButton = transform.Find("Header/FavButton").GetComponent<Button>();
 
                 myContentRoot = transform.Find("Scroll View/Viewport/ContentRoot").Cast<RectTransform>();
