@@ -18,8 +18,8 @@ namespace FavCat.Modules
     public class WorldsModule : ExtendedFavoritesModuleBase<StoredWorld>
     {
         private readonly PageWorldInfo myPageWorldInfo;
-        
-        public WorldsModule() : base(ExpandedMenu.WorldMenu, FavCatMod.Database.WorldFavorites, GetListsParent(), true, true)
+
+        public WorldsModule() : base(ExpandedMenu.WorldMenu, FavCatMod.Database.WorldFavorites, GetListsParent(), true)
         {
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.WorldDetailsMenu).AddSimpleButton("Local Favorite", ShowFavMenu);
 
@@ -38,7 +38,7 @@ namespace FavCat.Modules
                 yield return null;
                 myPageWorldInfo.transform.Find("WorldButtons/NewButton").GetComponent<Button>().interactable = true;
             }
-        } 
+        }
 
         private void ShowFavMenu()
         {
@@ -49,7 +49,7 @@ namespace FavCat.Modules
 
             if (storedCategories.Count == 0)
                 availableListsMenu.AddLabel("Create some categories first before favoriting worlds!");
-            
+
             availableListsMenu.AddSimpleButton("Close", () => availableListsMenu.Hide());
 
             foreach (var storedCategory in storedCategories)
@@ -58,7 +58,7 @@ namespace FavCat.Modules
                     continue;
 
                 availableListsMenu.AddSimpleButton(
-                    $"{(!Favorites.IsFavorite(currentWorld.id, storedCategory.CategoryName) ? "Favorite to" : "Unfavorite from")} {storedCategory.CategoryName}", 
+                    $"{(!Favorites.IsFavorite(currentWorld.id, storedCategory.CategoryName) ? "Favorite to" : "Unfavorite from")} {storedCategory.CategoryName}",
                     self =>
                     {
                         if (Favorites.IsFavorite(currentWorld.id, storedCategory.CategoryName))
@@ -67,11 +67,11 @@ namespace FavCat.Modules
                             Favorites.AddFavorite(currentWorld.id, storedCategory.CategoryName);
 
                         self.SetText($"{(!Favorites.IsFavorite(currentWorld.id, storedCategory.CategoryName) ? "Favorite to" : "Unfavorite from")} {storedCategory.CategoryName}");
-                        
+
                         if (FavCatSettings.HidePopupAfterFav.Value) availableListsMenu.Hide();
                     });
             }
-            
+
             availableListsMenu.Show();
         }
 
@@ -86,15 +86,16 @@ namespace FavCat.Modules
         }
 
         private string myLastRequestedWorld = "";
+
         protected override void OnPickerSelected(IPickerElement picker)
         {
-            if (picker.Id == myLastRequestedWorld) 
+            if (picker.Id == myLastRequestedWorld)
                 return;
-            
+
             PlaySound();
 
             myLastRequestedWorld = picker.Id;
-            var world = new ApiWorld {id = picker.Id};
+            var world = new ApiWorld { id = picker.Id };
             world.Fetch(new Action<ApiContainer>(_ =>
             {
                 myLastRequestedWorld = "";
@@ -131,7 +132,7 @@ namespace FavCat.Modules
                 case "name":
                 case "!name":
                 default:
-                    comparison = (a, b) => string.Compare(a.Model.Name, b.Model.Name, StringComparison.InvariantCultureIgnoreCase) * (inverted ? -1 : 1); 
+                    comparison = (a, b) => string.Compare(a.Model.Name, b.Model.Name, StringComparison.InvariantCultureIgnoreCase) * (inverted ? -1 : 1);
                     break;
                 case "updated":
                 case "!updated":
@@ -156,10 +157,19 @@ namespace FavCat.Modules
             BuiltinUiUtils.ShowInputPopup("Local Search (World)", "", InputField.InputType.Standard, false,
                 "Search!", (s, list, arg3) =>
                 {
-                    SetSearchListHeaderAndScrollToIt("Search running...");
+                    isLocalSearch = true;
+                    SetSearchListHeader("Search running...");
+                    ScrollToIt(true);
                     LastSearchRequest = s;
                     FavCatMod.Database.RunBackgroundWorldSearch(s, AcceptSearchResult);
                 });
         }
+
+        protected override bool FavButtonsOnLists => false;
+        protected override void OnFavButtonClicked(StoredCategory storedCategory)
+        { }
+        protected internal override void RefreshFavButtons()
+        { }
+
     }
 }

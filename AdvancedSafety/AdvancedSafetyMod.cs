@@ -34,7 +34,6 @@ namespace AdvancedSafety
 
         public override void OnApplicationStart()
         {
-            if (!CheckWasSuccessful || !MustStayTrue || MustStayFalse) return;
             
             AdvancedSafetySettings.RegisterSettings();
             ClassInjector.RegisterTypeInIl2Cpp<SortingOrderHammerer>();
