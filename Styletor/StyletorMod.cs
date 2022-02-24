@@ -1,21 +1,22 @@
-using HarmonyLib;
-using MelonLoader;
-using Styletor;
-using Styletor.ExtraHandlers;
-using Styletor.Styles;
 using System;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
+using MelonLoader;
+using Styletor;
+using Styletor.ExtraHandlers;
+using Styletor.Styles;
 using UIExpansionKit;
 using UIExpansionKit.API;
 using UnhollowerRuntimeLib.XrefScans;
 using VRC.UI.Core.Styles;
 
-[assembly: MelonInfo(typeof(StyletorMod), "Styletor", "0.2.0", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
-[assembly: MelonGame("VRChat", "VRChat")]
+[assembly:MelonInfo(typeof(StyletorMod), "Styletor", "0.3.0", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonGame("VRChat", "VRChat")]
+
 #nullable disable
 
 namespace Styletor
@@ -23,7 +24,7 @@ namespace Styletor
     public partial class StyletorMod : MelonMod
     {
         public static StyletorMod Instance;
-
+        
         private StyleEngineWrapper myStyleEngine;
         private StylesLoader myStylesLoader;
 
@@ -31,7 +32,7 @@ namespace Styletor
 
         private UiLasersHandler myLasersHandler;
         private ActionMenuHandler myActionMenuHandler;
-
+        
         public SettingsHolder Settings => mySettings;
 
         public override void OnApplicationStart()
@@ -39,16 +40,16 @@ namespace Styletor
             Instance = this;
 
             Directory.CreateDirectory(Path.Combine(MelonUtils.UserDataDirectory, StylesLoader.StylesSubDir));
-
+            
             mySettings = new SettingsHolder();
 
             var settingMenu = ExpansionKitApi.GetSettingsCategory(SettingsHolder.CategoryIdentifier);
-
+            
             settingMenu.AddSimpleButton("Configure mix-in styles", ShowMixinMenu);
             settingMenu.AddSimpleButton("Reload styles from disk", ReloadStyles);
             settingMenu.AddSimpleButton("Export default VRChat style reference", ExportStyleClick);
             settingMenu.AddSimpleButton("Export QM object/style tree", ExportTreeClick);
-            settingMenu.AddSimpleButton("Open mod documentation in browser", () => Process.Start("https://github.com/xAstroBoy/VRCMods-Unchained#Styletor"));
+            settingMenu.AddSimpleButton("Open mod documentation in browser", () => Process.Start("https://github.com/knah/VRCMods#Styletor"));
 
             MelonCoroutines.Start(WaitForStyleInit());
         }
@@ -69,9 +70,9 @@ namespace Styletor
                 menu.AddSpacer();
                 menu.AddSimpleButton("Yep, export it! No freeze can stop me!", DoSkinExport);
             }
-
+            
             menu.AddSimpleButton("Close", menu.Hide);
-
+            
             menu.Show();
         }
 
@@ -79,7 +80,7 @@ namespace Styletor
         {
             BuiltinStyleExporter.ExportDefaultStyle(Path.Combine(MelonUtils.UserDataDirectory, "StyletorDefaultSkin"), myStyleEngine.StyleEngine);
         }
-
+        
         private void ExportTreeClick()
         {
             if (myStyleEngine == null) return;
@@ -89,10 +90,10 @@ namespace Styletor
         private void ShowMixinMenu()
         {
             var disabledMixinSet = mySettings.DisabledMixinsEntry.Value.Split('|').ToHashSet();
-
+            
             var menu = ExpansionKitApi.CreateCustomFullMenuPopup(LayoutDescription.WideSlimList);
             menu.AddLabel("Click on a mix-in style to toggle it");
-
+            
             foreach (var (id, name) in myStylesLoader.GetKnownMixIns())
             {
                 menu.AddSimpleButton($"{name} ({(disabledMixinSet.Contains(id) ? "Disabled" : "Enabled")})", () =>
@@ -107,7 +108,7 @@ namespace Styletor
                     ShowMixinMenu();
                 });
             }
-
+            
             menu.AddSimpleButton("Close", menu.Hide);
             menu.Show();
         }
@@ -131,7 +132,7 @@ namespace Styletor
                 XrefScanner.XrefScan(it).Any(jt =>
                     jt.Type == XrefType.Global && jt.ReadAsObject()?.ToString() == "style-sheet"));
 
-            if (initMethod == null)
+            if (initMethod == null) 
                 MelonLogger.Warning("No Init method on StyleEngine, will wait for natural init");
             else
                 initMethod.Invoke(myStyleEngine.StyleEngine, Array.Empty<object>());
@@ -151,7 +152,7 @@ namespace Styletor
             {
                 MelonLogger.Error($"UI Laser recoloring handler failed to initialize: {ex}");
             }
-
+            
             try
             {
                 myActionMenuHandler = new ActionMenuHandler(mySettings);

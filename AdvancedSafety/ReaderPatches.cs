@@ -1,4 +1,3 @@
-using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading;
+using MelonLoader;
 
 namespace AdvancedSafety
 {
@@ -13,25 +13,23 @@ namespace AdvancedSafety
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr AudioMixerReadDelegate(IntPtr thisPtr, IntPtr readerPtr);
-
+        
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private unsafe delegate void FloatReadDelegate(IntPtr readerPtr, float* result, byte* fieldName);
 
         private static volatile AudioMixerReadDelegate ourAudioMixerReadDelegate;
 
         private static FloatReadDelegate ourFloatReadDelegate;
-
+        
         // Why these numbers? Check wrld_b9f80349-74af-4840-8ce9-a1b783436590 for how *horribly* things break even on 10^6. Nothing belongs outside these bounds. The significand is that of MaxValue.
         private const float MaxAllowedValueTop = 3.402823E+7f;
-
         private const float MaxAllowedValueBottom = -3.402823E+7f;
-
-        private static readonly List<object> ourPinnedDelegates = new();
+        
+        private static readonly List<object> ourPinnedDelegates = new ();
 
         private static readonly string[] ourAllowedFields = { "m_BreakForce", "m_BreakTorque", "collisionSphereDistance", "maxDistance", "inSlope", "outSlope" };
 
-        private static readonly Dictionary<string, (int ProduceMixer, int TransferFloat, int CountNodes, int DebugAssert, int ReaderOOB, int ReallocateString)> ourOffsets = new()
-        {
+        private static readonly Dictionary<string, (int ProduceMixer, int TransferFloat, int CountNodes, int DebugAssert, int ReaderOOB, int ReallocateString)> ourOffsets = new() {
             { "aCEmIwSIcjYriBQDFjQlpTNNW1/kA8Wlbkqelmt1USOMB09cnKwK7QWyOulz9d7DEYJh4+vO0Ldv8gdH+dZCrg==", (0x4997C0, 0xD7320, 0, 0, 0, 0) }, // U2018.4.20 non-dev
             { "5dkhl/dWeTREXhHCIkZK17mzZkbjhTKlxb+IUSk+YaWzZrrV+G+M0ekTOEGjZ4dJuB4O3nU/oE3dycXWeJq9uA==", (0xA80660, 0xC7B40, 0, 0, 0, 0) }, // U2019.4.28 non-dev
             { "MV6xP7theydao4ENbGi6BbiBxdZsgGOBo/WrPSeIqh6A/E00NImjUNZn+gL+ZxzpVbJms7nUb6zluLL3+aIcfg==", (0xA82350, 0xC7E50, 0, 0, 0, 0) }, // U2019.4.29 non-dev
@@ -59,8 +57,7 @@ namespace AdvancedSafety
             {
                 if (!module.FileName.Contains("UnityPlayer")) continue;
 
-                unsafe
-                {
+                unsafe {
                     // ProduceHelper<AudioMixer,0>::Produce, thanks to Ben for finding an adjacent method
                     DoPatch(module, offsets.ProduceMixer, AudioMixerReadPatch, out ourAudioMixerReadDelegate);
 
@@ -69,13 +66,13 @@ namespace AdvancedSafety
 
                     // CountNodesDeep, thanks to Requi and Ben for this and idea for next two
                     DoPatch<CountNodesDeepDelegate>(module, offsets.CountNodes, CountNodesDeepThunk, out _);
-
+                    
                     // DebugStringToFilePostprocessedStacktrace
                     DoPatch(module, offsets.DebugAssert, DebugAssertPatch, out ourOriginalAssert);
 
                     // CachedReader::OutOfBoundsError
                     DoPatch(module, offsets.ReaderOOB, ReaderOobPatch, out ourOriginalReaderOob);
-
+                    
                     // core::StringStorageDefault<char>::reallocate, identified to be an issue by Requi&Ben
                     DoPatch(module, offsets.ReallocateString, ReallocateStringPatch, out ourOriginalRealloc);
                 }
@@ -101,7 +98,7 @@ namespace AdvancedSafety
             if (AdvancedSafetyMod.CanReadBadFloats || *result > MaxAllowedValueBottom && *result < MaxAllowedValueTop || AdvancedSafetySettings.AllowReadingBadFloats.Value) return;
 
             if (float.IsNaN(*result)) goto clamp;
-
+            
             if (fieldName != null)
             {
                 foreach (var allowedField in ourAllowedFields)
@@ -110,11 +107,11 @@ namespace AdvancedSafety
                         if (fieldName[j] == 0 || fieldName[j] != allowedField[j])
                             goto next;
                     return;
-                next:;
+                    next: ;
                 }
             }
-
-        clamp:
+            
+            clamp:
 
             if (MelonDebug.IsEnabled())
                 MelonDebug.Msg($"Clamped a float to 0: {*result} {Marshal.PtrToStringAnsi((IntPtr)fieldName)}");
@@ -139,7 +136,6 @@ namespace AdvancedSafety
         private delegate void ReaderOobDelegate(IntPtr thisPtr, long a, long b);
 
         private static ReaderOobDelegate ourOriginalReaderOob;
-
         [ThreadStatic]
         private static int ourReaderOobDepth;
 
@@ -155,20 +151,20 @@ namespace AdvancedSafety
                 ourReaderOobDepth--;
             }
         }
+        
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void DebugAssertDelegate(IntPtr data);
 
         private static DebugAssertDelegate ourOriginalAssert;
-
         private static unsafe void DebugAssertPatch(IntPtr data)
         {
-            if (AdvancedSafetySettings.RiskyAssertDisable.Value && ourReaderOobDepth > 0)
+            if (AdvancedSafetySettings.RiskyAssertDisable.Value && ourReaderOobDepth > 0) 
                 *(byte*)(data + 0x30) &= 0xef;
 
             ourOriginalAssert(data);
         }
-
+        
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private unsafe delegate long CountNodesDeepDelegate(NodeContainer* thisPtr);
 
@@ -190,12 +186,12 @@ namespace AdvancedSafety
             if (thisPtr == null) return 1;
 
             var directSubsCount = thisPtr->DirectSubCount;
-
+            
             long totalNodes = 1;
             if (directSubsCount <= 0)
                 return totalNodes;
 
-            parents.Add((IntPtr)thisPtr);
+            parents.Add((IntPtr) thisPtr);
 
             var subsBase = thisPtr->Subs;
             if (subsBase == null)
@@ -209,7 +205,14 @@ namespace AdvancedSafety
             {
                 var subNode = subsBase[i];
 
-                if (parents.Contains((IntPtr)subNode))
+                if (subNode == null)
+                {
+                    MelonDebug.Msg("Owww. My other right toe hurts!");
+                    thisPtr->DirectSubCount = 0;
+                    return totalNodes;
+                }
+
+                if (parents.Contains((IntPtr) subNode))
                 {
                     MelonDebug.Msg("Owww. My right toe hurts!");
                     subNode->DirectSubCount = thisPtr->DirectSubCount = 0;
@@ -227,20 +230,19 @@ namespace AdvancedSafety
         {
             [FieldOffset(0x70)]
             public NodeContainer** Subs;
-
             [FieldOffset(0x80)]
             public long DirectSubCount;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private unsafe delegate void StringReallocateDelegate(NativeString* str, long newSize);
+        unsafe delegate IntPtr StringReallocateDelegate(NativeString* str, long newSize);
 
         private static StringReallocateDelegate ourOriginalRealloc;
 
         [ThreadStatic] private static unsafe NativeString* ourLastReallocatedString;
         [ThreadStatic] private static int ourLastReallocationCount;
 
-        private static unsafe void ReallocateStringPatch(NativeString* str, long newSize)
+        private static unsafe IntPtr ReallocateStringPatch(NativeString* str, long newSize)
         {
             if (str != null && newSize > 128 && str->Data != IntPtr.Zero)
             {
@@ -258,7 +260,7 @@ namespace AdvancedSafety
             }
 
             while (ourOriginalRealloc == null) Thread.Sleep(15);
-            ourOriginalRealloc(str, newSize);
+            return ourOriginalRealloc(str, newSize);
         }
 
         [StructLayout(LayoutKind.Sequential)]

@@ -1,11 +1,12 @@
-using MelonLoader;
-using Styletor.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MelonLoader;
+using Styletor.Utils;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using VRC.UI.Core.Styles;
+using Object = UnityEngine.Object;
 
 #nullable enable
 
@@ -14,7 +15,7 @@ namespace Styletor
     public class StyleEngineWrapper
     {
         public readonly StyleEngine StyleEngine;
-
+        
         private readonly List<(int styleIndex, ulong selectorPriority, Selector selector, List<(int, StyleElement.PropertyValue)> Properties)> myOriginalStylesBackup = new();
         private readonly Dictionary<string, Sprite> myOriginalSprites = new();
         private readonly Dictionary<string, Sprite> myOriginalSpritesByLowercaseShortKey = new();
@@ -22,6 +23,7 @@ namespace Styletor
         private readonly Dictionary<Il2CppSystem.Tuple<string, Il2CppSystem.Type>, Object> myOriginalResourcesInAllResourcesMap = new();
 
         private readonly Dictionary<string, List<ElementStyle>> myStylesCache = new();
+        private readonly Dictionary<string, List<ElementStyle>> myAddedStylesCache = new();
         private readonly Dictionary<string, string> myNormalizedToActualSpriteNames = new();
 
         private readonly Il2CppSystem.Collections.Generic.Dictionary<Sprite, Sprite> mySpriteOverrideDict = new();
@@ -33,7 +35,8 @@ namespace Styletor
 
         public List<ElementStyle>? TryGetBySelector(string normalizedSelector)
         {
-            return myStylesCache.TryGetValue(normalizedSelector, out var result) ? result : null;
+            return myStylesCache.TryGetValue(normalizedSelector, out var result) ? result : 
+                    myAddedStylesCache.TryGetValue(normalizedSelector, out result) ? result : null;
         }
 
         public Sprite? TryFindOriginalSprite(string key)
@@ -41,6 +44,15 @@ namespace Styletor
             return myOriginalSpritesByLowercaseFullKey.TryGetValue(key, out var result) ? result : null;
         }
 
+        public void RegisterAddedStyle(ElementStyle style)
+        {
+            var normalizedSelector = style.field_Public_Selector_0.ToStringNormalized();
+            if (myAddedStylesCache.TryGetValue(normalizedSelector, out var existing))
+                existing.Add(style);
+            else
+                myAddedStylesCache[normalizedSelector] = new List<ElementStyle> { style };
+        }
+        
         public Sprite? TryFindOriginalSpriteByShortKey(string key)
         {
             return myOriginalSpritesByLowercaseShortKey.TryGetValue(key, out var result) ? result : null;
@@ -48,7 +60,7 @@ namespace Styletor
 
         public void OverrideSprite(string key, Sprite sprite)
         {
-            var keyLastPart = Path.GetFileName(key);
+            var keyLastPart = Path.GetFileName(key); 
             var actualKey = myNormalizedToActualSpriteNames.TryGetValue(keyLastPart, out var normalized) ? normalized : keyLastPart;
 
             var originalSprite = TryFindOriginalSprite(key);
@@ -62,7 +74,7 @@ namespace Styletor
         internal void UpdateStylesForSpriteOverrides()
         {
             var writeAccumulator = new List<(int, StyleElement.PropertyValue)>();
-
+            
             foreach (var elementStyle in StyleEngine.field_Private_List_1_ElementStyle_0)
             {
                 foreach (var keyValuePair in elementStyle.field_Public_Dictionary_2_Int32_PropertyValue_0)
@@ -78,15 +90,16 @@ namespace Styletor
                 // ah yes, ConcurrentModificationException
                 foreach (var (k, v) in writeAccumulator)
                     elementStyle.field_Public_Dictionary_2_Int32_PropertyValue_0[k] = v;
-
+                
                 writeAccumulator.Clear();
             }
         }
-
+        
         internal void RestoreDefaultStyles()
         {
             mySpriteOverrideDict.Clear();
-
+            myAddedStylesCache.Clear();
+            
             var styles = StyleEngine.field_Private_List_1_ElementStyle_0;
             for (var i = 0; i < myOriginalStylesBackup.Count; i++)
             {
@@ -97,12 +110,15 @@ namespace Styletor
                 style.field_Public_Selector_0 = backup.selector;
                 var propsDict = style.field_Public_Dictionary_2_Int32_PropertyValue_0;
                 propsDict.Clear();
-                foreach (var (key, value) in backup.Properties)
+                foreach (var (key, value) in backup.Properties) 
                     propsDict[key] = value;
             }
 
+            if (styles.Count > myOriginalStylesBackup.Count)
+                styles.RemoveRange(myOriginalStylesBackup.Count, styles.Count - myOriginalStylesBackup.Count);
+
             var spriteDict = StyleEngine.field_Private_Dictionary_2_String_Sprite_0;
-            foreach (var keyValuePair in myOriginalSprites)
+            foreach (var keyValuePair in myOriginalSprites) 
                 spriteDict[keyValuePair.Key] = keyValuePair.Value;
 
             var resMap = StyleEngine.field_Private_Dictionary_2_Tuple_2_String_Type_Object_0;
@@ -120,8 +136,8 @@ namespace Styletor
                 myOriginalStylesBackup.Add((elementStyle.field_Public_Int32_0, elementStyle.field_Public_UInt64_0, elementStyle.field_Public_Selector_0, innerList));
 
                 var normalizedSelector = elementStyle.field_Public_Selector_0.ToStringNormalized();
-
-                if (myStylesCache.TryGetValue(normalizedSelector, out var existing))
+                
+                if (myStylesCache.TryGetValue(normalizedSelector, out var existing)) 
                     existing.Add(elementStyle);
                 else
                     myStylesCache[normalizedSelector] = new List<ElementStyle>() { elementStyle };
@@ -132,7 +148,7 @@ namespace Styletor
                 var key = keyValuePair.Key;
                 var normalizedKey = key.ToLower();
                 var sprite = keyValuePair.Value;
-
+                
                 myOriginalSprites[key] = sprite;
                 myOriginalSpritesByLowercaseShortKey[normalizedKey] = sprite;
                 myNormalizedToActualSpriteNames[normalizedKey] = key;

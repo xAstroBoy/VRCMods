@@ -268,6 +268,7 @@ Given that this mod is still work in progress, these are subject to change.
  * One-handed calibration - pressing one trigger will be enough to calibrate. Holding the trigger slightly pressed will freeze the avatar (if enabled).
  * Don't freeze head/hands inside walls - prevents your hands/head from freezing if your head gets inside a wall.
  * Hand angles/offsets (found in VRChat Settings menu -> left blue panel -> More IKTweaks -> Adjust hand angles/offsets) - you can configure how avatar hands are positioned relative to controllers. Defaults were tuned for Index controllers, but should be applicable to most other controllers too.
+ * Elbow/knee/chest bend goal offset - controls how far bend goal targets will be away from the actual joint. Lower values should produce better precision with bent joint, higher values - better stability with straight joint. Sensible range of values is between 0 and 1.
 
 ### Partial source code
 This mod includes parts of FinalIK, which is a paid Unity Store asset, therefore source code for those is not provided.  
@@ -360,6 +361,7 @@ Custom UI styles (both user-provided and world-provided) are planned for UI 2.5 
  * Create a new folder in `UserData/StyletorStyles`, i.e. `UserData/StyletorStyles/my-cool-style`
  * In that folder, create a file named `info.json`, i.e. `UserData/StyletorStyles/my-cool-style/info.json`. This JSON file contains some info about your skin, such as name. See [this class](Styletor/Jsons/StyleMetadata.cs) for a description of its format.
  * If you want to override style properties, create a file named `overrides.vrcss`. This file uses the same format as styles in the default skin. No, the format is not documented anywhere, just follow the example of default style.
+ * If you want to override style properties after all previous overrides from your style were applied, create a file named `overrides-secondpass.vrcss`. It uses the same format as `overrides.vrcss`
  * If you want to override images/sprites, place them in same files (and paths) as the default example skin.
  * You can additionally specify certain sprite properties using an extra JSON file named same as image file with added `.json` extensions, i.e. `background.png.json`. The format for this JSON is described in [this file](Styletor/Jsons/SpriteJson.cs)
  * If you want to make an user-friendly distribution of your style, you can add all contents of your style folder to a ZIP file (so that info.json is in ZIP file root) and distribute that.
@@ -367,17 +369,19 @@ Custom UI styles (both user-provided and world-provided) are planned for UI 2.5 
  * If you want your style to support user-provided colors, you can use special color placeholders. A list of them can be found in [this file](Styletor/Styles/ColorizerManager.cs) (look for `ReplacePlaceholders`)
  * You can look at example styles in [this folder](Styletor/BundledStyles)
 
+#### Custom stylesheet instructions
+Styletor provides a few custom stylesheet instructions to make certain tasks easier:
+ * `!!styletor-copy SelectorA !! SelectorB` will copy a style for `SelectorA` into `SelectorB`. This can both create new style for `SelectorB` or overwrite an existing one.
+ * `!!styletor-new` can be used, alone on a line, before a selector block to mark it as a new style. This suppresses "overrides nothing" warnings.
+ * `!!styletor-new-block-start` and `!!styletor-new-block-end` (alone on a line) can be used to mark start and end of a block wn which all styles are considered `!!styletor-new`
+
 #### Integration for other mods
  * Other (GPL-compatible) mods can provide custom styles via [an API](Styletor/API/StyletorApi.cs)
  * Alternatively, mods can have embedded resources with names ending in `.styletor.zip` for mod-provided styles
  * For mods that modify Quick Menu, cloning default elements should be sufficient to make them styled (as long as you don't delete StyleElement component off them)
 
 #### Known limitations
- * It takes a bit of time to apply QM style after opening it for the first time. This is due to VRChat only initializing styles when the menu is opened for the first time, and the mod having to do a bit of work on top of that.
  * Main menu is not currently recolored. It doesn't use the style system, although I'm looking into applying styles to it too before UI 2.0 update (which would make this menu styleable too).
- * Action menu is not currently recolored. I'll likely add this recoloring as a feature eventually.
- * UI Expansion Kit is not currently recolored. I'm planning to move it to UI style system eventually.
- * New selectors (the "what to apply this style to" part of stylesheet) can't be added currently. Not that it would be useful, but this will likely be supported too, eventually.
  * If you add new properties to a style, changing to another style without those properties will leave them applied to elements.
    * This is why the "Default style fixes" mix-in exists - it adds some properties over the default style to make reverting to it work properly
    * In general, if your skin has issues with reverting to default VRC style, you should also ship a similar "fixes" mix-in style to add missing properties to the default style.
@@ -423,8 +427,7 @@ The DLL uses Rust with `glam` vector math library.
 This mod provides additional UI panels for use by other mods, and a unified mod settings UI.  
 Some settings (currently boolean ones) can be pinned to quick menu for faster access.  
 Refer to [API](UIExpansionKit/API) for mod integration.  
-MirrorResolutionUnlimiter has an [example](MirrorResolutionUnlimiter/MirrorResolutionUnlimiterMod.cs) of soft dependency on this mod  
-EmojiPageButtons has an [example](EmojiPageButtons/EmojiPageButtonsMod.cs) for delaying button creation until your mod is done
+MirrorResolutionUnlimiter has an [example](MirrorResolutionUnlimiter/MirrorResolutionUnlimiterMod.cs) of soft dependency on this mod
  
 This mod uses [Google Noto](https://www.google.com/get/noto/) font, licensed under [SIL Open Font License 1.1](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).  
 

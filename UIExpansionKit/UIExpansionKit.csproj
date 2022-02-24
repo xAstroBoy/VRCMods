@@ -1,12 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <VrcReferences>true</VrcReferences>
         <LangVersion>latest</LangVersion>
-        <AssemblyVersion>0.4.1.0</AssemblyVersion>
-		<TargetFramework>net48</TargetFramework>	
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
-        <EmbeddedResource Include="modui.assetbundle" />
+        <EmbeddedResource Include="Resources\modui.assetbundle" />
+        <EmbeddedResource Include="Resources\uix-style-main.vrcss" />
+        <EmbeddedResource Include="Resources\UixBase.styletor.zip" />
     </ItemGroup>
 </Project>

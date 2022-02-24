@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using UIExpansionKit.API;
+using UIExpansionKit.API.Controls;
 using UIExpansionKit.Components;
 using UnityEngine;
 using UnityEngine.UI;
@@ -704,9 +705,8 @@ namespace FavCat.Modules
                 if (!go.activeSelf && !currentHiddenLists.Contains(gatherList.ListName))
                     continue; //it's already hidden by game itself
 
-                Text buttonText = null;
                 customShowHideMenu.AddSimpleButton($"{(currentHiddenLists.Contains(gatherList.ListName) ? "Show" : "Hide")} {gatherList.ListName}",
-                    () =>
+                    self =>
                     {
                         go.SetActive(!go.activeSelf);
                         if (go.activeSelf)
@@ -716,8 +716,8 @@ namespace FavCat.Modules
 
                         Favorites.SetStoredOrder(currentData.Order, currentHiddenLists.ToList());
 
-                        buttonText!.text = $"{(currentHiddenLists.Contains(gatherList.ListName) ? "Show" : "Hide")} {gatherList.ListName}";
-                    }, btn => buttonText = btn.GetComponentInChildren<Text>());
+                        self.SetText($"{(currentHiddenLists.Contains(gatherList.ListName) ? "Show" : "Hide")} {gatherList.ListName}");
+                    });
             }
 
             customShowHideMenu.AddSimpleButton("Close", customShowHideMenu.Hide);

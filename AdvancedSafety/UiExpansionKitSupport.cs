@@ -1,11 +1,10 @@
-using MelonLoader;
 using System;
 using System.Collections;
+using MelonLoader;
 using UIExpansionKit;
 using UIExpansionKit.API;
 using UnhollowerRuntimeLib;
 using UnityEngine;
-using UnityEngine.UI;
 using VRC.DataModel;
 using VRC.UI;
 using VRC.UI.Elements.Menus;
@@ -14,18 +13,24 @@ namespace AdvancedSafety
 {
     public static class UiExpansionKitSupport
     {
-        private static Text ourBigMenuHideText;
-        private static Text ourQuickMenuHideText;
         private static PageUserInfo ourUserInfoPage;
 
         private static SelectedUserMenuQM ourSelectedUserQm;
 
+        private static Action<string> ourHideAuthorTextSink;
+        private static Action<string> ourHideAvatarTextSink;
+
         public static void OnApplicationStart()
         {
             ClassInjector.RegisterTypeInIl2Cpp<QuickMenuHideAvatarButtonHandler>();
+            
+            var hideAuthorButton = ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserDetailsMenu).AddSimpleButton("Hide all avatars by this author", OnHideBigClick);
+            var hideAvatarButton = ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserQuickMenu).AddSimpleButton("Hide this avatar (on anyone)", OnHideAvatarClick);
 
-            ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserDetailsMenu).AddSimpleButton("Hide all avatars by this author", OnHideBigClick, ConsumeHideBigInstance);
-            ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UserQuickMenu).AddSimpleButton("Hide this avatar (on anyone)", OnHideAvatarClick, ConsumeOnHideAvatar);
+            ourHideAuthorTextSink = s => hideAuthorButton.Text = s;
+            ourHideAvatarTextSink = s => hideAvatarButton.Text = s;
+            
+            hideAvatarButton.OnInstanceCreated += obj => obj.AddComponent<QuickMenuHideAvatarButtonHandler>();
 
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.SettingsMenu).AddSimpleButton("Reload all avatars", () => ScanningReflectionCache.ReloadAllAvatars(false));
 
@@ -50,16 +55,10 @@ namespace AdvancedSafety
                 AvatarHiding.ourBlockedAvatars.Remove(apiAvatar.id);
             else
                 AvatarHiding.ourBlockedAvatars[apiAvatar.id] = apiAvatar.name;
-
+            
             AvatarHiding.SaveBlockedAvatars();
-
+            
             ScanningReflectionCache.ReloadAllAvatars(true);
-        }
-
-        private static void ConsumeOnHideAvatar(GameObject obj)
-        {
-            ourQuickMenuHideText = obj.GetComponentInChildren<Text>();
-            obj.AddComponent<QuickMenuHideAvatarButtonHandler>();
         }
 
         private static void OnHideBigClick()
@@ -67,7 +66,7 @@ namespace AdvancedSafety
             var apiUser = ourUserInfoPage?.field_Private_APIUser_0;
             var userId = apiUser?.id;
             if (userId == null) return;
-
+            
             if (AvatarHiding.ourBlockedAvatarAuthors.ContainsKey(userId))
                 AvatarHiding.ourBlockedAvatarAuthors.Remove(userId);
             else
@@ -76,7 +75,7 @@ namespace AdvancedSafety
             AvatarHiding.SaveBlockedAuthors();
 
             OnPageShown(ourUserInfoPage);
-
+            
             ScanningReflectionCache.ReloadAllAvatars(true);
         }
 
@@ -101,19 +100,20 @@ namespace AdvancedSafety
         {
             yield return new WaitForSeconds(.5f);
 
-            ourBigMenuHideText.text = AvatarHiding.ourBlockedAvatarAuthors.ContainsKey(pageUserInfo.field_Private_APIUser_0?.id ?? "") ? "Unhide all avatars by this author" : "Hide all avatars by this author";
+            ourHideAuthorTextSink(
+                AvatarHiding.ourBlockedAvatarAuthors.ContainsKey(pageUserInfo.field_Private_APIUser_0?.id ?? "")
+                    ? "Unhide all avatars by this author"
+                    : "Hide all avatars by this author");
         }
-
-        private static void ConsumeHideBigInstance(GameObject obj) => ourBigMenuHideText = obj.GetComponentInChildren<Text>();
 
         public static void QuickMenuUpdateTick(VRCPlayer player)
         {
             var currentAvatar = player.prop_VRCAvatarManager_0?.field_Private_ApiAvatar_0;
             if (currentAvatar == null) return;
 
-            ourQuickMenuHideText.text = AvatarHiding.ourBlockedAvatars.ContainsKey(currentAvatar.id)
+            ourHideAvatarTextSink(AvatarHiding.ourBlockedAvatars.ContainsKey(currentAvatar.id)
                 ? "Unhide this avatar (on anyone)"
-                : "Hide this avatar (on anyone)";
+                : "Hide this avatar (on anyone)");
         }
     }
 }
