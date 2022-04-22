@@ -9,7 +9,7 @@
     <AssemblyVersion>1.1.12.0</AssemblyVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <ClearOutputDirectory>False</ClearOutputDirectory>
-    <VRChatFolder>D:\Steam Library\steamapps\common\VRChat</VRChatFolder>
+    <VRChatFolder>D:\SteamLibrary\steamapps\common\VRChat</VRChatFolder>
     <MelonManaged>$(VRChatFolder)\MelonLoader\Managed</MelonManaged>
     <MelonLoader>$(VRChatFolder)\MelonLoader</MelonLoader>
   </PropertyGroup>

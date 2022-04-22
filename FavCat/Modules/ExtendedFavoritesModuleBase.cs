@@ -15,6 +15,8 @@ using UIExpansionKit.Components;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
+// WTF VRChat
+using ButtonReaction = MonoBehaviourPublicIEventSystemHandlerIPointerEnterHandlerIPointerClickHandlerIPointerExitHandlerAuSiAuUISpAuGaSpSpUnique;
 
 namespace FavCat.Modules
 {

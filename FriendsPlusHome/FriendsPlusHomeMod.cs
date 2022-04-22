@@ -25,6 +25,28 @@ namespace FriendsPlusHome
 
         private static MelonPreferences_Entry<string> StartupName;
         private static MelonPreferences_Entry<string> ButtonName;
+        private static readonly Func<VRCUiManager> ourGetUiManager;
+
+        static FriendsPlusHomeMod()
+        {
+            ourGetUiManager = (Func<VRCUiManager>)Delegate.CreateDelegate(typeof(Func<VRCUiManager>), typeof(VRCUiManager)
+                .GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .First(it => it.PropertyType == typeof(VRCUiManager)).GetMethod);
+        }
+
+        internal static VRCUiManager GetUiManager() => ourGetUiManager();
+
+        private static void DoAfterUiManagerInit(Action code)
+        {
+            MelonCoroutines.Start(OnUiManagerInitCoro(code));
+        }
+
+        private static IEnumerator OnUiManagerInitCoro(Action code)
+        {
+            while (GetUiManager() == null)
+                yield return null;
+            code();
+        }
 
         public override void OnApplicationStart()
         {
@@ -49,6 +71,7 @@ namespace FriendsPlusHome
 
             DoAfterUiManagerInit(OnUiManagerInit);
         }
+
 
         private void OnUiManagerInit()
         {

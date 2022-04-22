@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,7 @@ using UIExpansionKit.Components;
 using UnhollowerBaseLib.Attributes;
 using UnityEngine;
 using ViewPointTweaker;
+using Object = UnityEngine.Object;
 
 [assembly:MelonInfo(typeof(ViewPointTweakerMod), "View Point Tweaker", "1.0.6", "knah", "https://github.com/knah/VRCMods")]
 [assembly:MelonGame("VRChat", "VRChat")]
@@ -31,7 +33,29 @@ namespace ViewPointTweaker
         private static Transform ourCameraTransform;
         
         private bool myHighPrecisionMoves;
-        
+        private static readonly Func<VRCUiManager> ourGetUiManager;
+
+        static ViewPointTweakerMod()
+        {
+            ourGetUiManager = (Func<VRCUiManager>)Delegate.CreateDelegate(typeof(Func<VRCUiManager>), typeof(VRCUiManager)
+                .GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .First(it => it.PropertyType == typeof(VRCUiManager)).GetMethod);
+        }
+
+        internal static VRCUiManager GetUiManager() => ourGetUiManager();
+
+        private static void DoAfterUiManagerInit(Action code)
+        {
+            MelonCoroutines.Start(OnUiManagerInitCoro(code));
+        }
+
+        private static IEnumerator OnUiManagerInitCoro(Action code)
+        {
+            while (GetUiManager() == null)
+                yield return null;
+            code();
+        }
+
         public override void OnApplicationStart()
         {
             ExpansionKitApi.GetExpandedMenu(ExpandedMenu.UiElementsQuickMenu).AddSimpleButton("Tweak view point", ShowViewpointMenu);
