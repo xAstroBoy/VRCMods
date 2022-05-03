@@ -1,12 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <VrcReferences>true</VrcReferences>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
     <ClearOutputDirectory>False</ClearOutputDirectory>
     <AssemblyVersion>1.1.13.0</AssemblyVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <ClearOutputDirectory>False</ClearOutputDirectory>
+    <VRChatFolder>D:\SteamLibrary\steamapps\common\VRChat</VRChatFolder>
+    <MelonManaged>$(VRChatFolder)\MelonLoader\Managed</MelonManaged>
+    <MelonLoader>$(VRChatFolder)\MelonLoader</MelonLoader>
     <UsesNativePatches>true</UsesNativePatches>
   </PropertyGroup>
   <ItemGroup>
@@ -36,7 +41,8 @@
       <InputAssemblies Include="$(OutputPath)/System.Runtime.CompilerServices.Unsafe.dll" />
 
       <IlRepackLibs Include="$(OutputPath)" />
-      <IlRepackLibs Include="$(MsBuildThisFileDirectory)/../Libs" />
+      <IlRepackLibs Include="$(MelonManaged)" />
+      <IlRepackLibs Include="$(MelonLoader)" />
     </ItemGroup>
     <Message Text="MERGING: @(InputAssemblies->'%(Filename)') into $(OutputAssembly)" Importance="High" />
     <ILRepack Internalize="true" LibraryPath="@(IlRepackLibs)" OutputFile="$(OutputPath)/$(AssemblyName)-merged.dll" InputAssemblies="@(InputAssemblies)" />

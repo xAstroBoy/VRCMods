@@ -1,4 +1,4 @@
-Read the [Malicious Mods and you](https://github.com/knah/VRCMods/blob/master/Malicious-Mods.md) doc!
+Read the [Malicious Mods and you](https://github.com/xAstroBoy/VRCMods-Unchained/blob/master/Malicious-Mods.md) doc!
 
 Changes:
  * New mod: ScaleGoesBrr. See README for more info.

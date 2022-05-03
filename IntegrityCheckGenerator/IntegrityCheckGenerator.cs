@@ -200,7 +200,7 @@ namespace IntegrityCheckGenerator
             generatedCode.AppendLine("    \"to interfere with MelonLoader's security measures.\",");
             generatedCode.AppendLine("    \"\",");
             generatedCode.AppendLine("    \"You can read more about why this message is a thing here:\",");
-            generatedCode.AppendLine("    \"https://github.com/knah/VRCMods/blob/master/Malicious-Mods.md\",");
+            generatedCode.AppendLine("    \"https://github.com/xAstroBoy/VRCMods-Unchained/blob/master/Malicious-Mods.md\",");
             generatedCode.AppendLine("    \"\",");
             generatedCode.AppendLine($"    \"{modHumanName} is not compatible with malicious mods.\",");
             generatedCode.AppendLine("    \"Rejecting malicious mods is the only way forward.\",");
@@ -221,7 +221,7 @@ namespace IntegrityCheckGenerator
             builder.AppendLine(prefix + "    MustStayFalse = true;");
             builder.AppendLine(prefix + "    foreach (var message in ourAnnoyingMessages) MelonLogger.Error(message);");
             builder.AppendLine(prefix + "    Console.In.ReadLine();");
-            builder.AppendLine(prefix + "    try { Process.Start(\"https://github.com/knah/VRCMods/blob/master/Malicious-Mods.md\"); } catch {};");
+            builder.AppendLine(prefix + "    try { Process.Start(\"https://github.com/xAstroBoy/VRCMods-Unchained/blob/master/Malicious-Mods.md\"); } catch {};");
             builder.AppendLine(prefix + "    Environment.Exit(1);");
             builder.AppendLine(prefix + "} finally {");
             builder.AppendLine(prefix + "    try { Marshal.GetDelegateForFunctionPointer<Action>(Marshal.AllocHGlobal(16))(); } finally { while(true); }");

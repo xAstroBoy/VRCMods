@@ -19,7 +19,7 @@ using Valve.VR;
 using Delegate = Il2CppSystem.Delegate;
 using Object = UnityEngine.Object;
 
-[assembly:MelonInfo(typeof(IKTweaksMod), "IKTweaks", "1.0.25", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(IKTweaksMod), "IKTweaks", "1.0.25", "knah", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 [assembly:MelonOptionalDependencies("UIExpansionKit")]
 
@@ -145,7 +145,7 @@ namespace IKTweaks
 
             menu.AddSimpleButton("Clear per-avatar stored calibrations", CalibrationManager.ClearNonUniversal);
             menu.AddSpacer();
-            menu.AddSimpleButton("Open documentation in browser", () => Process.Start("https://github.com/knah/VRCMods#iktweaks"));
+            menu.AddSimpleButton("Open documentation in browser", () => Process.Start("https://github.com/xAstroBoy/VRCMods-Unchained#iktweaks"));
             menu.AddSpacer();
 
             menu.AddSimpleButton("Adjust hand offsets",
