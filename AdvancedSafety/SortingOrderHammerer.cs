@@ -7,7 +7,7 @@ namespace AdvancedSafety
     public class SortingOrderHammerer : MonoBehaviour
     {
         private Renderer[] myRenderersToHammer;
-
+        
         public SortingOrderHammerer(IntPtr ptr) : base(ptr)
         {
         }
@@ -21,8 +21,8 @@ namespace AdvancedSafety
         {
             for (var i = 0; i < myRenderersToHammer.Length; i++)
             {
-                if (ReferenceEquals(myRenderersToHammer[i], null)) continue;
-
+                if(myRenderersToHammer[i] is null) continue;
+                
                 try
                 {
                     myRenderersToHammer[i].sortingOrder = 0;

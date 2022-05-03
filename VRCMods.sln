@@ -44,6 +44,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Turbones", "Turbones\Turbon
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Styletor", "Styletor\Styletor.csproj", "{27F7A678-72DD-4BEA-B5FA-4589299FE595}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScaleGoesBrr", "ScaleGoesBrr\ScaleGoesBrr.csproj", "{6E79F8CC-0513-43DB-974F-983867F9CBBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -110,6 +112,10 @@ Global
 		{27F7A678-72DD-4BEA-B5FA-4589299FE595}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27F7A678-72DD-4BEA-B5FA-4589299FE595}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27F7A678-72DD-4BEA-B5FA-4589299FE595}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E79F8CC-0513-43DB-974F-983867F9CBBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E79F8CC-0513-43DB-974F-983867F9CBBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E79F8CC-0513-43DB-974F-983867F9CBBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E79F8CC-0513-43DB-974F-983867F9CBBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

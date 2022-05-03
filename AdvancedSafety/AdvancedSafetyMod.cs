@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using AdvancedSafety;
+using AdvancedSafety.BundleVerifier;
 using MelonLoader;
 using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
@@ -18,14 +19,13 @@ using VRC.Management;
 using Object = UnityEngine.Object;
 
 [assembly:MelonGame("VRChat", "VRChat")]
-[assembly:MelonInfo(typeof(AdvancedSafetyMod), "Advanced Safety", "1.5.15", "knah, Requi, Ben", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(AdvancedSafetyMod), "Advanced Safety", "1.6.0", "knah, Requi, Ben", "https://github.com/knah/VRCMods")]
 [assembly:MelonOptionalDependencies("UIExpansionKit")]
 
 namespace AdvancedSafety
 {
     internal partial class AdvancedSafetyMod : MelonMod
     {
-        private static List<object> ourPinnedDelegates = new List<object>();
         internal static bool CanReadAudioMixers = true;
         internal static bool CanReadBadFloats = true;
 
@@ -62,27 +62,27 @@ namespace AdvancedSafety
             AdvancedSafetySettings.RegisterSettings();
             ClassInjector.RegisterTypeInIl2Cpp<SortingOrderHammerer>();
 
+            try
+            {
+                BundleVerifierMod.OnApplicationStart(HarmonyInstance);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Error initializing Bundle Verifier: {ex}");
+            }
+
             var matchingMethods = typeof(AssetManagement)
                 .GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly).Where(it =>
                     it.Name.StartsWith("Method_Public_Static_Object_Object_Vector3_Quaternion_Boolean_Boolean_Boolean_") && it.GetParameters().Length == 6).ToList();
 
             foreach (var matchingMethod in matchingMethods)
             {
-                unsafe
-                {
-                    var originalMethodPointer = *(IntPtr*) (IntPtr) UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(matchingMethod).GetValue(null);
+                ObjectInstantiateDelegate originalInstantiateDelegate = null;
 
-                    ObjectInstantiateDelegate originalInstantiateDelegate = null;
+                ObjectInstantiateDelegate replacement = (assetPtr, pos, rot, allowCustomShaders, isUI, validate, nativeMethodPointer) =>
+                    ObjectInstantiatePatch(assetPtr, pos, rot, allowCustomShaders, isUI, validate, nativeMethodPointer, originalInstantiateDelegate);
 
-                    ObjectInstantiateDelegate replacement = (assetPtr, pos, rot, allowCustomShaders, isUI, validate, nativeMethodPointer) =>
-                        ObjectInstantiatePatch(assetPtr, pos, rot, allowCustomShaders, isUI, validate, nativeMethodPointer, originalInstantiateDelegate);
-
-                    ourPinnedDelegates.Add(replacement);
-
-                    MelonUtils.NativeHookAttach((IntPtr) (&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(replacement));
-
-                    originalInstantiateDelegate = Marshal.GetDelegateForFunctionPointer<ObjectInstantiateDelegate>(originalMethodPointer);
-                }
+                NativePatchUtils.NativePatch(matchingMethod, out originalInstantiateDelegate, replacement);
             }
             
             foreach (var nestedType in typeof(VRCAvatarManager).GetNestedTypes())
@@ -114,10 +114,8 @@ namespace AdvancedSafety
                     }
                     
                     var patchDelegate = new VoidDelegate(TaskMoveNextPatch);
-                    ourPinnedDelegates.Add(patchDelegate);
                     
-                    MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), Marshal.GetFunctionPointerForDelegate(patchDelegate));
-                    originalDelegate = Marshal.GetDelegateForFunctionPointer<VoidDelegate>(originalMethodPointer);
+                    NativePatchUtils.NativePatch(originalMethodPointer, out originalDelegate, patchDelegate);
                 }
             }
 
@@ -151,6 +149,11 @@ namespace AdvancedSafety
             {
                 typeof(UiExpansionKitSupport).GetMethod(nameof(UiExpansionKitSupport.OnApplicationStart), BindingFlags.Static | BindingFlags.Public)!.Invoke(null, new object[0]);
             }
+        }
+
+        public override void OnApplicationQuit()
+        {
+            BundleVerifierMod.OnApplicationQuit();
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

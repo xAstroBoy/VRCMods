@@ -1,5 +1,3 @@
-using HarmonyLib;
-using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using HarmonyLib;
+using MelonLoader;
 using UnhollowerBaseLib;
 using UnhollowerBaseLib.Attributes;
 using VRC;
@@ -18,10 +18,10 @@ namespace AdvancedSafety
     {
         private const string BlockedAvatarsMakersFilePath = "UserData\\blocked_avatar_authors.txt";
         private const string BlockedAvatarsFilePath = "UserData\\blocked_avatars.txt";
-
+        
         internal static readonly Dictionary<string, string> ourBlockedAvatarAuthors = new Dictionary<string, string>();
         internal static readonly Dictionary<string, string> ourBlockedAvatars = new Dictionary<string, string>();
-
+        
         public static void OnApplicationStart(HarmonyLib.Harmony harmony)
         {
             if (File.Exists(BlockedAvatarsMakersFilePath))
@@ -29,34 +29,25 @@ namespace AdvancedSafety
                 ourBlockedAvatarAuthors.Clear();
                 foreach (var it in File.ReadAllLines(BlockedAvatarsMakersFilePath, Encoding.UTF8))
                 {
-                    var split = it.Split(new[] { '͏', ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                    var split = it.Split(new[] {'͏', ' '}, 2, StringSplitOptions.RemoveEmptyEntries);
                     if (split.Length == 2)
                         ourBlockedAvatarAuthors[split[0].Trim()] = split[1];
                 }
             }
-
+            
             if (File.Exists(BlockedAvatarsFilePath))
             {
                 ourBlockedAvatars.Clear();
                 foreach (var it in File.ReadAllLines(BlockedAvatarsFilePath, Encoding.UTF8))
                 {
-                    var split = it.Split(new[] { '͏', ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                    var split = it.Split(new[] {'͏', ' '}, 2, StringSplitOptions.RemoveEmptyEntries);
                     if (split.Length == 2)
                         ourBlockedAvatars[split[0].Trim()] = split[1];
                 }
             }
 
-            unsafe
-            {
-                var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils
-                    .GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(VRCAvatarManager).GetMethod(
-                        nameof(VRCAvatarManager.Method_Public_UniTask_1_Boolean_ApiAvatar_Single_0)))
-                    .GetValue(null);
-
-                MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), typeof(AvatarHiding).GetMethod(nameof(SwitchAvatarPatch), BindingFlags.Static | BindingFlags.NonPublic)!.MethodHandle.GetFunctionPointer());
-
-                ourSwitchAvatar = Marshal.GetDelegateForFunctionPointer<SwitchAvatarDelegate>(originalMethodPointer);
-            }
+            NativePatchUtils.NativePatch(typeof(VRCAvatarManager).GetMethod(
+                nameof(VRCAvatarManager.Method_Public_UniTask_1_Boolean_ApiAvatar_Single_0))!, out ourSwitchAvatar, SwitchAvatarPatch);
 
             foreach (var methodInfo in typeof(FeaturePermissionManager).GetMethods()
                 .Where(it =>
@@ -72,7 +63,7 @@ namespace AdvancedSafety
         private delegate IntPtr SwitchAvatarDelegate(IntPtr hiddenValueTypeReturn, IntPtr thisPtr, IntPtr apiAvatarPtr, float someFloat, IntPtr nativeMethodInfo);
 
         private static SwitchAvatarDelegate ourSwitchAvatar;
-
+        
         private static IntPtr SwitchAvatarPatch(IntPtr hiddenStructReturn, IntPtr thisPtr, IntPtr apiAvatarPtr, float someFloat, IntPtr nativeMethodInfo)
         {
             using (new SwitchAvatarCookie(new VRCAvatarManager(thisPtr), apiAvatarPtr == IntPtr.Zero ? null : new ApiAvatar(apiAvatarPtr)))
@@ -85,7 +76,7 @@ namespace AdvancedSafety
             {
                 if (!SwitchAvatarCookie.ourInSwitch || SwitchAvatarCookie.ourApiAvatar == null)
                     return;
-
+                
                 var apiAvatar = SwitchAvatarCookie.ourApiAvatar;
                 var avatarManager = SwitchAvatarCookie.ourAvatarManager;
 
@@ -127,14 +118,14 @@ namespace AdvancedSafety
             internal static bool ourInSwitch;
             internal static VRCAvatarManager ourAvatarManager;
             internal static ApiAvatar ourApiAvatar;
-
+            
             public SwitchAvatarCookie(VRCAvatarManager avatarManager, ApiAvatar apiAvatar)
             {
                 ourAvatarManager = avatarManager;
                 ourApiAvatar = apiAvatar;
                 ourInSwitch = true;
             }
-
+            
             public void Dispose()
             {
                 ourApiAvatar = null;
@@ -143,11 +134,12 @@ namespace AdvancedSafety
             }
         }
 
+
         public static void SaveBlockedAuthors()
         {
             File.WriteAllLines(BlockedAvatarsMakersFilePath, ourBlockedAvatarAuthors.Select(it => $"{it.Key} ͏{it.Value}"), Encoding.UTF8);
         }
-
+        
         public static void SaveBlockedAvatars()
         {
             File.WriteAllLines(BlockedAvatarsFilePath, ourBlockedAvatars.Select(it => $"{it.Key} ͏{it.Value}"), Encoding.UTF8);
