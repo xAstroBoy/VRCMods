@@ -6,7 +6,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
     <ClearOutputDirectory>False</ClearOutputDirectory>
-    <AssemblyVersion>1.1.13.0</AssemblyVersion>
+    <AssemblyVersion>1.1.15.0</AssemblyVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <ClearOutputDirectory>False</ClearOutputDirectory>
     <VRChatFolder>D:\SteamLibrary\steamapps\common\VRChat</VRChatFolder>
