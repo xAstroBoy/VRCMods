@@ -20,7 +20,7 @@ using VRCSDK2;
 using Object = UnityEngine.Object;
 using QuickMenuNew = VRC.UI.Elements.QuickMenu;
 
-[assembly:MelonInfo(typeof(UiExpansionKitMod), "UI Expansion Kit", "1.0.1", "knah", "https://github.com/xAstroBoy/VRCMods-Unchained")]
+[assembly:MelonInfo(typeof(UiExpansionKitMod), "UI Expansion Kit", "1.0.2", "knah", "https://github.com/knah/VRCMods")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace UIExpansionKit
@@ -39,29 +39,7 @@ namespace UIExpansionKit
         private GameObject myInputKeypadPopup;
         internal Transform myCameraExpandoRoot;
         internal Transform myQmExpandosRoot;
-        private static readonly Func<VRCUiManager> ourGetUiManager;
-
-        static UiExpansionKitMod()
-        {
-            ourGetUiManager = (Func<VRCUiManager>)Delegate.CreateDelegate(typeof(Func<VRCUiManager>), typeof(VRCUiManager)
-                .GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                .First(it => it.PropertyType == typeof(VRCUiManager)).GetMethod);
-        }
-
-        internal static VRCUiManager GetUiManager() => ourGetUiManager();
-
-        private static void DoAfterUiManagerInit(Action code)
-        {
-            MelonCoroutines.Start(OnUiManagerInitCoro(code));
-        }
-
-        private static IEnumerator OnUiManagerInitCoro(Action code)
-        {
-            while (GetUiManager() == null)
-                yield return null;
-            code();
-        }
-
+        
         private static readonly List<(ExpandedMenu, string, bool isFullMenu)> GameObjectToCategoryList = new List<(ExpandedMenu, string, bool)>
         {
             (ExpandedMenu.AvatarMenu, "UserInterface/MenuContent/Screens/Avatar", true),
@@ -138,6 +116,8 @@ namespace UIExpansionKit
             while (GetQuickMenu() == null)
                 yield return null;
 
+            if (!CheckWasSuccessful) yield break;
+            
             IsInDesktop = !XRDevice.isPresent || Environment.CommandLine.Contains("--no-vr");
             
             {
@@ -230,6 +210,7 @@ namespace UIExpansionKit
             mainMenuBackground.AddComponent<StyleEngineUpdateDriver>().StyleEngine = StylingHelper.StyleEngine;
 
             DecorateFullMenu();
+            CheckA();
             DecorateMenuPages();
             DecorateCamera();
         }
@@ -242,7 +223,7 @@ namespace UIExpansionKit
             var quickMenuRoot = GetQuickMenu().transform.Find("Container").gameObject;
             
             var fullMenuExpandoPrefab = myStuffBundle.BigMenuExpando;
-            var fullMenuRoot = GetUiManager().field_Public_GameObject_0;
+            var fullMenuRoot = UnityUtils.FindInactiveObjectInActiveRoot("UserInterface/MenuContent");
 
             var qmExpandosRootGo = new GameObject("UIX QM Expandos Root", new []{Il2CppType.Of<RectTransform>()});
             myQmExpandosRoot = qmExpandosRootGo.transform;
@@ -497,7 +478,9 @@ namespace UIExpansionKit
 
         private void DecorateFullMenu()
         {
-            var fullMenuRoot = GetUiManager().field_Public_GameObject_0;
+            var fullMenuRoot = UnityUtils.FindInactiveObjectInActiveRoot("UserInterface/MenuContent");
+            CheckC();
+
             var settingsExpandoPrefab = myStuffBundle.SettingsMenuExpando;
             myModSettingsExpando = Object.Instantiate(settingsExpandoPrefab, fullMenuRoot.transform, false);
             myModSettingsExpandoTransform = myModSettingsExpando.transform;

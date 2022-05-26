@@ -33,6 +33,8 @@ namespace ScaleGoesBrr
         public float amSingle3;
         public float amSingle4;
         public float amSingle5;
+        public float amSingle6;
+        public float amSingle7;
         
         public Vector3 tmSV0;
         public Vector3 tmSV1;
@@ -74,7 +76,16 @@ namespace ScaleGoesBrr
         private void LateUpdate()
         {
             if (!ActuallyDoThings) return;
-            
+
+            var fixPsCenterBias = ScaleGoesBrrMod.FixPlayspaceCenterBias.Value;
+            Vector3 originalPsToAvOffset = default;
+            Vector3 originalAvPosition = default;
+            if (fixPsCenterBias)
+            {
+                source.get_position_Injected(out originalAvPosition);
+                targetPs.InverseTransformPoint_Injected(ref originalAvPosition, out originalPsToAvOffset);
+            }
+
             source.get_localScale_Injected(out var sourceScale);
             var scaleFactor = sourceScale.y / originalSourceScale.y;
             DoScale(scaleFactor, originalTargetPsScale, targetPs);
@@ -97,6 +108,8 @@ namespace ScaleGoesBrr
             avatarManager.field_Private_Single_3 = amSingle3 * scaleFactor;
             avatarManager.field_Private_Single_4 = amSingle4 * scaleFactor;
             avatarManager.field_Private_Single_5 = amSingle5 * scaleFactor;
+            avatarManager.field_Private_Single_6 = amSingle6 * scaleFactor;
+            avatarManager.field_Private_Single_7 = amSingle7 * scaleFactor;
 
             if (!tmReady) return;
             
@@ -111,6 +124,19 @@ namespace ScaleGoesBrr
                 ScaleGoesBrrMod.UpdateCameraOffsetForScale(vpOffset);
                 vrik.footDistance = originalStep * scaleFactor;
                 ScaleGoesBrrMod.FireScaleChange(source, scaleFactor);
+            }
+
+            if (fixPsCenterBias)
+            {
+                targetPs.TransformPoint_Injected(ref originalPsToAvOffset, out var newAvPosition);
+                targetPs.get_position_Injected(out var originalPsPosition);
+                var newPsPosition = new Vector3
+                {
+                    x = originalAvPosition.x - newAvPosition.x + originalPsPosition.x,
+                    y = originalPsPosition.y,
+                    z = originalAvPosition.z - newAvPosition.z + originalPsPosition.z,
+                };
+                targetPs.position = newPsPosition;
             }
             
             ScaleGoesBrrMod.FixAvatarRootFlyingOff(RootFix);

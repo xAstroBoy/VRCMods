@@ -19,7 +19,7 @@ using Valve.VR;
 using Delegate = Il2CppSystem.Delegate;
 using Object = UnityEngine.Object;
 
-[assembly:MelonInfo(typeof(IKTweaksMod), "IKTweaks", "1.0.25", "knah", "https://github.com/xAstroBoy/VRCMods-Unchained")]
+[assembly:MelonInfo(typeof(IKTweaksMod), "IKTweaks", "1.0.26", "knah", "https://github.com/knah/VRCMods")]
 [assembly:MelonGame("VRChat", "VRChat")]
 [assembly:MelonOptionalDependencies("UIExpansionKit")]
 
@@ -145,7 +145,7 @@ namespace IKTweaks
 
             menu.AddSimpleButton("Clear per-avatar stored calibrations", CalibrationManager.ClearNonUniversal);
             menu.AddSpacer();
-            menu.AddSimpleButton("Open documentation in browser", () => Process.Start("https://github.com/xAstroBoy/VRCMods-Unchained#iktweaks"));
+            menu.AddSimpleButton("Open documentation in browser", () => Process.Start("https://github.com/knah/VRCMods#iktweaks"));
             menu.AddSpacer();
 
             menu.AddSimpleButton("Adjust hand offsets",
@@ -289,9 +289,8 @@ namespace IKTweaks
             // only one of them is the correct type, so just try all of them 
             steamVrControllerManager.field_Private_Action_0.TryCast<SteamVR_Events.Action<VREvent_t>>()?.action?.Invoke(new VREvent_t());
             steamVrControllerManager.field_Private_Action_1.TryCast<SteamVR_Events.Action<VREvent_t>>()?.action?.Invoke(new VREvent_t());
-            steamVrControllerManager.field_Private_Action_2.TryCast<SteamVR_Events.Action<VREvent_t>>()?.action?.Invoke(new VREvent_t());
 
-            myAfkIcon = GameObject.Find("UserInterface/UnscaledUI/HudContent/Hud/AFK").transform.Find("Icon").gameObject;
+            myAfkIcon = GameObject.Find("UserInterface/UnscaledUI/HudContent_Old/Hud/AFK").transform.Find("Icon").gameObject;
         }
 
         public static bool IsAfk { get; private set; }
