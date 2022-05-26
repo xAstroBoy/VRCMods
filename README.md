@@ -84,13 +84,13 @@ An all-in-one local favorites mod. Unlimited favorite lists with unlimited favor
 * Unlimited lists (categories) for favorites, each of unlimited size
 * Lag-free even with large lists
 * Freely changeable list height
-* ~~Avatar,~~ world, and player favorites supported
+* Avatar, world, and player favorites supported
 * Modifiable list order and multiple list sorting options
 * Fully searchable database of everything you have ever seen
 * Changeable database location (**it's recommended to store the database in a directory backed up to cloud storage, such as Dropbox or OneDrive**, see below for setup)
 * Local image cache for even better performance
-* ~~Categorize your own private avatars~~
-* ~~Import avatar favorites from other local favorite mods (read below)~~
+* Categorize your own private avatars
+* Import avatar favorites from other local favorite mods (read below)
 * Exchange search database with friends (read below)
 * Hide default lists that you never use  
 * Many more small things
