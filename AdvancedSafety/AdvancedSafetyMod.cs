@@ -19,7 +19,7 @@ using VRC.Management;
 using Object = UnityEngine.Object;
 
 [assembly:MelonGame("VRChat", "VRChat")]
-[assembly:MelonInfo(typeof(AdvancedSafetyMod), "Advanced Safety", "1.6.1", "knah, Requi, Ben", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(AdvancedSafetyMod), "Advanced Safety", "1.6.1", "knah, Requi, Ben", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonOptionalDependencies("UIExpansionKit")]
 
 namespace AdvancedSafety
@@ -31,10 +31,31 @@ namespace AdvancedSafety
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void VoidDelegate(IntPtr thisPtr, IntPtr nativeMethodInfo);
+        private static readonly Func<VRCUiManager> ourGetUiManager;
+
+        static AdvancedSafetyMod()
+        {
+            ourGetUiManager = (Func<VRCUiManager>)Delegate.CreateDelegate(typeof(Func<VRCUiManager>), typeof(VRCUiManager)
+                .GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .First(it => it.PropertyType == typeof(VRCUiManager)).GetMethod);
+        }
+
+        internal static VRCUiManager GetUiManager() => ourGetUiManager();
+
+        private static void DoAfterUiManagerInit(Action code)
+        {
+            MelonCoroutines.Start(OnUiManagerInitCoro(code));
+        }
+
+        private static IEnumerator OnUiManagerInitCoro(Action code)
+        {
+            while (GetUiManager() == null)
+                yield return null;
+            code();
+        }
 
         public override void OnApplicationStart()
         {
-            if (!CheckWasSuccessful || !MustStayTrue || MustStayFalse) return;
             
             AdvancedSafetySettings.RegisterSettings();
             ClassInjector.RegisterTypeInIl2Cpp<SortingOrderHammerer>();

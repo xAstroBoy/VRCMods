@@ -16,7 +16,7 @@ using VRC.Core;
 using VRC.Management;
 using Object = UnityEngine.Object;
 
-[assembly:MelonInfo(typeof(JoinNotifierMod), "JoinNotifier", "1.0.7", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(JoinNotifierMod), "JoinNotifier", "1.0.7", "knah", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace JoinNotifier
@@ -35,21 +35,42 @@ namespace JoinNotifier
         private AudioSource myLeaveSource;
         private Text myJoinText;
         private Text myLeaveText;
-        
+
         private int myLastLevelLoad;
         private bool myObservedLocalPlayerJoin;
-        
+
         private AssetBundle myAssetBundle;
         private Sprite myJoinSprite;
         private AudioClip myJoinClip;
         private AudioClip myLeaveClip;
 
         private AudioMixerGroup myUIGroup;
+        private static readonly Func<VRCUiManager> ourGetUiManager;
+
+        static JoinNotifierMod()
+        {
+            ourGetUiManager = (Func<VRCUiManager>)Delegate.CreateDelegate(typeof(Func<VRCUiManager>), typeof(VRCUiManager)
+                .GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .First(it => it.PropertyType == typeof(VRCUiManager)).GetMethod);
+        }
+
+        internal static VRCUiManager GetUiManager() => ourGetUiManager();
+
+        private static void DoAfterUiManagerInit(Action code)
+        {
+            MelonCoroutines.Start(OnUiManagerInitCoro(code));
+        }
+
+        private static IEnumerator OnUiManagerInitCoro(Action code)
+        {
+            while (GetUiManager() == null)
+                yield return null;
+            code();
+        }
 
         public override void OnApplicationStart()
         {
-            if (!CheckWasSuccessful || !MustStayTrue || MustStayFalse) return;
-            
+
             JoinNotifierSettings.RegisterSettings();
 
             MelonCoroutines.Start(InitThings());
@@ -58,7 +79,7 @@ namespace JoinNotifier
         public IEnumerator InitThings()
         {
             MelonDebug.Msg("Waiting for init");
-            
+
             while (ReferenceEquals(NetworkManager.field_Internal_Static_NetworkManager_0, null)) yield return null;
             while (ReferenceEquals(VRCAudioManager.field_Private_Static_VRCAudioManager_0, null)) yield return null;
             while (ReferenceEquals(GetUiManager(), null)) yield return null;
@@ -72,18 +93,18 @@ namespace JoinNotifier
             }.Single(it => it.name == "UI");
 
             MelonDebug.Msg("Start init");
-            
+
             NetworkManagerHooks.Initialize();
 
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("JoinNotifier.joinnotifier.assetbundle"))
-            using (var tempStream = new MemoryStream((int) stream.Length))
+            using (var tempStream = new MemoryStream((int)stream.Length))
             {
                 stream.CopyTo(tempStream);
-                
+
                 myAssetBundle = AssetBundle.LoadFromMemory_Internal(tempStream.ToArray(), 0);
                 myAssetBundle.hideFlags |= HideFlags.DontUnloadUnusedAsset;
             }
-            
+
             myJoinSprite = myAssetBundle.LoadAsset_Internal("Assets/JoinNotifier/JoinIcon.png", Il2CppType.Of<Sprite>()).Cast<Sprite>();
             myJoinSprite.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 
@@ -94,34 +115,34 @@ namespace JoinNotifier
                 uwr.SendWebRequest();
 
                 while (!uwr.isDone) yield return null;
-                
+
                 myJoinClip = WebRequestWWW.InternalCreateAudioClipUsingDH(uwr.downloadHandler, uwr.url, false, false, AudioType.UNKNOWN);
             }
-            
+
             if (myJoinClip == null)
                 myJoinClip = myAssetBundle.LoadAsset_Internal("Assets/JoinNotifier/Chime.ogg", Il2CppType.Of<AudioClip>()).Cast<AudioClip>();
-            
+
             myJoinClip.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 
             if (File.Exists(CustomLeaveSoundFileName))
             {
                 MelonLogger.Msg("Loading custom leave sound");
-                
+
                 var uwr = UnityWebRequest.Get($"file://{Path.Combine(Environment.CurrentDirectory, CustomLeaveSoundFileName)}");
                 uwr.SendWebRequest();
 
                 while (!uwr.isDone) yield return null;
-                
+
                 myLeaveClip = WebRequestWWW.InternalCreateAudioClipUsingDH(uwr.downloadHandler, uwr.url, false, false, AudioType.UNKNOWN);
             }
-            
+
             if (myLeaveClip == null)
                 myLeaveClip = myAssetBundle.LoadAsset_Internal("Assets/JoinNotifier/DoorClose.ogg", Il2CppType.Of<AudioClip>()).Cast<AudioClip>();
-            
+
             myLeaveClip.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 
             CreateGameObjects();
-            
+
             NetworkManagerHooks.OnJoin += OnPlayerJoined;
             NetworkManagerHooks.OnLeave += OnPlayerLeft;
 
@@ -219,25 +240,25 @@ namespace JoinNotifier
                 MelonLogger.Msg("Not creating gameobjects - no hud root");
                 return;
             }
-            
+
             MelonDebug.Msg("Creating gameobjects");
-//            var pathToThing = "UserInterface/UnscaledUI/HudContent_Old/Hud/NotificationDotParent/NotificationDot";
+            //            var pathToThing = "UserInterface/UnscaledUI/HudContent_Old/Hud/NotificationDotParent/NotificationDot";
             myJoinImage = CreateNotifierImage("join", 0f, JoinNotifierSettings.GetJoinIconColor());
             myJoinSource = CreateAudioSource(myJoinClip, myJoinImage.gameObject);
             myJoinText = CreateTextNear(myJoinImage, 110f, TextAnchor.LowerRight);
-            
+
             myLeaveImage = CreateNotifierImage("leave", 100f, JoinNotifierSettings.GetLeaveIconColor());
             myLeaveSource = CreateAudioSource(myLeaveClip, myLeaveImage.gameObject);
             myLeaveText = CreateTextNear(myLeaveImage, 110f, TextAnchor.LowerLeft);
         }
 
-        partial void OnSceneWasLoaded2(int buildIndex, string sceneName)
+
+        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
-            base.OnSceneWasLoaded(buildIndex, sceneName);
-            
             myLastLevelLoad = Environment.TickCount;
             myObservedLocalPlayerJoin = false;
         }
+    
 
         public void OnPlayerJoined(Player player)
         {

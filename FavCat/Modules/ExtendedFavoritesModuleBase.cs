@@ -39,7 +39,6 @@ namespace FavCat.Modules
         private UISoundCollection mySoundCollection;
         private static ScrollRect? _AvatarPageScrollRect;
         protected internal abstract void RefreshFavButtons();
-
         protected abstract void OnFavButtonClicked(StoredCategory storedCategory);
         private static ScrollRect? AvatarPageScrollRect
         {

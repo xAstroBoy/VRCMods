@@ -75,7 +75,7 @@ Requires UI Expansion Kit - new buttons are added to Camera expando (collapsed b
 * [Move the camera lens to not be instrusively in the middle of the camera screen](https://feedback.vrchat.com/feature-requests/p/move-the-camera-lens-to-not-be-instrusively-in-the-middle-of-the-camera-screen)
 
 ## EmojiPageButtons
-This mod is deprecated with the new Quick Menu (UI 1.5).  Last revision containing its code can be found [here](https://github.com/knah/VRCMods/tree/c1c21edbb0ce13ef4c12b5ffefe0d9fcc0161f77)
+This mod is deprecated with the new Quick Menu (UI 1.5).  Last revision containing its code can be found [here](https://github.com/xAstroBoy/VRCMods-Unchained/tree/c1c21edbb0ce13ef4c12b5ffefe0d9fcc0161f77)
 
 ## FavCat
 An all-in-one local favorites mod. Unlimited favorite lists with unlimited favorites in them and a searchable local database of content and players.  
@@ -144,7 +144,7 @@ I believe this step to be necessary to ensure that VRChat team sees (wholesome) 
 On top of that, recent API changes indicate that VRChat Team is taking action to restrict access to avatars. It might be an attempt at ripping prevention, or it might be aimed at privacy enhancement, or it might be aimed at extended avatar favorites. There's no way to tell for sure, and there's no knowing how far those changes would go in the future. 
 Local favorite mods have to rely on the API to some degree, and with things changing quickly, there's no reliable way to ensure that things will stay working and stay safe ban-wise in the long run.
 
-Before you read on, please [scroll up a bit](https://github.com/knah/VRCMods#canny-tickets) and **upvote all linked Canny tickets related to avatar favorites**. If you decide to comment on them, remember to **stay civil** and **avoid mentioning mods**.
+Before you read on, please [scroll up a bit](https://github.com/xAstroBoy/VRCMods-Unchained#canny-tickets) and **upvote all linked Canny tickets related to avatar favorites**. If you decide to comment on them, remember to **stay civil** and **avoid mentioning mods**.
 
 In more practical terms, this means the following:
  * Starting with this update, you will not be able to add new avatar favorites, create new avatar favorite lists, or import avatar favorite lists  
@@ -359,7 +359,7 @@ It's not recommended to scale avatar too small (below 0.1 scale) or too big as t
  * [Remeasure avatar](https://vrchat.canny.io/avatar-30/p/remeasure-avatar) (not this exact feature, but a similar one)
 
 ## SparkleBeGone
-This mod is deprecated with the new Quick Menu (UI 1.5). Last revision containing its code can be found [here](https://github.com/knah/VRCMods/tree/c1c21edbb0ce13ef4c12b5ffefe0d9fcc0161f77)
+This mod is deprecated with the new Quick Menu (UI 1.5). Last revision containing its code can be found [here](https://github.com/xAstroBoy/VRCMods-Unchained/tree/c1c21edbb0ce13ef4c12b5ffefe0d9fcc0161f77)
 
 ## Styletor
 This mod allows you to reskin your Quick Menu (and, eventually, main menu and other UI elements) using VRChat's new UI Styling system.  
@@ -471,7 +471,7 @@ These two serve to tightly integrate integrity check with mods to make automated
 
 ## Installation
 To install these mods, you will need to install [MelonLoader](https://discord.gg/2Wn3N2P) (discord link, see \#how-to-install).  
-Then, you will have to put mod .dll files from [releases](https://github.com/knah/VRCMods/releases) into the `Mods` folder of your game directory
+Then, you will have to put mod .dll files from [releases](https://github.com/xAstroBoy/VRCMods-Unchained/releases) into the `Mods` folder of your game directory
 
 ## Building
 To build these, drop required libraries (found in `<vrchat instanll dir>/MelonLoader/Managed` after melonloader installation, list found in `Directory.Build.props`) into Libs folder, then use your IDE of choice to build.
