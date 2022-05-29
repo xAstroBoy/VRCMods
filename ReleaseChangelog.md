@@ -1,14 +1,16 @@
 Read the [Malicious Mods and you](https://github.com/xAstroBoy/VRCMods-Unchained/blob/master/Malicious-Mods.md) doc!
 
 Changes:
- * All mods: updated for build 1200 of VRChat
- * Advanced Safety: integrate [FinalIKSanity](https://github.com/FenrixTheFox/FinalIKSanity) and additional IK-related fixes by @Requi
- * Advanced Safety: taught BundleVerifier to intentionally crash on additional corrupted bundle type
- * Advanced Safety: added a patch for a specific bundle corruption type that's not immediately caught by BundleVerifier
- * FavCat: minor fixes for not-strictly-correct internals
- * FavCat: fix hiding social and avatar favorite lists
- * IKTweaks: speculative fix for exceptions when resetting avatar
- * ScaleGoesBrr: add an option to scale towards avatar root instead of playspace center
- * ScaleGoesBrr: reduce console spam
+ * LagFreeScreenshot: fixed for build 1203
+ * ScaleGoesBrr: fixed issues with UI having weird scale if calibrating while scaled
+ * ScaleGoesBrr: fixed head-follow calibration failing to follow the head vertically
+ * IKTweaks: initial update for build 1203/IK 2.0
+   * Removed all calibration-related options
+   * You must use IK 2.0 for IKTweaks to work. It won't do anything for legacy IK.
+   * Most mod features now work in 3/4-point tracking too
+   * IKT spine solver now obeys lock modes. "Lock head" is same as old IKTweaks, "Lock both" is "Lock head but ignore angle limits"
+   * Added an option to disable elbow-torso avoidance
+   * Overall performance improvements
+   * Fully open-source now - no FinalIK dependency anymore!
 
 **USE IT AT YOUR OWN RISK.** Modding the client is against VRChat ToS. I am not responsible for any bans or other punishments you may get by using these mods!
