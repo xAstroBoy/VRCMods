@@ -9,7 +9,7 @@ using UIExpansionKit.API.Controls;
 using UIExpansionKit.Components;
 using UnityEngine;
 
-[assembly:MelonInfo(typeof(IKTweaksMod), "IKTweaks", "2.0.0", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(IKTweaksMod), "IKTweaks", "2.0.0", "knah", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 [assembly:MelonOptionalDependencies("UIExpansionKit")]
 
@@ -19,8 +19,6 @@ namespace IKTweaks
     {
         public override void OnApplicationStart()
         {
-            if (!CheckWasSuccessful || !MustStayTrue || MustStayFalse) return;
-            
             IkTweaksSettings.RegisterSettings();
 
             VrIkHandling.HookVrIkInit();
@@ -41,7 +39,7 @@ namespace IKTweaks
 
             menu.AddSpacer();
             menu.AddSpacer();
-            menu.AddSimpleButton("Open documentation in browser", () => Process.Start("https://github.com/knah/VRCMods#iktweaks"));
+            menu.AddSimpleButton("Open documentation in browser", () => Process.Start("https://github.com/xAstroBoy/VRCMods-Unchained#iktweaks"));
             menu.AddSpacer();
 
             menu.AddSimpleButton("Adjust hand offsets",
