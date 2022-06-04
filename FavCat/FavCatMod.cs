@@ -11,6 +11,7 @@ using FavCat.Modules;
 using HarmonyLib;
 using MelonLoader;
 using UIExpansionKit.API;
+using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -182,14 +183,24 @@ namespace FavCat
 
         public static void DoPatch()
         {
-            NativePatchUtils.NativePatch(typeof(ApiModel).GetMethods().Single(it =>
-                    it.Name == nameof(ApiModel.SetApiFieldsFromJson) && it.GetParameters().Length == 2 && it.GetParameters()[0].ParameterType.GenericTypeArguments[1] == typeof(Il2CppSystem.Object)),
-                out ourOriginalApiPopulate, ApiSnifferStatic);
-            
-            NativePatchUtils.NativePatch(ImageDownloaderClosureType.GetMethod(nameof(ImageDownloaderClosure
-                ._DownloadImageInternal_b__0))!, out ourOriginalOnDone, ImageSnifferPatch);
-        }
+            unsafe
+            {
+                var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils
+                    .GetIl2CppMethodInfoPointerFieldForGeneratedMethod(
+                        typeof(ApiModel).GetMethods().Single(it =>
+                            it.Name == nameof(ApiModel.SetApiFieldsFromJson) && it.GetParameters().Length == 2 && it.GetParameters()[0].ParameterType.GenericTypeArguments[1] == typeof(Il2CppSystem.Object)))
+                    .GetValue(null);
+                MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), typeof(ApiSnifferPatch).GetMethod(nameof(ApiSnifferStatic))!.MethodHandle.GetFunctionPointer());
+                ourOriginalApiPopulate = Marshal.GetDelegateForFunctionPointer<ApiPopulateDelegate>(originalMethodPointer);
+            }
 
+            unsafe
+            {
+                var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(ImageDownloaderClosureType.GetMethod(nameof(ImageDownloaderClosure._DownloadImageInternal_b__0))).GetValue(null);
+                MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), typeof(ApiSnifferPatch).GetMethod(nameof(ImageSnifferPatch))!.MethodHandle.GetFunctionPointer());
+                ourOriginalOnDone = Marshal.GetDelegateForFunctionPointer<ImageDownloaderOnDoneDelegate>(originalMethodPointer);
+            }
+        }
         private static readonly object[] EmptyObjectArray = new object[0];
 
         public static void ImageSnifferPatch(IntPtr instancePtr, IntPtr asyncOperationPtr, IntPtr methodInfo)
