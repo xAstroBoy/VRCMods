@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,7 +10,6 @@ using FavCat.Modules;
 using HarmonyLib;
 using MelonLoader;
 using UIExpansionKit.API;
-using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -20,7 +18,7 @@ using VRC.UI;
 using ImageDownloaderClosure = ImageDownloader.__c__DisplayClass11_0;
 using Object = UnityEngine.Object;
 
-[assembly:MelonInfo(typeof(FavCatMod), "FavCat Unchained", "1.1.15~unchained", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
+[assembly:MelonInfo(typeof(FavCatMod), "FavCat", "1.1.16", "knah", "https://github.com/knah/VRCMods")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace FavCat
@@ -35,32 +33,11 @@ namespace FavCat
         internal PlayersModule? PlayerModule;
         
         internal static PageUserInfo PageUserInfo;
-        private static readonly Func<VRCUiManager> ourGetUiManager;
-
-        static FavCatMod()
-        {
-            ourGetUiManager = (Func<VRCUiManager>)Delegate.CreateDelegate(typeof(Func<VRCUiManager>), typeof(VRCUiManager)
-                .GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                .First(it => it.PropertyType == typeof(VRCUiManager)).GetMethod);
-        }
-
-        internal static VRCUiManager GetUiManager() => ourGetUiManager();
-
-        private static void DoAfterUiManagerInit(Action code)
-        {
-            MelonCoroutines.Start(OnUiManagerInitCoro(code));
-        }
-
-        private static IEnumerator OnUiManagerInitCoro(Action code)
-        {
-            while (GetUiManager() == null)
-                yield return null;
-            code();
-        }
-
+        
         public override void OnApplicationStart()
         {
             Instance = this;
+            if (!CheckWasSuccessful || !MustStayTrue || MustStayFalse) return;
 
             Directory.CreateDirectory("./UserData/FavCatImport");
             
@@ -164,6 +141,7 @@ namespace FavCat
         private delegate void ImageDownloaderOnDoneDelegate(IntPtr thisPtr, IntPtr asyncOperationPtr, IntPtr methodInfo);
 
         private static ApiPopulateDelegate ourOriginalApiPopulate = (_, _, _, _) => 0;
+        private static ApiPopulateDelegate ourOriginalApiPopulateTokens = (_, _, _, _) => 0;
         private static ImageDownloaderOnDoneDelegate ourOriginalOnDone = (_, _, _) => { };
 
         private static readonly Type ImageDownloaderClosureType;
@@ -183,24 +161,18 @@ namespace FavCat
 
         public static void DoPatch()
         {
-            unsafe
-            {
-                var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils
-                    .GetIl2CppMethodInfoPointerFieldForGeneratedMethod(
-                        typeof(ApiModel).GetMethods().Single(it =>
-                            it.Name == nameof(ApiModel.SetApiFieldsFromJson) && it.GetParameters().Length == 2 && it.GetParameters()[0].ParameterType.GenericTypeArguments[1] == typeof(Il2CppSystem.Object)))
-                    .GetValue(null);
-                MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), typeof(ApiSnifferPatch).GetMethod(nameof(ApiSnifferStatic))!.MethodHandle.GetFunctionPointer());
-                ourOriginalApiPopulate = Marshal.GetDelegateForFunctionPointer<ApiPopulateDelegate>(originalMethodPointer);
-            }
-
-            unsafe
-            {
-                var originalMethodPointer = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(ImageDownloaderClosureType.GetMethod(nameof(ImageDownloaderClosure._DownloadImageInternal_b__0))).GetValue(null);
-                MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPointer), typeof(ApiSnifferPatch).GetMethod(nameof(ImageSnifferPatch))!.MethodHandle.GetFunctionPointer());
-                ourOriginalOnDone = Marshal.GetDelegateForFunctionPointer<ImageDownloaderOnDoneDelegate>(originalMethodPointer);
-            }
+            NativePatchUtils.NativePatch(typeof(ApiModel).GetMethods().Single(it =>
+                    it.Name == nameof(ApiModel.SetApiFieldsFromJson) && it.GetParameters().Length == 2 && it.GetParameters()[0].ParameterType.GenericTypeArguments[1] == typeof(Il2CppSystem.Object)),
+                out ourOriginalApiPopulate, ApiSnifferStatic);
+            
+            NativePatchUtils.NativePatch(typeof(ApiModel).GetMethods().Single(it =>
+                    it.Name == nameof(ApiModel.SetApiFieldsFromJson) && it.GetParameters().Length == 2 && it.GetParameters()[0].ParameterType.GenericTypeArguments[1] != typeof(Il2CppSystem.Object)),
+                out ourOriginalApiPopulateTokens, ApiSnifferStaticTokens);
+            
+            NativePatchUtils.NativePatch(ImageDownloaderClosureType.GetMethod(nameof(ImageDownloaderClosure
+                ._DownloadImageInternal_b__0))!, out ourOriginalOnDone, ImageSnifferPatch);
         }
+
         private static readonly object[] EmptyObjectArray = new object[0];
 
         public static void ImageSnifferPatch(IntPtr instancePtr, IntPtr asyncOperationPtr, IntPtr methodInfo)
@@ -238,10 +210,26 @@ namespace FavCat
         {
             var result = ourOriginalApiPopulate(@this, dictionary, someRef, methodInfo);
 
+            ApiSnifferBody(@this);
+
+            return result;
+        }
+        
+        public static byte ApiSnifferStaticTokens(IntPtr @this, IntPtr dictionary, IntPtr someRef, IntPtr methodInfo)
+        {
+            var result = ourOriginalApiPopulateTokens(@this, dictionary, someRef, methodInfo);
+
+            ApiSnifferBody(@this);
+
+            return result;
+        }
+
+        private static void ApiSnifferBody(IntPtr @this)
+        {
             try
             {
                 var apiModel = new ApiModel(@this);
-                if (!apiModel.Populated) return result;
+                if (!apiModel.Populated) return;
 
                 var maybeUser = apiModel.TryCast<APIUser>();
                 if (maybeUser != null) FavCatMod.Database?.UpdateStoredPlayer(maybeUser);
@@ -252,8 +240,6 @@ namespace FavCat
             {
                 MelonLogger.Error($"Exception in API sniffer patch: {ex}");
             }
-
-            return result;
         }
     }
 }

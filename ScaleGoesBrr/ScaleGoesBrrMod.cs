@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Linq;
-using System.Reflection;
 using HarmonyLib;
 using MelonLoader;
 using RootMotion.FinalIK;
@@ -10,7 +8,7 @@ using UnhollowerRuntimeLib;
 using UnityEngine;
 using VRC.SDKBase;
 
-[assembly:MelonInfo(typeof(ScaleGoesBrrMod), "Scale Goes Brr", "1.1.2", "knah", "https://github.com/xAstroBoy/VRCMods-Unchained")]
+[assembly:MelonInfo(typeof(ScaleGoesBrrMod), "Scale Goes Brr", "1.1.3", "knah", "https://github.com/knah/VRCMods")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace ScaleGoesBrr
@@ -20,33 +18,13 @@ namespace ScaleGoesBrr
         private static MelonPreferences_Entry<bool> ourIsEnabled;
         private static MelonPreferences_Entry<bool> ourFixFlyOff;
         internal static MelonPreferences_Entry<bool> FixPlayspaceCenterBias;
+        internal static MelonPreferences_Entry<bool> DoShoulderScaling;
 
         private static VRCVrCameraSteam ourSteamCamera;
         private static Transform ourCameraTransform;
 
         public static event Action<Transform, float> OnAvatarScaleChanged;
-        private static readonly Func<VRCUiManager> ourGetUiManager;
 
-        static ScaleGoesBrrMod()
-        {
-            ourGetUiManager = (Func<VRCUiManager>)Delegate.CreateDelegate(typeof(Func<VRCUiManager>), typeof(VRCUiManager)
-                .GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                .First(it => it.PropertyType == typeof(VRCUiManager)).GetMethod);
-        }
-
-        internal static VRCUiManager GetUiManager() => ourGetUiManager();
-
-        private static void DoAfterUiManagerInit(Action code)
-        {
-            MelonCoroutines.Start(OnUiManagerInitCoro(code));
-        }
-
-        private static IEnumerator OnUiManagerInitCoro(Action code)
-        {
-            while (GetUiManager() == null)
-                yield return null;
-            code();
-        }
         internal static void FireScaleChange(Transform avatarRoot, float newScale)
         {
             OnAvatarScaleChanged?.Invoke(avatarRoot, newScale);
@@ -60,6 +38,7 @@ namespace ScaleGoesBrr
             ourIsEnabled = category.CreateEntry("Enabled", true, "Enable avatar scaling support");
             FixPlayspaceCenterBias = category.CreateEntry("FixPlayspaceCenterBias", true, "Scale towards avatar root (not playspace center)");
             ourFixFlyOff = category.CreateEntry("FixFlyOff", true, "Fix avatar root flying off");
+            DoShoulderScaling = category.CreateEntry("DoShoulderScaling", true, "Scale avatar shoulders (with elbow trackers)");
         
             HarmonyInstance.Patch(typeof(VRCPlayer).GetMethod(nameof(VRCPlayer.Start)),
                 postfix: new HarmonyMethod(typeof(ScaleGoesBrrMod), nameof(PlayerStartPatch)));
@@ -153,8 +132,14 @@ namespace ScaleGoesBrr
             comp.targetUi = uiRoot.transform;
             comp.targetUiInverted = unscaledUi;
 
-            comp.vrik = go.GetComponent<VRIK>().solver.locomotion;
-            comp.originalStep = comp.vrik.footDistance;
+            var ikSolverVR = go.GetComponent<VRIK>().solver;
+            comp.locomotion = ikSolverVR.locomotion;
+            comp.originalStep = comp.locomotion.footDistance;
+
+            comp.targetLeftArm = ikSolverVR.leftArm;
+            comp.targetRightArm = ikSolverVR.rightArm;
+            comp.leftArmOriginalShoulder = ikSolverVR.leftArm.vrcShoulderHeightAboveChest;
+            comp.rightArmOriginalShoulder = ikSolverVR.rightArm.vrcShoulderHeightAboveChest;
 
             comp.ActuallyDoThings = true;
 
