@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Linq;
+using System.Reflection;
 using HarmonyLib;
 using MelonLoader;
 using RootMotion.FinalIK;
@@ -8,7 +10,7 @@ using UnhollowerRuntimeLib;
 using UnityEngine;
 using VRC.SDKBase;
 
-[assembly:MelonInfo(typeof(ScaleGoesBrrMod), "Scale Goes Brr", "1.1.3", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(ScaleGoesBrrMod), "Scale Goes Brr", "1.1.3", "knah", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace ScaleGoesBrr
@@ -22,6 +24,7 @@ namespace ScaleGoesBrr
 
         private static VRCVrCameraSteam ourSteamCamera;
         private static Transform ourCameraTransform;
+        private static readonly Func<VRCUiManager> ourGetUiManager;
 
         public static event Action<Transform, float> OnAvatarScaleChanged;
 
@@ -29,7 +32,26 @@ namespace ScaleGoesBrr
         {
             OnAvatarScaleChanged?.Invoke(avatarRoot, newScale);
         }
+        static ScaleGoesBrrMod()
+        {
+            ourGetUiManager = (Func<VRCUiManager>)Delegate.CreateDelegate(typeof(Func<VRCUiManager>), typeof(VRCUiManager)
+                .GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .First(it => it.PropertyType == typeof(VRCUiManager)).GetMethod);
+        }
 
+        internal static VRCUiManager GetUiManager() => ourGetUiManager();
+
+        private static void DoAfterUiManagerInit(Action code)
+        {
+            MelonCoroutines.Start(OnUiManagerInitCoro(code));
+        }
+
+        private static IEnumerator OnUiManagerInitCoro(Action code)
+        {
+            while (GetUiManager() == null)
+                yield return null;
+            code();
+        }
         public override void OnApplicationStart()
         {
             ClassInjector.RegisterTypeInIl2Cpp<ScaleGoesBrrComponent>();

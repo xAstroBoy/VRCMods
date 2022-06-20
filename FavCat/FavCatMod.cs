@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +19,7 @@ using VRC.UI;
 using ImageDownloaderClosure = ImageDownloader.__c__DisplayClass11_0;
 using Object = UnityEngine.Object;
 
-[assembly:MelonInfo(typeof(FavCatMod), "FavCat", "1.1.16", "knah", "https://github.com/knah/VRCMods")]
+[assembly:MelonInfo(typeof(FavCatMod), "FavCat Unchained", "1.1.16~unchained", "knah & xAstroBoy", "https://github.com/xAstroBoy/VRCMods-Unchained")]
 [assembly:MelonGame("VRChat", "VRChat")]
 
 namespace FavCat
@@ -33,11 +34,31 @@ namespace FavCat
         internal PlayersModule? PlayerModule;
         
         internal static PageUserInfo PageUserInfo;
-        
+        private static readonly Func<VRCUiManager> ourGetUiManager;
+
+        static FavCatMod()
+        {
+            ourGetUiManager = (Func<VRCUiManager>)Delegate.CreateDelegate(typeof(Func<VRCUiManager>), typeof(VRCUiManager)
+                .GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .First(it => it.PropertyType == typeof(VRCUiManager)).GetMethod);
+        }
+
+        internal static VRCUiManager GetUiManager() => ourGetUiManager();
+
+        private static void DoAfterUiManagerInit(Action code)
+        {
+            MelonCoroutines.Start(OnUiManagerInitCoro(code));
+        }
+
+        private static IEnumerator OnUiManagerInitCoro(Action code)
+        {
+            while (GetUiManager() == null)
+                yield return null;
+            code();
+        }
         public override void OnApplicationStart()
         {
             Instance = this;
-            if (!CheckWasSuccessful || !MustStayTrue || MustStayFalse) return;
 
             Directory.CreateDirectory("./UserData/FavCatImport");
             
